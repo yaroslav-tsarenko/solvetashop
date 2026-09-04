@@ -8,7 +8,7 @@ import { useCurrency } from "@/providers/CurrencyProvider";
 import { formatPrice } from "@/lib/utils/format-price";
 import { format } from "date-fns";
 import type { OrderDetail } from "@/types/order";
-import { accountClasses as styles } from "@/app/[locale]/account/account-classes";
+import { accountClasses as styles } from "@/app/(shop)/account/account-classes";
 
 const statusColors: Record<string, "default" | "accent" | "success" | "warning" | "danger"> = {
   PENDING: "warning",

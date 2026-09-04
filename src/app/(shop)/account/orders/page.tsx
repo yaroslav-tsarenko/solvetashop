@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { formatPrice } from "@/lib/utils/format-price";
 import { format } from "date-fns";
 import { Package } from "lucide-react";
-import { accountClasses as styles } from "@/app/[locale]/account/account-classes";
+import { accountClasses as styles } from "@/app/(shop)/account/account-classes";
 
 interface Order {
   id: string;

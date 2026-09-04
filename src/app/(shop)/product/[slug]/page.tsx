@@ -11,7 +11,7 @@ import { productClasses as styles } from "./product-classes";
 export const revalidate = 60;
 
 interface ProductPageProps {
-  params: Promise<{ slug: string; locale: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 async function getCategoryChain(categoryId: string): Promise<{ name: string; slug: string }[]> {
@@ -100,7 +100,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       availability: product.quantity > 0
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
-      url: `${siteUrl}/en/product/${product.slug}`,
+      url: `${siteUrl}/product/${product.slug}`,
     },
     ...(reviewCount > 0 && {
       aggregateRating: {

@@ -1,7 +1,9 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { useRouter, usePathname, routing, LOCALE_LABELS, type Locale } from "@/i18n/routing";
+import { useRouter } from "next/navigation";
+import { routing, LOCALE_LABELS, type Locale } from "@/i18n/routing";
+import { setStoredLocale } from "@/components/layout/LocaleSync";
 import { Check, Globe } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -11,15 +13,15 @@ const triggerCls =
 /**
  * Language menu.
  *
- * It swaps the locale segment of the *current* path rather than sending anyone
- * home, so switching language on a product page keeps you on that product. The
- * trigger shows the current code beside the globe, because a bare globe makes
- * people open the menu just to find out what they are already reading.
+ * The locale is no longer in the URL, so switching writes the preference
+ * (cookie + localStorage) and refreshes in place — you stay on the exact same
+ * page, now re-rendered in the chosen language. The trigger shows the current
+ * code beside the globe, because a bare globe makes people open the menu just
+ * to find out what they are already reading.
  */
 export function LanguageSwitcher() {
   const locale = useLocale() as Locale;
   const router = useRouter();
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -44,7 +46,8 @@ export function LanguageSwitcher() {
   function switchTo(next: Locale) {
     setOpen(false);
     if (next === locale) return;
-    router.replace(pathname, { locale: next });
+    setStoredLocale(next);
+    router.refresh();
   }
 
   return (

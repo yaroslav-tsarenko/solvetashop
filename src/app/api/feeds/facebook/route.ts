@@ -22,7 +22,7 @@ export async function GET() {
       product.quantity > 0 ? "in stock" : "out of stock",
       product.condition,
       `${Number(product.price).toFixed(2)} GBP`,
-      `${siteUrl}/en/product/${product.slug}`,
+      `${siteUrl}/product/${product.slug}`,
       product.images[0]?.url || "",
       product.brand || "",
       product.gtin || "",

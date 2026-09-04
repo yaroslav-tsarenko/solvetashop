@@ -15,7 +15,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (!loading && !user) {
-      window.location.href = "/en/auth/login";
+      window.location.href = "/auth/login";
     }
   }, [loading, user]);
 

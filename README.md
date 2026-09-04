@@ -168,3 +168,4 @@ Set the required environment variables in your Vercel project settings before de
 ## License
 
 MIT
+# solvetashop

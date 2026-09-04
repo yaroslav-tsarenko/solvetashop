@@ -31,7 +31,7 @@ export default function LoginPage() {
       if (data.user?.role === "ADMIN" || data.user?.role === "SUPER_ADMIN") {
         window.location.href = "/admin";
       } else {
-        window.location.href = "/en/account";
+        window.location.href = "/account";
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");

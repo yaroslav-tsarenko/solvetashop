@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 export const revalidate = 60;
 
 interface CategoryPageProps {
-  params: Promise<{ category: string; locale: string }>;
+  params: Promise<{ category: string }>;
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {

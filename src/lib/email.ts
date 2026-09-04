@@ -1,24 +1,37 @@
-import { Resend } from "resend";
+import nodemailer, { type Transporter } from "nodemailer";
 import { COMPANY, COMPANY_ADDRESS } from "@/lib/company";
 
-let resend: Resend | null = null;
+let transporter: Transporter | null = null;
 
-function getResend(): Resend | null {
-  if (!process.env.RESEND_API_KEY) return null;
-  if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
-  return resend;
+function getTransporter(): Transporter | null {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!host || !user || !pass) return null;
+
+  if (!transporter) {
+    const port = Number(process.env.SMTP_PORT) || 587;
+    transporter = nodemailer.createTransport({
+      host,
+      port,
+      // 465 is implicit TLS; 587 upgrades in-band via STARTTLS.
+      secure: port === 465,
+      auth: { user, pass },
+    });
+  }
+  return transporter;
 }
 
 function getFrom(): string {
   return (
-    process.env.RESEND_FROM_EMAIL ||
-    process.env.RESEND_FROM ||
-    "Solvetashop <noreply@solvetashop.com>"
+    process.env.SMTP_FROM ||
+    process.env.SMTP_USER ||
+    "Solvetashop <info@solvetashop.com>"
   );
 }
 
 function getReplyTo(): string | undefined {
-  return process.env.RESEND_REPLY_TO || undefined;
+  return process.env.SMTP_REPLY_TO || process.env.SMTP_USER || undefined;
 }
 
 function getSiteUrl(): string {
@@ -39,26 +52,22 @@ interface SendArgs {
 }
 
 async function send({ to, subject, html, replyTo }: SendArgs): Promise<boolean> {
-  const r = getResend();
-  if (!r) {
-    console.log(`[Email] Skipped (Resend not configured) → ${subject} to ${to}`);
+  const t = getTransporter();
+  if (!t) {
+    console.log(`[Email] Skipped (SMTP not configured) → ${subject} to ${to}`);
     return false;
   }
   try {
-    const { error } = await r.emails.send({
+    await t.sendMail({
       from: getFrom(),
       to,
       subject,
       html,
       replyTo: replyTo ?? getReplyTo(),
     });
-    if (error) {
-      console.error(`[Email] Send failed → ${subject} to ${to}:`, error);
-      return false;
-    }
     return true;
   } catch (err) {
-    console.error(`[Email] Exception → ${subject} to ${to}:`, err);
+    console.error(`[Email] Send failed → ${subject} to ${to}:`, err);
     return false;
   }
 }
@@ -91,9 +100,9 @@ function emailWrapper(content: string, options: { preheader?: string } = {}): st
       <p style="margin:0 0 4px;">&copy; ${new Date().getFullYear()} Solvetashop. All rights reserved.</p>
       <p style="margin:0;">${COMPANY.legalName} &middot; ${COMPANY.country} &middot; <a href="${getSiteUrl()}" style="color:${BRAND_COLOR};text-decoration:none;">solvetashop.com</a></p>
       <p style="margin:8px 0 0;">
-        <a href="${getSiteUrl()}/en/policies/privacy" style="color:#999;text-decoration:underline;margin:0 6px;">Privacy</a>
-        <a href="${getSiteUrl()}/en/policies/terms" style="color:#999;text-decoration:underline;margin:0 6px;">Terms</a>
-        <a href="${getSiteUrl()}/en/contact" style="color:#999;text-decoration:underline;margin:0 6px;">Contact</a>
+        <a href="${getSiteUrl()}/policies/privacy" style="color:#999;text-decoration:underline;margin:0 6px;">Privacy</a>
+        <a href="${getSiteUrl()}/policies/terms" style="color:#999;text-decoration:underline;margin:0 6px;">Terms</a>
+        <a href="${getSiteUrl()}/contact" style="color:#999;text-decoration:underline;margin:0 6px;">Contact</a>
       </p>
     </div>
   </div>
@@ -145,7 +154,7 @@ export async function sendWelcomeEmail(email: string, name?: string | null): Pro
           <li>Get free shipping on orders over &euro;100</li>
         </ul>
       </div>
-      ${button(`${siteUrl}/en/catalog`, "Start Shopping")}
+      ${button(`${siteUrl}/catalog`, "Start Shopping")}
       <p style="color:#999;font-size:13px;margin:24px 0 0;text-align:center;">
         Standard 2-year EU warranty on all products
       </p>
@@ -331,7 +340,7 @@ export async function sendOrderConfirmationEmail(data: OrderEmailData): Promise<
       ${itemsTable(data.items)}
       ${totalsBlock(data)}
 
-      ${button(`${siteUrl}/en/account/orders/${data.orderId}`, "View Your Order")}
+      ${button(`${siteUrl}/account/orders/${data.orderId}`, "View Your Order")}
 
       <p style="color:#999;font-size:13px;margin:24px 0 0;text-align:center;">
         You&rsquo;ll receive a shipping confirmation when your order is on its way.
@@ -452,7 +461,7 @@ export async function sendOrderShippedEmail(data: OrderEmailData): Promise<boole
         We&rsquo;ll send another email when your order is delivered.
       </p>
 
-      ${button(`${siteUrl}/en/account/orders/${data.orderId}`, "Track Your Order")}
+      ${button(`${siteUrl}/account/orders/${data.orderId}`, "Track Your Order")}
     `,
       { preheader: `Order #${id} shipped${tracking ? ` — ${tracking}` : ""}` },
     ),
@@ -476,7 +485,7 @@ export async function sendOrderStatusEmail(
       iconColor: "#2E7D32",
       message: "Your order has been delivered. We hope you love it! If anything's wrong, just reply to this email.",
       cta: "Leave a review",
-      ctaHref: `${siteUrl}/en/account/orders/${data.orderId}`,
+      ctaHref: `${siteUrl}/account/orders/${data.orderId}`,
     },
     CANCELLED: {
       subject: `Order #${id} cancelled`,
@@ -486,7 +495,7 @@ export async function sendOrderStatusEmail(
       iconColor: "#C62828",
       message: "This order has been cancelled. If you were charged, a refund will be processed back to your original payment method within 5–10 business days.",
       cta: "Continue shopping",
-      ctaHref: `${siteUrl}/en/catalog`,
+      ctaHref: `${siteUrl}/catalog`,
     },
     REFUNDED: {
       subject: `Order #${id} refunded`,
@@ -496,7 +505,7 @@ export async function sendOrderStatusEmail(
       iconColor: "#1565C0",
       message: `Your refund of <strong>${formatEur(toNum(data.total))}</strong> has been issued to your original payment method. It may take 5–10 business days to appear on your statement.`,
       cta: "View order",
-      ctaHref: `${siteUrl}/en/account/orders/${data.orderId}`,
+      ctaHref: `${siteUrl}/account/orders/${data.orderId}`,
     },
   } as const;
 
@@ -568,7 +577,7 @@ interface ContactSubmission {
 
 // Internal notification to support inbox
 export async function sendContactFormEmail(submission: ContactSubmission): Promise<boolean> {
-  const supportInbox = getReplyTo() || process.env.RESEND_FROM_EMAIL || process.env.RESEND_FROM;
+  const supportInbox = getReplyTo() || process.env.SMTP_FROM || process.env.SMTP_USER;
   if (!supportInbox) {
     console.log("[Email] Contact form notification skipped (no inbox configured)");
     return false;
@@ -615,7 +624,7 @@ export async function sendContactAutoReplyEmail(submission: ContactSubmission): 
         <p style="margin:0;font-size:14px;color:${MUTED_COLOR};line-height:1.6;white-space:pre-wrap;">${escape(submission.message)}</p>
       </div>
       <p style="color:#999;font-size:13px;margin:16px 0 0;">
-        In the meantime, you can check our <a href="${getSiteUrl()}/en/faq" style="color:${BRAND_COLOR};">FAQ</a> or browse our <a href="${getSiteUrl()}/en/catalog" style="color:${BRAND_COLOR};">catalog</a>.
+        In the meantime, you can check our <a href="${getSiteUrl()}/faq" style="color:${BRAND_COLOR};">FAQ</a> or browse our <a href="${getSiteUrl()}/catalog" style="color:${BRAND_COLOR};">catalog</a>.
       </p>
     `,
       { preheader: "Thanks for your message — we'll reply within 24 hours." },

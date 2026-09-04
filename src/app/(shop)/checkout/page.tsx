@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/routing";
-import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
 import { Button } from "@/components/ui/Button";
@@ -112,8 +111,7 @@ export default function CheckoutPage() {
   const t = useTranslations("checkout");
   const nav = useTranslations("nav");
   const router = useRouter();
-  const params = useParams();
-  const locale = params.locale as string;
+  const locale = useLocale();
   const { cart, clearCart } = useCart();
   const { user } = useAuth();
   const { currency, convert } = useCurrency();

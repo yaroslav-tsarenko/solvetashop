@@ -1,31 +1,22 @@
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { routing, type Locale } from "@/i18n/routing";
+import { getLocale, getMessages } from "next-intl/server";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { CartProvider } from "@/providers/CartProvider";
 import { CurrencyProvider } from "@/providers/CurrencyProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
+import { LocaleSync } from "@/components/layout/LocaleSync";
+import type { Locale } from "@/i18n/routing";
 import { Header } from "@/components/layout/Header/Header";
 import { Footer } from "@/components/layout/Footer/Footer";
 
-interface LocaleLayoutProps {
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
-}
-
-export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
-  const { locale } = await params;
-
-  if (!routing.locales.includes(locale as Locale)) {
-    notFound();
-  }
-
+export default async function ShopLayout({ children }: { children: React.ReactNode }) {
+  const locale = (await getLocale()) as Locale;
   const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <LocaleSync locale={locale} />
       <ThemeProvider>
         <AuthProvider>
           <CurrencyProvider>
