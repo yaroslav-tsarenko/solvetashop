@@ -1,0 +1,13 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ssApple" x1="0" y1="0" x2="180" y2="180" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#26618F"/>
+      <stop offset="1" stop-color="#123047"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" rx="40" fill="url(#ssApple)"/>
+  <rect x="45" y="74" width="90" height="68" rx="14" fill="none" stroke="#FFFFFF" stroke-width="12"/>
+  <path d="M69 78V62a21 21 0 0 1 42 0v16" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round"/>
+  <circle cx="131" cy="52" r="19" fill="#D2AC6D" fill-opacity="0.22"/>
+  <circle cx="131" cy="52" r="11" fill="#D2AC6D"/>
+</svg>
