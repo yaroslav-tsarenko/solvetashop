@@ -16,6 +16,8 @@ export const COMPANY = {
   director: "Vladimirs PUHINS",
   phone: "+44 7446 940486",
   phoneHref: "tel:+447446940486",
+  phone2: "+44 7481 359087",
+  phone2Href: "tel:+447481359087",
   email: "info@solvetashop.com",
 } as const;
 
