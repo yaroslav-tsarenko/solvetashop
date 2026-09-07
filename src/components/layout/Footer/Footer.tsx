@@ -47,10 +47,6 @@ export function Footer() {
               <br />
               Director: {COMPANY.director}
               <br />
-              <a href={COMPANY.phoneHref} className="transition-colors hover:text-[var(--color-accent)]">
-                {COMPANY.phone}
-              </a>
-              <br />
               <a href={COMPANY.phone2Href} className="transition-colors hover:text-[var(--color-accent)]">
                 {COMPANY.phone2}
               </a>
