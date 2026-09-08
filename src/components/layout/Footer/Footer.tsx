@@ -45,8 +45,6 @@ export function Footer() {
               <br />
               {COMPANY_ADDRESS}
               <br />
-              Director: {COMPANY.director}
-              <br />
               <a href={COMPANY.phone2Href} className="transition-colors hover:text-[var(--color-accent)]">
                 {COMPANY.phone2}
               </a>

@@ -52,8 +52,6 @@ export function ContactBlock() {
         <br />
         Registered office: {COMPANY_ADDRESS}
         <br />
-        Director: {COMPANY.director}
-        <br />
         Phone: {COMPANY.phone}
         <br />
         Email: {COMPANY.email}

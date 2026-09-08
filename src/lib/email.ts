@@ -393,8 +393,7 @@ export async function sendOrderInvoiceEmail(data: OrderEmailData): Promise<boole
             <p style="margin:0;font-size:13px;color:${TEXT_COLOR};line-height:1.55;">
               <strong>${COMPANY.legalName}</strong><br />
               Company number: ${COMPANY.companyNumber}<br />
-              ${COMPANY_ADDRESS}<br />
-              Director: ${COMPANY.director}
+              ${COMPANY_ADDRESS}
             </p>
           </td>
           <td style="width:50%;vertical-align:top;padding-left:12px;">

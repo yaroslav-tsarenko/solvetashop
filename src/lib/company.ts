@@ -13,7 +13,6 @@ export const COMPANY = {
   city: "Wood Green, London",
   postalCode: "N22 8HH",
   country: "United Kingdom",
-  director: "Vladimirs PUHINS",
   phone: "+44 7446 940486",
   phoneHref: "tel:+447446940486",
   phone2: "+44 7481 359087",

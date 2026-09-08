@@ -29,7 +29,7 @@ const CONTACT_INFO = [
     title: "Our Office",
     detail: `${COMPANY.city.split(", ").pop()}, ${COMPANY.country}`,
     sub: COMPANY.legalName,
-    tooltip: `${COMPANY.legalName}\nCompany No. ${COMPANY.companyNumber}\n${COMPANY_ADDRESS}\nDirector: ${COMPANY.director}`,
+    tooltip: `${COMPANY.legalName}\nCompany No. ${COMPANY.companyNumber}\n${COMPANY_ADDRESS}`,
   },
   { icon: Clock, title: "Working Hours", detail: "Mon-Fri 9:00-18:00", sub: "Sat 10:00-14:00" },
 ];
