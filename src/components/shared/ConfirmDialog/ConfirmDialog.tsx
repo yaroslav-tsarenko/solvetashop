@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
+import { useEffect } from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -23,27 +23,47 @@ export function ConfirmDialog({
   cancelLabel = "Cancel",
   isDangerous = false,
 }: ConfirmDialogProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)" }} onClick={onClose} />
-      <div style={{ position: "relative", background: "var(--color-bg)", borderRadius: "var(--radius-lg)", padding: "1.5rem", maxWidth: "28rem", width: "100%", zIndex: 51 }}>
-        <h2 style={{ fontSize: "1.125rem", fontWeight: 600, marginBottom: "0.75rem" }}>{title}</h2>
-        <p style={{ marginBottom: "1.5rem" }}>{message}</p>
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.5rem" }}>
-          <Button variant="light" onPress={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
+      <div className="fixed inset-0 bg-ink/40" onClick={onClose} aria-hidden="true" />
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-message"
+        className="relative z-[51] w-full max-w-md rounded-[var(--radius-lg)] border border-line bg-paper p-7 shadow-[var(--shadow-md)]"
+      >
+        <h2 id="confirm-dialog-title" className="text-xl font-normal tracking-[-0.01em] text-ink">
+          {title}
+        </h2>
+        <p id="confirm-dialog-message" className="mt-3 text-[0.9375rem] leading-relaxed text-muted">
+          {message}
+        </p>
+        <div className="mt-7 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-5">
+          <button type="button" className="btn-quiet btn-sm" onClick={onClose}>
             {cancelLabel}
-          </Button>
-          <Button
-            color={isDangerous ? "danger" : "primary"}
-            onPress={() => {
+          </button>
+          <button
+            type="button"
+            className={`btn-ink btn-sm ${isDangerous ? "!border-brick !bg-brick" : ""}`}
+            onClick={() => {
               onConfirm();
               onClose();
             }}
           >
             {confirmLabel}
-          </Button>
+          </button>
         </div>
       </div>
     </div>

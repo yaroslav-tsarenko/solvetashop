@@ -1,36 +1,44 @@
 "use client";
 
+import { useId } from "react";
 import { useTranslations } from "next-intl";
+import { ChevronDown } from "lucide-react";
 
 interface ProductSortProps {
   value: string;
   onChange: (value: string) => void;
 }
 
+/** Quiet inline select: "Order  Latest arrivals ⌄". */
 export function ProductSort({ value, onChange }: ProductSortProps) {
-  const t = useTranslations("product");
+  const t = useTranslations("listing");
+  const id = useId();
 
   const options = [
-    { key: "newest", label: t("newest") },
-    { key: "price-asc", label: t("priceLowHigh") },
-    { key: "price-desc", label: t("priceHighLow") },
-    { key: "name-asc", label: t("nameAZ") },
+    { key: "newest", label: t("sortNewest") },
+    { key: "price-asc", label: t("sortPriceAsc") },
+    { key: "price-desc", label: t("sortPriceDesc") },
+    { key: "name-asc", label: t("sortName") },
   ];
 
   return (
-    <div style={{ maxWidth: "200px" }}>
-      <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.25rem" }}>
-        {t("sortBy")}
+    <div className="inline-flex items-center gap-2 text-sm">
+      <label htmlFor={id} className="text-muted">
+        {t("sortLabel")}
       </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text)", fontSize: "0.875rem" }}
-      >
-        {options.map((option) => (
-          <option key={option.key} value={option.key}>{option.label}</option>
-        ))}
-      </select>
+      <span className="relative inline-flex items-center">
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="cursor-pointer appearance-none border-0 bg-transparent py-1 pr-6 pl-0 text-sm font-medium text-ink focus:outline-none focus-visible:underline focus-visible:underline-offset-4"
+        >
+          {options.map((option) => (
+            <option key={option.key} value={option.key}>{option.label}</option>
+          ))}
+        </select>
+        <ChevronDown size={14} strokeWidth={1.5} className="pointer-events-none absolute right-0 text-muted" />
+      </span>
     </div>
   );
 }

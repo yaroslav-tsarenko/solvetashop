@@ -1,7 +1,6 @@
 "use client";
 
 import { Link } from "@/i18n/routing";
-import { ChevronRight } from "lucide-react";
 
 interface BreadcrumbItem {
   label: string;
@@ -12,28 +11,24 @@ interface BreadcrumbsProps {
   items: BreadcrumbItem[];
 }
 
+/** Slash-separated trail in small muted type. */
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav className="py-5 text-[0.8125rem]" aria-label="Breadcrumb">
-      <ol className="m-0 flex flex-wrap items-center gap-2 p-0 [list-style:none]">
+    <nav aria-label="Breadcrumb" className="pb-6 pt-8 text-xs text-muted">
+      <p className="m-0 flex flex-wrap items-center gap-x-1.5 gap-y-1">
         {items.map((item, index) => (
-          <li key={index} className="flex items-center gap-2">
-            {index > 0 && (
-              <ChevronRight size={14} className="text-xs text-[var(--color-text-tertiary)]" />
-            )}
+          <span key={index} className="inline-flex items-center gap-1.5">
+            {index > 0 ? <span aria-hidden="true" className="text-faint">/</span> : null}
             {item.href ? (
-              <Link
-                href={item.href}
-                className="text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-accent)]"
-              >
+              <Link href={item.href} className="transition-colors hover:text-ink">
                 {item.label}
               </Link>
             ) : (
-              <span className="font-semibold text-[var(--color-text)]">{item.label}</span>
+              <span aria-current="page" className="text-ink">{item.label}</span>
             )}
-          </li>
+          </span>
         ))}
-      </ol>
+      </p>
     </nav>
   );
 }

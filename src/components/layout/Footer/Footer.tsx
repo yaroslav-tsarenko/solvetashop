@@ -1,127 +1,175 @@
 "use client";
 
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
 import Image from "next/image";
-import { FaLinkedinIn, FaInstagram } from "react-icons/fa6";
-import { SolvetaShopMark } from "../SolvetaShopMark";
+import { Link } from "@/i18n/routing";
+import { ArrowRight } from "lucide-react";
+import { Wordmark } from "../Wordmark/Wordmark";
+import { PreferenceFields } from "../Header/Preferences";
 import { COMPANY, COMPANY_ADDRESS } from "@/lib/company";
 import visaLogo from "@/assets/visa-logo.svg";
 import mastercardLogo from "@/assets/mastercard-logo.svg";
 import pciDssLogo from "@/assets/pci-dss-compliant-logo-vector.svg";
 
-const linkCls =
-  "text-sm text-[var(--color-text-secondary)] transition-[color,padding-left] duration-200 hover:pl-1 hover:text-[var(--color-accent)]";
+const colLink = "text-[0.875rem] text-muted transition-colors hover:text-ink";
 
-const sectionTitleCls =
-  "mb-4 text-[0.8125rem] font-bold uppercase tracking-[0.06em] text-[var(--color-text)]";
+function NewsletterInline() {
+  const t = useTranslations("footer");
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
+
+  return (
+    <div className="grid gap-6 border-b border-line py-12 md:grid-cols-[1fr_minmax(0,26rem)] md:items-end md:py-16">
+      <div>
+        <p className="m-0 max-w-md text-xl font-light leading-snug tracking-[-0.02em] text-ink sm:text-2xl">
+          {t("newsletterTitle")}
+        </p>
+        <p className="mt-2 text-[0.8125rem] text-muted">{t("newsletterText")}</p>
+      </div>
+      {done ? (
+        <p className="m-0 text-[0.875rem] text-sage" role="status">{t("newsletterThanks")}</p>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (email.trim()) setDone(true);
+          }}
+          className="flex items-center gap-3 border-b border-ink pb-2"
+        >
+          <label htmlFor="footer-email" className="sr-only">{t("newsletterPlaceholder")}</label>
+          <input
+            id="footer-email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder={t("newsletterPlaceholder")}
+            className="min-w-0 flex-1 border-none bg-transparent py-2 text-[0.9375rem] text-ink outline-none placeholder:text-faint"
+          />
+          <button type="submit" className="inline-flex items-center gap-1.5 text-[0.8125rem] font-medium text-ink hover:text-sage-hover">
+            {t("newsletterCta")}
+            <ArrowRight size={15} strokeWidth={1.5} />
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
 
 export function Footer() {
   const t = useTranslations("footer");
-  const nav = useTranslations("nav");
-  const currentYear = new Date().getFullYear();
+  const year = new Date().getFullYear();
+
+  const columns: { title: string; links: { href: string; label: string }[] }[] = [
+    {
+      title: t("shop"),
+      links: [
+        { href: "/catalog", label: t("shop") },
+        { href: "/catalog?sort=newest", label: t("recent") },
+        { href: "/catalog?onSale=true", label: t("reduced") },
+        { href: "/catalog?sort=popular", label: t("loved") },
+        { href: "/account/orders", label: t("orders") },
+      ],
+    },
+    {
+      title: t("help"),
+      links: [
+        { href: "/policies/shipping", label: t("shipping") },
+        { href: "/policies/returns", label: t("returns") },
+        { href: "/policies/warranty", label: t("warranty") },
+        { href: "/policies/payment", label: t("payment") },
+        { href: "/faq", label: t("faq") },
+      ],
+    },
+    {
+      title: t("company"),
+      links: [
+        { href: "/about", label: t("about") },
+        { href: "/contact", label: t("contact") },
+        { href: "/policies/terms", label: t("terms") },
+        { href: "/policies/privacy", label: t("privacy") },
+        { href: "/policies/cookies", label: t("cookies") },
+      ],
+    },
+  ];
+
+  const socials = [
+    { href: process.env.NEXT_PUBLIC_INSTAGRAM_URL, label: "Instagram" },
+    { href: process.env.NEXT_PUBLIC_LINKEDIN_URL, label: "LinkedIn" },
+  ].filter((s): s is { href: string; label: string } => !!s.href);
 
   return (
-    <footer className="mt-auto border-t border-[var(--color-border)] bg-[var(--color-bg-secondary)]">
-      <div className="mx-auto max-w-[var(--max-width)] px-4 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 pb-10 pt-12 md:grid-cols-[1.5fr_1fr_1fr_1fr] md:gap-8">
-          <div className="flex flex-col gap-4">
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-2xl font-extrabold tracking-[-0.04em] text-[var(--color-text)]"
-            >
-              <SolvetaShopMark size={28} gradientId="ssMarkFooter" />
-              <span>
-                Solveta<span className="text-[var(--color-accent)]">shop</span>
-              </span>
+    <footer className="mt-auto border-t border-line bg-paper">
+      <div className="wrap">
+        <NewsletterInline />
+
+        <div className="grid gap-12 py-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.6fr)] lg:gap-20">
+          <div className="flex flex-col gap-6">
+            <Link href="/" aria-label="solveta·shop" className="w-fit">
+              <Wordmark size={44} />
             </Link>
-            <p className="max-w-[280px] text-sm leading-relaxed text-[var(--color-text-secondary)]">
-              Your trusted source for electrical materials, wiring, and installation supplies. Professional quality delivered to your door.
-            </p>
-            <address className="max-w-[280px] text-xs not-italic leading-relaxed text-[var(--color-text-tertiary)]">
-              <strong className="text-[var(--color-text-secondary)]">{COMPANY.legalName}</strong>
+            <p className="m-0 max-w-xs text-[0.9375rem] leading-relaxed text-muted">{t("slogan")}</p>
+            <address className="text-[0.75rem] not-italic leading-relaxed text-faint">
+              <span className="text-muted">{COMPANY.legalName}</span>
               <br />
-              Company number: {COMPANY.companyNumber}
+              {t("companyNumber", { number: COMPANY.companyNumber })}
               <br />
               {COMPANY_ADDRESS}
               <br />
-              <a href={COMPANY.phone2Href} className="transition-colors hover:text-[var(--color-accent)]">
-                {COMPANY.phone2}
-              </a>
+              <a href={COMPANY.phone2Href} className="transition-colors hover:text-ink">{COMPANY.phone2}</a>
             </address>
-            <div className="mt-2 flex gap-2">
-              {process.env.NEXT_PUBLIC_LINKEDIN_URL && (
-                <a
-                  href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
-                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] border-none bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-[background-color,color,transform] duration-200 hover:-translate-y-0.5 hover:bg-[var(--color-accent)] hover:text-white"
-                  aria-label="LinkedIn"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaLinkedinIn size={16} />
-                </a>
-              )}
-              {process.env.NEXT_PUBLIC_INSTAGRAM_URL && (
-                <a
-                  href={process.env.NEXT_PUBLIC_INSTAGRAM_URL}
-                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-lg)] border-none bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] transition-[background-color,color,transform] duration-200 hover:-translate-y-0.5 hover:bg-[var(--color-accent)] hover:text-white"
-                  aria-label="Instagram"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaInstagram size={16} />
-                </a>
-              )}
-            </div>
+            {socials.length > 0 ? (
+              <p className="m-0 flex gap-4 text-[0.8125rem]">
+                <span className="text-faint">{t("followUs")}</span>
+                {socials.map((s) => (
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="link-sage">
+                    {s.label}
+                  </a>
+                ))}
+              </p>
+            ) : null}
           </div>
 
-          <div>
-            <h3 className={sectionTitleCls}>Shop</h3>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-              <li><Link href="/catalog" className={linkCls}>{nav("catalog")}</Link></li>
-              <li><Link href="/catalog?sort=newest" className={linkCls}>New Arrivals</Link></li>
-              <li><Link href="/catalog?onSale=true" className={linkCls}>Sale</Link></li>
-              <li><Link href="/catalog?sort=popular" className={linkCls}>Best Sellers</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className={sectionTitleCls}>{nav("account")}</h3>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-              <li><Link href="/auth/login" className={linkCls}>{nav("login")}</Link></li>
-              <li><Link href="/account/orders" className={linkCls}>My Orders</Link></li>
-              <li><Link href="/account/wishlist" className={linkCls}>Wishlist</Link></li>
-              <li><Link href="/contact" className={linkCls}>{t("contact")}</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className={sectionTitleCls}>Info</h3>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
-              <li><Link href="/policies/terms" className={linkCls}>{t("terms")}</Link></li>
-              <li><Link href="/policies/privacy" className={linkCls}>{t("privacy")}</Link></li>
-              <li><Link href="/policies/returns" className={linkCls}>{t("returns")}</Link></li>
-              <li><Link href="/policies/shipping" className={linkCls}>Shipping Policy</Link></li>
-              <li><Link href="/policies/warranty" className={linkCls}>Warranty</Link></li>
-              <li><Link href="/policies/payment" className={linkCls}>Payment Policy</Link></li>
-            </ul>
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
+            {columns.map((col) => (
+              <div key={col.title}>
+                <p className="eyebrow mb-5">{col.title}</p>
+                <ul className="m-0 flex list-none flex-col gap-3 p-0">
+                  {col.links.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className={colLink}>{l.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-4 border-t border-[var(--color-border)] py-6 md:flex-row md:justify-between">
-          <p className="text-xs text-[var(--color-text-tertiary)]">
-            {t("copyright", { year: currentYear, storeName: "Solvetashop" })}
+        <div className="flex flex-col gap-6 border-t border-line py-8 lg:flex-row lg:items-center lg:justify-between">
+          <p className="m-0 text-xs text-faint">
+            {t("copyright", { year, storeName: "solveta·shop" })} · {COMPANY.legalName}
           </p>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center">
-              <Image src={visaLogo} alt="Visa" height={100} width={100} className="!h-auto !w-[60px] object-contain" />
-            </span>
-            <span className="flex items-center justify-center">
-              <Image src={mastercardLogo} alt="Mastercard" height={100} width={100} className="!h-auto !w-[60px] object-contain" />
-            </span>
-            <span className="flex items-center justify-center">
-              <Image src={pciDssLogo} alt="PCI DSS Compliant" height={100} width={100} className="!h-auto !w-[60px] object-contain" />
-            </span>
+          <div className="w-full max-w-md">
+            <PreferenceFields compact />
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="text-[0.6875rem] text-faint">{t("weAccept")}</span>
+            {[
+              { src: visaLogo, alt: "Visa" },
+              { src: mastercardLogo, alt: "Mastercard" },
+              { src: pciDssLogo, alt: "PCI DSS" },
+            ].map((logo) => (
+              <Image
+                key={logo.alt}
+                src={logo.src}
+                alt={logo.alt}
+                width={100}
+                height={100}
+                className="!h-auto !w-[44px] object-contain opacity-80"
+              />
+            ))}
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 "use client";
 
-import { Minus, Plus } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { useTranslations } from "next-intl";
 
 interface QuantitySelectorProps {
   quantity: number;
@@ -9,39 +8,41 @@ interface QuantitySelectorProps {
   onChange: (quantity: number) => void;
 }
 
+/**
+ * Minimal text stepper: "−  2  +" inside a hairline pill.
+ */
 export function QuantitySelector({ quantity, maxQuantity, onChange }: QuantitySelectorProps) {
+  const t = useTranslations("cart");
+  const stepBtn =
+    "flex h-9 w-9 items-center justify-center text-base font-light text-ink transition-colors hover:text-sage disabled:cursor-not-allowed disabled:text-faint";
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-      <Button
-        isIconOnly
-        size="sm"
-        variant="flat"
-        onPress={() => onChange(Math.max(1, quantity - 1))}
-        isDisabled={quantity <= 1}
-        aria-label="Decrease quantity"
+    <div
+      role="group"
+      aria-label={t("quantity")}
+      className="inline-flex h-9 items-center rounded-[var(--radius-pill)] border border-line"
+    >
+      <button
+        type="button"
+        className={stepBtn}
+        onClick={() => onChange(Math.max(1, quantity - 1))}
+        disabled={quantity <= 1}
+        aria-label={t("decrease")}
       >
-        <Minus size={14} />
-      </Button>
-      <span
-        style={{
-          minWidth: "2rem",
-          textAlign: "center",
-          fontWeight: 600,
-          fontSize: "0.875rem",
-        }}
-      >
+        −
+      </button>
+      <span className="min-w-[1.75rem] text-center text-sm font-medium tabular-nums" aria-live="polite">
         {quantity}
       </span>
-      <Button
-        isIconOnly
-        size="sm"
-        variant="flat"
-        onPress={() => onChange(Math.min(maxQuantity, quantity + 1))}
-        isDisabled={quantity >= maxQuantity}
-        aria-label="Increase quantity"
+      <button
+        type="button"
+        className={stepBtn}
+        onClick={() => onChange(Math.min(maxQuantity, quantity + 1))}
+        disabled={quantity >= maxQuantity}
+        aria-label={t("increase")}
       >
-        <Plus size={14} />
-      </Button>
+        +
+      </button>
     </div>
   );
 }

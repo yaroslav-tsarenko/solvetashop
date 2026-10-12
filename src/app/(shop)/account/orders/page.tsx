@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Chip } from "@heroui/react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner/LoadingSpinner";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { formatPrice } from "@/lib/utils/format-price";
-import { format } from "date-fns";
 import { Package } from "lucide-react";
 import { accountClasses as styles } from "@/app/(shop)/account/account-classes";
+import { OrderStatusPill } from "@/app/(shop)/account/OrderStatus";
 
 interface Order {
   id: string;
@@ -22,19 +21,9 @@ interface Order {
   items: { id: string }[];
 }
 
-const statusColors: Record<string, "default" | "accent" | "success" | "warning" | "danger"> = {
-  PENDING: "warning",
-  CONFIRMED: "accent",
-  PROCESSING: "accent",
-  SHIPPED: "default",
-  DELIVERED: "success",
-  CANCELLED: "danger",
-  REFUNDED: "danger",
-};
-
 export default function OrdersPage() {
   const t = useTranslations("account");
-  const nav = useTranslations("nav");
+  const format = useFormatter();
   const { user } = useAuth();
   const { currency, convert } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -51,34 +40,81 @@ export default function OrdersPage() {
 
   if (loading) return <LoadingSpinner />;
 
+  const dateOf = (o: Order) => format.dateTime(new Date(o.createdAt), { dateStyle: "medium" });
+  const numberOf = (o: Order) => t("orderNumber", { number: o.orderNumber.slice(-8) });
+  const totalOf = (o: Order) => formatPrice(convert(Number(o.total)), currency);
+
   return (
     <div>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1.25rem" }}>{t("orders")}</h1>
+      <div className="mb-10">
+        <h2 className={styles.pageTitle}>{t("ordersTitle")}</h2>
+        <p className={styles.pageLede}>{t("ordersLede")}</p>
+      </div>
 
       {orders.length === 0 ? (
         <EmptyState
           title={t("noOrders")}
           subtitle={t("noOrdersSubtitle")}
-          actionLabel={nav("catalog")}
+          actionLabel={t("shopCta")}
           actionHref="/catalog"
-          icon={<Package size={48} />}
+          icon={<Package size={40} strokeWidth={1.25} />}
         />
       ) : (
-        <div className={styles.orderList}>
-          {orders.map((order) => (
-            <Link key={order.id} href={`/account/orders/${order.id}`} className={styles.orderCard}>
-              <div className={styles.orderCardMain}>
-                <div className={styles.orderCardNumber}>#{order.orderNumber.slice(-8)}</div>
-                <div className={styles.orderCardDate}>{format(new Date(order.createdAt), "MMM d, yyyy")}</div>
-                <div className={styles.orderCardItems}>
-                  {order.items.length} {order.items.length === 1 ? "item" : "items"}
-                </div>
-              </div>
-              <Chip size="sm" color={statusColors[order.status] || "default"}>{order.status}</Chip>
-              <span className={styles.orderCardPrice}>{formatPrice(convert(Number(order.total)), currency)}</span>
-            </Link>
-          ))}
-        </div>
+        <>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th scope="col">{t("colOrder")}</th>
+                <th scope="col">{t("colPlaced")}</th>
+                <th scope="col">{t("colPieces")}</th>
+                <th scope="col">{t("colStatus")}</th>
+                <th scope="col" className="text-right">
+                  {t("colTotal")}
+                </th>
+                <th scope="col">
+                  <span className="sr-only">{t("view")}</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td className="font-medium tabular-nums text-ink">{numberOf(order)}</td>
+                  <td className="text-muted">{dateOf(order)}</td>
+                  <td className="text-muted">{t("pieces", { count: order.items.length })}</td>
+                  <td>
+                    <OrderStatusPill status={order.status} />
+                  </td>
+                  <td className="text-right tabular-nums text-ink">{totalOf(order)}</td>
+                  <td className="w-24 text-right">
+                    <Link href={`/account/orders/${order.id}`} className={styles.textLink}>
+                      {t("view")}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <ul className={styles.rowList}>
+            {orders.map((order) => (
+              <li key={order.id}>
+                <Link href={`/account/orders/${order.id}`} className={styles.row}>
+                  <span className="min-w-0">
+                    <span className="block text-[0.9375rem] font-medium tabular-nums">{numberOf(order)}</span>
+                    <span className="mt-1 block text-[0.8125rem] text-muted">
+                      {dateOf(order)} · {t("pieces", { count: order.items.length })}
+                    </span>
+                    <span className="mt-3 block">
+                      <OrderStatusPill status={order.status} />
+                    </span>
+                  </span>
+                  <span className="text-[0.9375rem] tabular-nums">{totalOf(order)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </div>
   );

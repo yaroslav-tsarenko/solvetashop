@@ -114,19 +114,10 @@ export function getNewProducts(products: HomepageProduct[], limit = 10): Homepag
   return pickForShelf(ranked, limit, "new");
 }
 
-export function getPopularProducts(products: HomepageProduct[], limit = 10): HomepageProduct[] {
-  const ranked = [...products].sort((a, b) => (b.quantity ?? 0) - (a.quantity ?? 0));
-  return pickForShelf(ranked, limit, "popular");
-}
-
 export function getProductsByCategory(products: HomepageProduct[], categorySlug: string): HomepageProduct[] {
   return products.filter((p) =>
     p.categories?.some((c) => c.category.slug === categorySlug)
   );
-}
-
-export function getProductsByBrand(products: HomepageProduct[], brandName: string): HomepageProduct[] {
-  return products.filter((p) => p.brand?.toLowerCase() === brandName.toLowerCase());
 }
 
 export function getDiscountPercent(product: HomepageProduct): number {
@@ -135,72 +126,3 @@ export function getDiscountPercent(product: HomepageProduct): number {
   if (!compare || compare <= price) return 0;
   return Math.round(((compare - price) / compare) * 100);
 }
-
-export interface CategorySection {
-  category: HomepageCategory;
-  products: HomepageProduct[];
-  subcategoryTabs: string[];
-}
-
-export function getHomepageCategorySections(
-  products: HomepageProduct[],
-  categories: HomepageCategory[],
-  maxPerCategory = 10,
-  maxSections?: number,
-): CategorySection[] {
-  const sections = categories
-    .map((cat) => {
-      const catProducts = getProductsByCategory(products, cat.slug);
-      const childSlugs = cat.children?.map((c) => c.slug) || [];
-      const fromChildren = childSlugs.length > 0
-        ? products.filter((p) =>
-            p.categories?.some((c) => childSlugs.includes(c.category.slug))
-          )
-        : [];
-      const merged = [...catProducts, ...fromChildren];
-      const unique = Array.from(new Map(merged.map((p) => [p.id, p])).values());
-
-      const subcategoryTabs = cat.children?.length
-        ? ["All", ...cat.children.map((c) => c.name)]
-        : [];
-
-      return {
-        category: cat,
-        products: pickForShelf(unique, maxPerCategory, `category:${cat.slug}`),
-        subcategoryTabs,
-        totalCount: unique.length,
-      };
-    })
-    .filter((s) => s.products.length > 0)
-    .sort((a, b) => b.totalCount - a.totalCount);
-
-  const limited = maxSections ? sections.slice(0, maxSections) : sections;
-  return limited.map(({ totalCount: _, ...rest }) => rest);
-}
-
-export interface BrandSection {
-  brand: string;
-  products: HomepageProduct[];
-}
-
-export function getBrandSections(
-  products: HomepageProduct[],
-  brandNames: string[],
-  limit = 8,
-): BrandSection[] {
-  return brandNames
-    .map((brand) => ({
-      brand,
-      products: pickForShelf(getProductsByBrand(products, brand), limit, `brand:${brand}`),
-    }))
-    .filter((s) => s.products.length > 0);
-}
-
-/** The manufacturers actually represented in this catalogue, by volume. The
- *  list the template shipped with was consumer-electronics brands, which match
- *  nothing here and rendered as empty rows. */
-export const TOP_BRANDS = [
-  "Legrand", "VEXEN electric", "PAWBOL", "ETI", "Bticino",
-  "ambro-sol", "GACIA", "NIKDIM", "HORA eTec", "Pollmann",
-  "Mersen", "Eltako", "Schneider Electric", "WAGO",
-];

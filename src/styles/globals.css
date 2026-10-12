@@ -1,89 +1,88 @@
 /*
- * Solvetashop — global stylesheet
+ * solveta·shop — global stylesheet
  * ------------------------------------------------------------
- * Layers order (Tailwind v4):
  *   1. tailwindcss (preflight + utilities)
- *   2. design-tokens (variables.css)
- *   3. keyframes / animations (animations.css)
- *   4. @theme block — maps our CSS custom properties into
- *      Tailwind's utility scale (bg-primary, text-muted, ...)
- *   5. base overrides (typography, scrollbars, selection)
- *   6. legacy helper classes still consumed by templates
+ *   2. design tokens (variables.css)
+ *   3. keyframes (animations.css)
+ *   4. @theme bridge — tokens become Tailwind utilities
+ *      (bg-surface, text-ink, border-line, text-sage, …)
+ *   5. base layer — Manrope, light headings, hairline scrollbars
+ *   6. component primitives shared by every storefront page:
+ *      .wrap, .btn-ink / .btn-line / .btn-quiet, .field, .eyebrow,
+ *      .display, .lede, .link-sage, .tag
  */
 
 @import "tailwindcss";
 @import "./variables.css";
 @import "./animations.css";
 
-/* ─────────────────────────────────────────────────────────────
- * Tailwind v4 design-token bridge.
- * Every semantic token becomes a Tailwind utility, so the
- * migration from CSS Modules to utility classes preserves the
- * exact same palette, radii, shadows and typography.
- * ──────────────────────────────────────────────────────────── */
+/* The theme toggle writes data-theme on <html>; make `dark:` follow it
+ * instead of the OS media query so both stay in step. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme inline {
-  /* Surfaces */
+  /* Nordic Minimal palette */
+  --color-paper: var(--color-paper);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-plate: var(--color-plate);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-on-ink: var(--color-on-ink);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
+  --color-muted: var(--color-muted);
+  --color-faint: var(--color-faint);
+  --color-sage: var(--color-sage);
+  --color-sage-hover: var(--color-sage-hover);
+  --color-sage-soft: var(--color-sage-soft);
+  --color-brick: var(--color-brick);
+  --color-brick-soft: var(--color-brick-soft);
+
+  /* Semantic aliases */
   --color-bg: var(--color-bg);
   --color-bg-secondary: var(--color-bg-secondary);
   --color-bg-tertiary: var(--color-bg-tertiary);
-  --color-bg-warm: var(--color-bg-warm);
-
-  /* Text */
   --color-text: var(--color-text);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-tertiary: var(--color-text-tertiary);
-
-  /* Brand + accents */
-  --color-primary: var(--color-accent);
-  --color-primary-hover: var(--color-accent-hover);
-  --color-primary-soft: var(--color-accent-light);
+  --color-primary: var(--color-ink);
+  --color-primary-hover: var(--color-ink-soft);
+  --color-primary-soft: var(--color-sage-soft);
   --color-accent-2: var(--color-accent-2);
-  --color-accent-3: var(--color-accent-3);
-
-  /* States */
   --color-success: var(--color-success);
   --color-warning: var(--color-warning);
   --color-danger: var(--color-danger);
   --color-sale: var(--color-sale);
-
-  /* Borders */
   --color-border: var(--color-border);
   --color-border-hover: var(--color-border-hover);
 
-  /* Promo tints */
-  --color-promo-blue: var(--promo-bg-blue);
-  --color-promo-warm: var(--promo-bg-warm);
-  --color-promo-green: var(--promo-bg-green);
-
   /* Typography */
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   /* Radii */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-pill: 9999px;
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+  --radius-pill: 999px;
 
   /* Shadows */
   --shadow-token-sm: var(--shadow-sm);
   --shadow-token-md: var(--shadow-md);
   --shadow-token-lg: var(--shadow-lg);
-  --shadow-token-xl: var(--shadow-xl);
-  --shadow-token-card: var(--shadow-card);
-  --shadow-token-card-hover: var(--shadow-card-hover);
-  --shadow-token-accent: var(--shadow-accent);
 
   /* Layout */
-  --container-max: 1320px;
-  --spacing-header: 64px;
-  --spacing-announcement: 36px;
+  --container-max: 1360px;
+  --spacing-header: 72px;
+  --spacing-announcement: 32px;
 }
 
 /* ─────────────────────────────────────────────────────────────
- * Base layer — resets and body defaults
+ * Base
  * ──────────────────────────────────────────────────────────── */
 @layer base {
   *,
@@ -98,10 +97,18 @@
 
   body {
     font-family: var(--font-sans);
+    font-weight: 400;
     background-color: var(--color-bg);
     color: var(--color-text);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01" on;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 400;
+    letter-spacing: var(--tracking-heading);
+    line-height: 1.15;
   }
 
   a {
@@ -114,99 +121,220 @@
     height: auto;
   }
 
+  :focus-visible {
+    outline: 2px solid var(--color-sage);
+    outline-offset: 2px;
+  }
+
   ::selection {
-    background-color: var(--color-accent);
-    color: #ffffff;
+    background-color: var(--color-sage-soft);
+    color: var(--color-ink);
   }
 
   ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--color-bg-secondary);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-text-tertiary);
+    background: var(--color-line-strong);
+    border-radius: 999px;
   }
 }
 
 /* ─────────────────────────────────────────────────────────────
- * Component/utility helpers still referenced by templates.
- * These wrap common patterns that Tailwind cannot express as a
- * single utility (padding scale with three breakpoints, glass,
- * gradient text). Everything else is Tailwind utilities in JSX.
+ * Primitives
  * ──────────────────────────────────────────────────────────── */
 @layer components {
-  .section-padding {
-    padding: 4rem 1rem;
+  /* Page frame: 1360px max, wide fluid side padding. */
+  .wrap {
+    width: 100%;
+    max-width: calc(var(--max-width) + var(--gutter) * 2);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
   }
 
-  @media (min-width: 768px) {
-    .section-padding {
-      padding: 5rem 1.5rem;
-    }
+  .wrap-narrow {
+    width: 100%;
+    max-width: calc(760px + var(--gutter) * 2);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
   }
 
-  @media (min-width: 1024px) {
-    .section-padding {
-      padding: 6rem 2rem;
-    }
+  /* Small all-caps label above headings. */
+  .eyebrow {
+    display: inline-block;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
-  .section-container {
-    max-width: var(--max-width);
-    margin-left: auto;
-    margin-right: auto;
+  /* Large, light display type. */
+  .display {
+    font-weight: 300;
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
+    line-height: 1.02;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-ink);
   }
 
-  .section-title {
-    font-size: 1.75rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--color-text);
-    line-height: 1.15;
+  .heading {
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    line-height: 1.12;
+    letter-spacing: var(--tracking-heading);
+    color: var(--color-ink);
   }
 
-  @media (min-width: 768px) {
-    .section-title {
-      font-size: 2.25rem;
-    }
-  }
-
-  .section-subtitle {
+  .lede {
     font-size: 1rem;
-    color: var(--color-text-secondary);
-    margin-top: 0.5rem;
-    max-width: 480px;
-    line-height: 1.6;
+    line-height: 1.7;
+    color: var(--color-muted);
+    max-width: 34rem;
   }
 
-  .gradient-text {
-    color: var(--color-accent);
+  /* Buttons: pills. Ink = primary, line = secondary, quiet = text. */
+  .btn-ink,
+  .btn-line,
+  .btn-quiet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0 1.5rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s var(--ease-soft), color 0.2s var(--ease-soft),
+      border-color 0.2s var(--ease-soft), opacity 0.2s;
   }
 
-  .glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-on-ink);
+    border: 1px solid var(--color-ink);
   }
 
-  [data-theme="dark"] .glass {
-    background: rgba(10, 15, 13, 0.75);
+  .btn-ink:hover {
+    background: var(--color-ink-soft);
+    border-color: var(--color-ink-soft);
   }
 
-  .glass-border {
-    border: 1px solid rgba(255, 255, 255, 0.15);
+  .btn-line {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid var(--color-line-strong);
   }
 
-  [data-theme="dark"] .glass-border {
-    border-color: rgba(255, 255, 255, 0.08);
+  .btn-line:hover {
+    border-color: var(--color-ink);
+  }
+
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid transparent;
+    padding: 0 0.25rem;
+    text-decoration: underline;
+    text-underline-offset: 0.3em;
+    text-decoration-thickness: 1px;
+  }
+
+  .btn-quiet:hover {
+    color: var(--color-sage-hover);
+  }
+
+  .btn-ink:disabled,
+  .btn-line:disabled,
+  .btn-quiet:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-sm {
+    min-height: 2.25rem;
+    padding: 0 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .btn-lg {
+    min-height: 3.25rem;
+    padding: 0 2rem;
+    font-size: 0.9375rem;
+  }
+
+  /* Form fields: underline-free boxes with hairline borders. */
+  .field {
+    width: 100%;
+    min-height: 2.875rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-md);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-size: 0.9375rem;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+
+  .field::placeholder {
+    color: var(--color-faint);
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--color-sage);
+    box-shadow: 0 0 0 3px var(--color-sage-soft);
+  }
+
+  .field-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  .link-sage {
+    color: var(--color-sage);
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+    transition: color 0.15s;
+  }
+
+  .link-sage:hover {
+    color: var(--color-sage-hover);
+  }
+
+  /* Tiny sage/brick marker used for New / Sale. */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1875rem 0.5rem;
+    border-radius: var(--radius-pill);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    background: var(--color-paper);
+    color: var(--color-sage);
+  }
+
+  .tag-sale {
+    color: var(--color-brick);
+  }
+
+  .hairline {
+    border-color: var(--color-line);
   }
 }

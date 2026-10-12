@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
-import { Heart, ShoppingCart, Shield, Truck, RotateCcw, Lock } from "lucide-react";
+import { Heart } from "lucide-react";
 import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
 import { QuantitySelector } from "@/components/shared/QuantitySelector/QuantitySelector";
 import { useCart } from "@/providers/CartProvider";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { formatPrice } from "@/lib/utils/format-price";
-import { useRouter } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 
+// Warranty add-on pricing — must stay in line with /policies/warranty.
 const WARRANTY_OPTIONS = [
   { key: "none", years: 0, percent: 0, min: 0 },
   { key: "1year", years: 1, percent: 10, min: 6.99 },
@@ -46,6 +46,8 @@ interface ProductInfoProps {
   categoryPath?: { name: string; slug: string }[];
 }
 
+type WarrantyLabelKey = "warrantyNone" | "warranty1" | "warranty2" | "warranty3";
+
 export function ProductInfo({
   id,
   name,
@@ -62,10 +64,12 @@ export function ProductInfo({
   ean,
   reviewCount = 0,
   avgRating = 0,
+  categoryPath = [],
 }: ProductInfoProps) {
   const t = useTranslations("product");
   const [qty, setQty] = useState(1);
   const [selectedWarranty, setSelectedWarranty] = useState(0);
+  const [saving, setSaving] = useState(false);
   const { addItem } = useCart();
   const { currency, convert } = useCurrency();
   const router = useRouter();
@@ -78,7 +82,7 @@ export function ProductInfo({
   const warrantyPrice = calcWarrantyPrice(price, warrantyOption);
   const totalPrice = price + warrantyPrice;
 
-  const handleAddToCart = () => {
+  const addToBag = () => {
     addItem({
       productId: id,
       name: warrantyOption.years > 0 ? `${name} + ${warrantyOption.years}yr warranty` : name,
@@ -88,188 +92,198 @@ export function ProductInfo({
   };
 
   const handleBuyNow = () => {
-    addItem({
-      productId: id,
-      name: warrantyOption.years > 0 ? `${name} + ${warrantyOption.years}yr warranty` : name,
-      slug, sku, price: totalPrice, quantity: qty,
-      imageUrl: imageUrl || null, maxQuantity: stockQuantity,
-    });
+    addToBag();
     router.push("/checkout");
   };
 
   const handleWishlist = async () => {
+    if (saving) return;
+    setSaving(true);
     try {
       const res = await fetch("/api/wishlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ productId: id }),
       });
+      if (res.status === 401) {
+        toast.message(t("wishlistSignIn"));
+        return;
+      }
       const data = await res.json();
-      if (data.action === "added") toast.success(t("addToWishlist"));
-      else toast.success(t("removeFromWishlist"));
+      if (!res.ok) throw new Error(data?.error || "wishlist");
+      if (data.action === "added") toast.success(t("wishlistAdded"));
+      else toast.success(t("wishlistRemoved"));
     } catch {
-      toast.error("Please log in to use wishlist");
+      toast.error(t("wishlistError"));
+    } finally {
+      setSaving(false);
     }
   };
 
-  const isOnSale = comparePrice && comparePrice > price;
-  const savingsPercent = isOnSale ? Math.round(((comparePrice - price) / comparePrice) * 100) : 0;
+  const isOnSale = !!comparePrice && comparePrice > price;
+  const savingsPercent = isOnSale ? Math.round(((comparePrice! - price) / comparePrice!) * 100) : 0;
 
-  const stockCls = outOfStock
-    ? "text-[var(--color-danger)] bg-[rgba(239,68,68,0.08)]"
-    : lowStock
-    ? "text-[var(--color-warning)] bg-[rgba(245,158,11,0.08)]"
-    : "text-[var(--color-success)] bg-[rgba(16,185,129,0.08)]";
+  const conditionLabel = (() => {
+    switch (condition.toLowerCase()) {
+      case "new": return t("conditionNew");
+      case "used": return t("conditionUsed");
+      case "refurbished": return t("conditionRefurbished");
+      default: return condition;
+    }
+  })();
+
+  const eyebrow = brand || categoryPath[categoryPath.length - 1]?.name;
+  const roundedRating = Math.round(avgRating * 10) / 10;
 
   return (
-    <div className="flex flex-col gap-4 sm:gap-5">
-      <div>
-        <h1 className="break-words text-xl font-extrabold leading-[1.15] tracking-[-0.02em] [overflow-wrap:anywhere] min-[481px]:text-[1.375rem] md:text-[1.75rem]">
+    <div className="flex flex-col">
+      {/* Title block */}
+      <header className="pb-6">
+        {eyebrow && <span className="eyebrow mb-3 block">{eyebrow}</span>}
+        <h1 className="break-words text-[2rem] font-light leading-[1.08] tracking-[-0.02em] text-ink [overflow-wrap:anywhere] md:text-[2.5rem]">
           {name}
         </h1>
-        <div className="mt-2 flex flex-wrap items-center gap-4">
-          <span className="text-xs text-[var(--color-text-tertiary)]">{t("sku")}: {sku}</span>
-          {ean && <span className="text-xs text-[var(--color-text-tertiary)]">{t("ean")}: {ean}</span>}
-          {reviewCount > 0 && (
-            <span className="inline-flex items-center gap-1 text-[0.8125rem] font-semibold text-[var(--color-warning)]">
-              {"★".repeat(Math.round(avgRating))}{"☆".repeat(5 - Math.round(avgRating))}
-              <span className="font-normal text-[var(--color-text-tertiary)]">({reviewCount})</span>
-            </span>
-          )}
-        </div>
-      </div>
-
-      {shortDescription && (
-        <p className="text-[0.9375rem] leading-[1.65] text-[var(--color-text-secondary)]">{shortDescription}</p>
-      )}
-
-      <hr className="m-0 h-px border-none bg-[var(--color-border)]" />
-
-      <div className="flex items-center gap-4">
-        <PriceDisplay price={price} comparePrice={comparePrice} size="lg" />
-        {isOnSale && (
-          <span className="rounded-[var(--radius-pill)] bg-[var(--color-danger)] px-2.5 py-1 text-xs font-bold text-white">
-            -{savingsPercent}%
-          </span>
+        {reviewCount > 0 && (
+          <a href="#reviews" className="mt-3 inline-block text-sm text-muted underline-offset-4 hover:text-ink hover:underline">
+            {t("ratingSummary", { rating: roundedRating, count: reviewCount })}
+          </a>
         )}
-      </div>
+      </header>
 
-      <p className={`inline-flex w-fit items-center gap-1.5 rounded-[var(--radius-pill)] px-3 py-1.5 text-[0.8125rem] font-semibold ${stockCls}`}>
+      {/* Price + stock */}
+      <div className="flex flex-wrap items-center gap-3">
+        <PriceDisplay price={price} comparePrice={comparePrice} size="lg" />
+        {isOnSale && <span className="tag tag-sale border border-line">{t("saveTag", { percent: savingsPercent })}</span>}
+      </div>
+      <p className="mt-2 flex items-center gap-2 text-sm text-muted">
+        <span
+          aria-hidden="true"
+          className={[
+            "inline-block h-1.5 w-1.5 rounded-full",
+            outOfStock ? "bg-brick" : lowStock ? "bg-line-strong" : "bg-sage",
+          ].join(" ")}
+        />
         {outOfStock ? t("outOfStock") : lowStock ? t("onlyLeft", { count: stockQuantity }) : t("inStock")}
       </p>
 
-      <hr className="m-0 h-px border-none bg-[var(--color-border)]" />
+      {shortDescription && (
+        <p className="mt-6 text-[0.9375rem] leading-[1.75] text-muted">{shortDescription}</p>
+      )}
 
-      <div className="flex flex-col gap-2">
-        <span className="flex items-center gap-1.5 text-[0.8125rem] font-bold text-[var(--color-text)]">
-          <Shield size={14} /> {t("warranty")}
-        </span>
-        <p className="mb-2 text-xs text-[var(--color-text-secondary)]">{t("warrantyStandard")}</p>
+      {/* Warranty add-on */}
+      <fieldset className="m-0 mt-8 border-0 p-0">
+        <legend className="mb-1 text-sm font-medium text-ink">{t("warrantyHeading")}</legend>
+        <p className="mb-3 text-xs leading-relaxed text-muted">
+          {t("warrantyNote")}{" "}
+          <Link href="/policies/warranty" className="link-sage">{t("warrantyPolicyLink")}</Link>
+        </p>
         {warrantyAvailable && (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="border-t border-line">
             {WARRANTY_OPTIONS.map((opt, idx) => {
               const active = idx === selectedWarranty;
+              const labelKey: WarrantyLabelKey = idx === 0 ? "warrantyNone" : (`warranty${opt.years}` as WarrantyLabelKey);
               return (
-                <button
+                <label
                   key={opt.key}
-                  onClick={() => setSelectedWarranty(idx)}
-                  className={[
-                    "flex cursor-pointer flex-col items-center gap-0.5 rounded-[var(--radius-lg)] border-2 px-2 py-2.5 text-center text-[0.8125rem] font-semibold text-[var(--color-text)] transition-all duration-200",
-                    active
-                      ? "border-[var(--color-accent)] bg-[var(--color-accent-light)] shadow-[0_0_0_1px_var(--color-accent)]"
-                      : "border-[var(--color-border)] bg-[var(--color-bg)] hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-light)]",
-                  ].join(" ")}
+                  className="flex cursor-pointer items-center gap-3 border-b border-line py-3 text-sm text-ink"
                 >
-                  {idx === 0
-                    ? t("noWarranty")
-                    : t(`warrantyOption${opt.years}year` as "warrantyOption1year" | "warrantyOption2year" | "warrantyOption3year")}
-                  {opt.percent > 0 && (
-                    <span className="text-[0.6875rem] font-normal text-[var(--color-text-secondary)]">
-                      +{formatPrice(convert(calcWarrantyPrice(price, opt)), currency)}
-                    </span>
-                  )}
-                </button>
+                  <input
+                    type="radio"
+                    name={`warranty-${id}`}
+                    value={opt.key}
+                    checked={active}
+                    onChange={() => setSelectedWarranty(idx)}
+                    className="peer sr-only"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className={[
+                      "flex h-4 w-4 flex-none items-center justify-center rounded-full border peer-focus-visible:ring-2 peer-focus-visible:ring-sage-soft",
+                      active ? "border-ink" : "border-line-strong",
+                    ].join(" ")}
+                  >
+                    {active && <span className="h-2 w-2 rounded-full bg-ink" />}
+                  </span>
+                  <span className={`flex-1 ${active ? "text-ink" : "text-muted"}`}>{t(labelKey)}</span>
+                  <span className="tabular-nums text-muted">
+                    {opt.percent > 0
+                      ? `+${formatPrice(convert(calcWarrantyPrice(price, opt)), currency)}`
+                      : t("warrantyIncluded")}
+                  </span>
+                </label>
               );
             })}
           </div>
         )}
-      </div>
+      </fieldset>
 
-      <div className="flex flex-wrap items-center gap-2 min-[481px]:gap-3">
-        <QuantitySelector quantity={qty} maxQuantity={stockQuantity} onChange={setQty} />
-        <Button
-          color="primary"
-          size="lg"
-          onPress={handleAddToCart}
-          isDisabled={outOfStock}
-          startContent={<ShoppingCart size={18} />}
-          style={{ flex: 1 }}
-        >
-          {selectedWarranty > 0 ? t("addToCartWithWarranty") : t("addToCart")}
-        </Button>
-        <Button
-          color="default"
-          size="lg"
-          onPress={handleBuyNow}
-          isDisabled={outOfStock}
-          className="!bg-[var(--color-text)] !font-bold !text-[var(--color-bg)] hover:!opacity-85 [flex:0.6]"
-        >
-          {t("buyNow")}
-        </Button>
-        <Button
-          isIconOnly
-          variant="bordered"
-          size="lg"
-          onPress={handleWishlist}
-          aria-label={t("addToWishlist")}
-        >
-          <Heart size={18} />
-        </Button>
-      </div>
-
-      <div className="border-t border-[var(--color-border)] pt-4">
-        {brand && (
-          <div className="flex justify-between border-b border-[var(--color-bg-tertiary)] py-2 text-sm">
-            <span className="text-[var(--color-text-secondary)]">{t("brand")}</span>
-            <span className="font-semibold text-[var(--color-text)]">{brand}</span>
+      {/* Actions */}
+      <div className="mt-8 flex flex-col gap-3">
+        <div className="flex items-center gap-3">
+          <div className="flex-none" aria-label={t("quantity")} role="group">
+            <QuantitySelector quantity={qty} maxQuantity={stockQuantity} onChange={setQty} />
           </div>
-        )}
-        <div className="flex justify-between border-b border-[var(--color-bg-tertiary)] py-2 text-sm">
-          <span className="text-[var(--color-text-secondary)]">{t("condition")}</span>
-          <span className="font-semibold text-[var(--color-text)]">{condition}</span>
-        </div>
-        <div className="flex justify-between border-b border-[var(--color-bg-tertiary)] py-2 text-sm last:border-b-0">
-          <span className="text-[var(--color-text-secondary)]">{t("sku")}</span>
-          <span className="font-semibold text-[var(--color-text)]">{sku}</span>
-        </div>
-        {ean && (
-          <div className="flex justify-between py-2 text-sm">
-            <span className="text-[var(--color-text-secondary)]">{t("ean")}</span>
-            <span className="font-semibold text-[var(--color-text)]">{ean}</span>
-          </div>
-        )}
-      </div>
-
-      <div className="grid grid-cols-3 gap-2 pt-2 min-[381px]:gap-3">
-        {[
-          { icon: Truck, titleKey: "freeShipping", descKey: "freeShippingDesc" },
-          { icon: RotateCcw, titleKey: "easyReturns", descKey: "easyReturnsDesc" },
-          { icon: Lock, titleKey: "securePayment", descKey: "securePaymentDesc" },
-        ].map(({ icon: Icon, titleKey, descKey }) => (
-          <div
-            key={titleKey}
-            className="flex flex-col items-center gap-1 rounded-[var(--radius-lg)] bg-[var(--color-bg-secondary)] px-1.5 py-2.5 text-center min-[381px]:px-2 min-[381px]:py-3"
+          <button
+            type="button"
+            onClick={addToBag}
+            disabled={outOfStock}
+            className="btn-ink btn-lg flex-1"
           >
-            <Icon size={18} className="text-[var(--color-accent)]" />
-            <span className="text-[0.6875rem] font-bold text-[var(--color-text)]">
-              {t(titleKey as "freeShipping" | "easyReturns" | "securePayment")}
-            </span>
-            <span className="text-[0.625rem] text-[var(--color-text-tertiary)]">
-              {t(descKey as "freeShippingDesc" | "easyReturnsDesc" | "securePaymentDesc")}
-            </span>
-          </div>
-        ))}
+            {outOfStock ? t("outOfStock") : selectedWarranty > 0 && warrantyAvailable ? t("addToCartWithWarranty") : t("addToCart")}
+          </button>
+        </div>
+        <div className="flex gap-3">
+          <button type="button" onClick={handleBuyNow} disabled={outOfStock} className="btn-line flex-1">
+            {t("buyNow")}
+          </button>
+          <button
+            type="button"
+            onClick={handleWishlist}
+            disabled={saving}
+            className="btn-line"
+            aria-label={t("addToWishlist")}
+          >
+            <Heart size={16} strokeWidth={1.5} />
+            <span className="max-[380px]:hidden">{t("wishlistShort")}</span>
+          </button>
+        </div>
       </div>
+
+      {/* Practical notes */}
+      <ul className="m-0 mt-8 flex list-none flex-col gap-1.5 p-0 text-xs leading-relaxed text-muted">
+        <li>
+          {t("noteDelivery")}{" "}
+          <Link href="/policies/shipping" className="link-sage">{t("noteDeliveryLink")}</Link>
+        </li>
+        <li>
+          {t("noteReturns")}{" "}
+          <Link href="/policies/returns" className="link-sage">{t("noteReturnsLink")}</Link>
+        </li>
+        <li>
+          {t("notePayment")}{" "}
+          <Link href="/policies/payment" className="link-sage">{t("notePaymentLink")}</Link>
+        </li>
+      </ul>
+
+      {/* Quiet facts */}
+      <dl className="m-0 mt-8 grid grid-cols-[auto_1fr] gap-x-8 gap-y-2 border-t border-line pt-6 text-xs">
+        {brand && (
+          <>
+            <dt className="text-muted">{t("brand")}</dt>
+            <dd className="m-0 text-ink">{brand}</dd>
+          </>
+        )}
+        <dt className="text-muted">{t("condition")}</dt>
+        <dd className="m-0 text-ink">{conditionLabel}</dd>
+        <dt className="text-muted">{t("sku")}</dt>
+        <dd className="m-0 break-all tabular-nums text-ink">{sku}</dd>
+        {ean && (
+          <>
+            <dt className="text-muted">{t("ean")}</dt>
+            <dd className="m-0 break-all tabular-nums text-ink">{ean}</dd>
+          </>
+        )}
+      </dl>
     </div>
   );
 }

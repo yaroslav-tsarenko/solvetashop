@@ -1,249 +1,103 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { ShoppingBag } from "lucide-react";
 import { Link } from "@/i18n/routing";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, ArrowRight, ShieldCheck, Trash2, Package, Truck, ImageOff } from "lucide-react";
 import { useCart } from "@/providers/CartProvider";
 import { useCurrency } from "@/providers/CurrencyProvider";
-import { QuantitySelector } from "@/components/shared/QuantitySelector/QuantitySelector";
-import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
+import { CartItem } from "@/components/cart/CartItem/CartItem";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { formatPrice } from "@/lib/utils/format-price";
+import { FREE_STANDARD_MIN, qualifiesForFreeStandard } from "@/lib/shipping";
 import { cartClasses as styles } from "./cart-classes";
 
 export default function CartPage() {
   const t = useTranslations("cart");
   const nav = useTranslations("nav");
-  const { cart, updateQuantity, removeItem } = useCart();
+  const { cart } = useCart();
   const { currency, convert } = useCurrency();
 
-  const freeShippingThreshold = convert(100);
-  const subtotalConverted = convert(cart.subtotal);
+  // Delivery depends on the method picked (and any code applied) at checkout,
+  // so the bag shows the goods + tax and leaves delivery to the next step.
+  const beforeDelivery = cart.subtotal + cart.taxAmount;
+  // Free standard delivery is judged on the subtotal after discounts; the bag
+  // doesn't know about discounts yet, so this is a guide the checkout confirms.
+  const freeStandard = qualifiesForFreeStandard(cart.subtotal);
+  const remaining = Math.max(FREE_STANDARD_MIN - cart.subtotal, 0);
 
   return (
     <div className={styles.wrapper}>
       <Breadcrumbs items={[{ label: nav("home"), href: "/" }, { label: t("title") }]} />
 
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={styles.title}
-      >
-        {t("title")}{" "}
+      <header className={`${styles.head} ${cart.items.length > 0 ? "border-b border-line pb-6" : ""}`}>
+        <h1 className={styles.title}>{t("title")}</h1>
         {cart.items.length > 0 && (
-          <span style={{ color: "var(--color-text-tertiary)", fontWeight: 500 }}>
-            ({cart.itemCount} {cart.itemCount === 1 ? "item" : "items"})
-          </span>
+          <span className={styles.count}>{t("count", { count: cart.itemCount })}</span>
         )}
-      </motion.h1>
+      </header>
 
       {cart.items.length === 0 ? (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-          <EmptyState
-            title={t("empty")}
-            subtitle={t("emptySubtitle")}
-            actionLabel={t("continueShopping")}
-            actionHref="/catalog"
-            icon={<ShoppingCart size={48} />}
-          />
-        </motion.div>
+        <EmptyState
+          title={t("empty")}
+          subtitle={t("emptySubtitle")}
+          actionLabel={t("emptyAction")}
+          actionHref="/catalog"
+          icon={<ShoppingBag size={28} strokeWidth={1.25} />}
+        />
       ) : (
         <div className={styles.layout}>
-          {/* Cart Items */}
-          <div className={styles.itemsBlock}>
-            <div className={styles.itemsHeader}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Package size={16} style={{ color: "var(--color-text-secondary)" }} />
-                <span style={{ fontSize: "0.8125rem", fontWeight: 600, color: "var(--color-text-secondary)" }}>
-                  {cart.itemCount} {cart.itemCount === 1 ? "item" : "items"} in your cart
-                </span>
-              </div>
-              {subtotalConverted >= freeShippingThreshold && (
-                <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem", fontWeight: 600, color: "#2E7D32" }}>
-                  <Truck size={14} />
-                  Free shipping
-                </div>
-              )}
-            </div>
-
-            <AnimatePresence mode="popLayout">
-              {cart.items.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20, height: 0, padding: 0, margin: 0 }}
-                  transition={{ delay: index * 0.05, duration: 0.25 }}
-                  className={styles.itemRow}
-                >
-                  <div className={styles.itemImage}>
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.name}
-                        fill
-                        sizes="100px"
-                        style={{ objectFit: "contain", padding: "8px" }}
-                      />
-                    ) : (
-                      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-tertiary)" }}>
-                        <ImageOff size={24} />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className={styles.itemContent}>
-                    <Link href={`/product/${item.slug}`} className={styles.itemName}>
-                      {item.name}
-                    </Link>
-                    {item.variantName && (
-                      <span style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)" }}>
-                        {item.variantName}
-                      </span>
-                    )}
-                    <span style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)" }}>
-                      SKU: {item.sku}
-                    </span>
-
-                    <div className={styles.itemFooter}>
-                      <QuantitySelector
-                        quantity={item.quantity}
-                        maxQuantity={item.maxQuantity}
-                        onChange={(qty) => updateQuantity(item.productId, qty, item.variantId)}
-                      />
-                      <div className={styles.itemPriceRow}>
-                        <PriceDisplay price={item.price * item.quantity} size="sm" />
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => removeItem(item.productId, item.variantId)}
-                          style={{
-                            width: "2rem",
-                            height: "2rem",
-                            borderRadius: "var(--radius-lg)",
-                            border: "none",
-                            background: "transparent",
-                            color: "var(--color-text-tertiary)",
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            transition: "color 0.15s, background 0.15s",
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-danger)"; e.currentTarget.style.background = "var(--color-bg-tertiary)"; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--color-text-tertiary)"; e.currentTarget.style.background = "transparent"; }}
-                          aria-label="Remove"
-                        >
-                          <Trash2 size={16} />
-                        </motion.button>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+          <section aria-label={t("listLabel")}>
+            <ul className={styles.list}>
+              {cart.items.map((item) => (
+                <CartItem key={item.id} item={item} />
               ))}
-            </AnimatePresence>
-          </div>
+            </ul>
+          </section>
 
-          {/* Order Summary */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className={styles.summary}
-          >
-            <h2 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "1.25rem" }}>
-              Order Summary
+          <aside className={styles.summary} aria-labelledby="bag-summary">
+            <h2 id="bag-summary" className={styles.summaryTitle}>
+              {t("summary")}
             </h2>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.25rem" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem" }}>
-                <span style={{ color: "var(--color-text-secondary)" }}>{t("subtotal")}</span>
-                <span style={{ fontWeight: 500 }}>{formatPrice(convert(cart.subtotal), currency)}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem" }}>
-                <span style={{ color: "var(--color-text-secondary)" }}>{t("shipping")}</span>
-                <span style={{ fontWeight: 600, color: cart.shippingCost === 0 ? "#2E7D32" : undefined }}>
-                  {cart.shippingCost > 0 ? formatPrice(convert(cart.shippingCost), currency) : "Free"}
-                </span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem" }}>
-                <span style={{ color: "var(--color-text-secondary)" }}>{t("tax")} (21%)</span>
-                <span style={{ fontWeight: 500 }}>{formatPrice(convert(cart.taxAmount), currency)}</span>
-              </div>
-
-              {subtotalConverted < freeShippingThreshold && (
-                <div
-                  style={{
-                    padding: "0.625rem 0.75rem",
-                    borderRadius: "var(--radius-md)",
-                    background: "var(--color-bg-secondary)",
-                    fontSize: "0.75rem",
-                    color: "var(--color-text-secondary)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.375rem",
-                  }}
-                >
-                  <Truck size={14} />
-                  Add {formatPrice(freeShippingThreshold - subtotalConverted, currency)} more for free shipping
-                </div>
-              )}
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontWeight: 800,
-                  fontSize: "1.25rem",
-                  borderTop: "2px solid var(--color-border)",
-                  paddingTop: "1rem",
-                  marginTop: "0.25rem",
-                }}
-              >
-                <span>{t("total")}</span>
-                <span>{formatPrice(convert(cart.total), currency)}</span>
-              </div>
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>{t("subtotal")}</span>
+              <span>{formatPrice(convert(cart.subtotal), currency)}</span>
+            </div>
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>{t("tax", { rate: 21 })}</span>
+              <span>{formatPrice(convert(cart.taxAmount), currency)}</span>
+            </div>
+            <div className={styles.row}>
+              <span className={styles.rowLabel}>{t("shipping")}</span>
+              <span className="text-muted">{t("shippingCalculated")}</span>
             </div>
 
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Link href="/checkout" className={styles.checkoutBtn}>
-                {t("checkout")} <ArrowRight size={18} />
-              </Link>
-            </motion.div>
+            <div className={styles.totalRow}>
+              <span className="text-sm font-medium">{t("total")}</span>
+              <span className="text-2xl font-light tracking-[-0.01em]">
+                {formatPrice(convert(beforeDelivery), currency)}
+              </span>
+            </div>
 
-            <Link
-              href="/catalog"
-              style={{
-                display: "block",
-                textAlign: "center",
-                marginTop: "0.875rem",
-                fontSize: "0.875rem",
-                fontWeight: 600,
-                color: "var(--color-accent)",
-              }}
-            >
+            <p className="mt-4 text-xs leading-relaxed text-muted">
+              {freeStandard
+                ? t("freeStandardReached", { amount: formatPrice(convert(FREE_STANDARD_MIN), currency) })
+                : t("freeStandardRemaining", {
+                    remaining: formatPrice(convert(remaining), currency),
+                    amount: formatPrice(convert(FREE_STANDARD_MIN), currency),
+                  })}
+            </p>
+
+            <Link href="/checkout" className={styles.checkoutBtn}>
+              {t("checkout")}
+            </Link>
+            <Link href="/catalog" className={styles.continueLink}>
               {t("continueShopping")}
             </Link>
 
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "0.375rem",
-              marginTop: "1.25rem",
-              paddingTop: "1rem",
-              borderTop: "1px solid var(--color-border)",
-              fontSize: "0.75rem",
-              color: "var(--color-text-tertiary)",
-            }}>
-              <ShieldCheck size={14} />
-              Secure checkout with SSL encryption
-            </div>
-          </motion.div>
+            <p className={styles.footnote}>{t("footnote")}</p>
+          </aside>
         </div>
       )}
     </div>

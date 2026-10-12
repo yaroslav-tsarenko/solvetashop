@@ -7,11 +7,16 @@ interface LoadingSpinnerProps {
   label?: string;
 }
 
+/** Quiet loading indicator: a thin ink-coloured spinner with an optional muted caption. */
 export function LoadingSpinner({ size = "md", label }: LoadingSpinnerProps) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "2rem" }}>
-      <Spinner size={size} />
-      {label && <span style={{ marginLeft: "0.5rem", fontSize: "0.875rem", color: "var(--color-text-secondary)" }}>{label}</span>}
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex flex-col items-center justify-center gap-3 px-4 py-16 text-ink"
+    >
+      <Spinner size={size} color="current" className="opacity-70" />
+      {label && <span className="text-[0.8125rem] text-muted">{label}</span>}
     </div>
   );
 }

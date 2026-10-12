@@ -1,664 +1,830 @@
-import { PolicyLayout, ContactBlock } from "@/components/layout/PolicyLayout/PolicyLayout";
+import type { Metadata } from "next";
+import { PolicyLayout, ContactBlock, type PolicySection } from "@/components/layout/PolicyLayout/PolicyLayout";
 import { COMPANY } from "@/lib/company";
 
-export const metadata = { title: "Privacy Policy — Solvetashop" };
+export const metadata: Metadata = { title: "Privacy Notice" };
 
-export default function PrivacyPolicyPage() {
+const sections: PolicySection[] = [
+  {
+    id: "what-this-notice-covers",
+    title: "What this notice covers",
+    body: (
+      <>
+        <p>1.1 This notice deals with the personal data we handle when you:</p>
+        <ul>
+          <li>browse or visit the Website;</li>
+          <li>open a customer account or use one you already have;</li>
+          <li>place an order, keep track of it, or take delivery of it;</li>
+          <li>
+            buy lighting, lamps, light fittings, light bulbs, home décor and related electrical and lighting
+            accessories from us;
+          </li>
+          <li>ask for, or make use of, trade, business or professional customer access;</li>
+          <li>get in touch with our customer support team;</li>
+          <li>
+            ask us about delivery progress, returns, refunds, warranty help or assistance with a product;
+          </li>
+          <li>sign up to receive marketing from us;</li>
+          <li>come into contact with cookies, analytics, advertising or similar technologies;</li>
+          <li>write to us or speak to us by email, telephone, online form or any other channel.</li>
+        </ul>
+        <p>1.2 It applies equally to Consumers and to Business Customers.</p>
+        <p>
+          1.3 Please read it alongside our <a href="/policies/terms">Terms of Sale</a>, our{" "}
+          <a href="/policies/shipping">Shipping &amp; Delivery Policy</a>, our{" "}
+          <a href="/policies/returns">Returns &amp; Refunds Policy</a>, our{" "}
+          <a href="/policies/cookies">Cookie Notice</a> and any other policy or notice published on the
+          Website.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "who-is-responsible",
+    title: "Who is responsible for your data",
+    body: (
+      <>
+        <p>
+          2.1 {COMPANY.legalName} acts as the data controller of your personal data under the data protection
+          laws that apply to us. Those laws include the UK General Data Protection Regulation and the Data
+          Protection Act 2018 and, where relevant, the EU General Data Protection Regulation.
+        </p>
+        <p>2.2 Being the controller means that we decide the purposes for which, and the way in which, your personal data is used.</p>
+        <p>
+          2.3 Any question about privacy can be sent to us using the contact details set out at the start of
+          this notice and again in section 19.
+        </p>
+        <p>
+          2.4 The law does not currently require us to appoint a Data Protection Officer, so we have not done
+          so. Privacy questions can still be raised with us through the contact details mentioned above.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "information-we-collect",
+    title: "The information we hold about you",
+    body: (
+      <>
+        <p>3.1 Exactly what we collect will depend on how you deal with Solvetashop.</p>
+        <p>3.2 The kinds of personal data we may collect and use are grouped below.</p>
+
+        <h3>3.3 Who you are and how to reach you</h3>
+        <ul>
+          <li>your full name;</li>
+          <li>your billing address and your delivery address;</li>
+          <li>your email address and telephone number;</li>
+          <li>the name of your company, if relevant;</li>
+          <li>your VAT number, tax number or other business details, if relevant;</li>
+          <li>your account username or customer reference.</li>
+        </ul>
+
+        <h3>3.4 Your customer account</h3>
+        <p>Where you open an account or use account features, this can include:</p>
+        <ul>
+          <li>the details you use to sign in;</li>
+          <li>the preferences you have set and the addresses you have saved;</li>
+          <li>your past orders;</li>
+          <li>products you have saved or added to a wishlist, if that feature is offered;</li>
+          <li>the status of your account;</li>
+          <li>how you prefer us to communicate with you.</li>
+        </ul>
+        <p>
+          Where secure password systems are in use, your password is never visible to us in a readable form.
+        </p>
+
+        <h3>3.5 Your orders and transactions</h3>
+        <p>Each order you place gives us information such as:</p>
+        <ul>
+          <li>the products you chose, the order number and the order value;</li>
+          <li>the currency you selected;</li>
+          <li>whether payment has been made;</li>
+          <li>the delivery method, dispatch details and tracking information;</li>
+          <li>invoice and receipt details;</li>
+          <li>records of any refund, return, cancellation or warranty claim;</li>
+          <li>the history of any customer service contact about that order.</li>
+        </ul>
+
+        <h3>3.6 Payment information</h3>
+        <p>
+          Card and other payments are handled by secure external payment providers. Your complete card number,
+          your full card security code and your complete card credentials are not stored by us.
+        </p>
+        <p>The provider may pass us a limited amount of payment information, which we may keep, for example:</p>
+        <ul>
+          <li>confirmation that the payment went through;</li>
+          <li>the transaction ID and the payment provider&rsquo;s reference;</li>
+          <li>the last four digits of your card, if the provider shares them;</li>
+          <li>the card brand, such as Visa or Mastercard;</li>
+          <li>the outcome of fraud screening;</li>
+          <li>details of any refund or chargeback.</li>
+        </ul>
+
+        <h3>3.7 Delivery and customs information</h3>
+        <p>So that your order can reach you, we may use:</p>
+        <ul>
+          <li>the delivery address, the recipient&rsquo;s name, a telephone number and an email address;</li>
+          <li>the tracking number, courier records and proof of delivery;</li>
+          <li>details needed for customs declarations and commercial invoices;</li>
+          <li>any import or export information that an international shipment requires.</li>
+        </ul>
+        <p>
+          On international orders, some order and delivery details may be passed to couriers, customs brokers,
+          customs authorities or local delivery partners.
+        </p>
+
+        <h3>3.8 Business and trade customers</h3>
+        <p>
+          When you buy as a Business Customer, ask for trade access or deal with us in a professional
+          capacity, we may also hold:
+        </p>
+        <ul>
+          <li>your company name and trading name;</li>
+          <li>registration details and VAT or tax details;</li>
+          <li>your business address;</li>
+          <li>the name of your contact person and their professional role;</li>
+          <li>information about your trade or contracting activity;</li>
+          <li>your order history;</li>
+          <li>records of our business correspondence with you.</li>
+        </ul>
+
+        <h3>3.9 Support requests and correspondence</h3>
+        <p>Whenever you contact us, we may keep:</p>
+        <ul>
+          <li>emails exchanged with you and details of telephone calls;</li>
+          <li>anything you submit through a contact form;</li>
+          <li>the details of your support request or product question;</li>
+          <li>the details of any complaint;</li>
+          <li>return or refund requests and information about warranty claims;</li>
+          <li>
+            photographs, videos, documents or other files you send us to show a problem with a product,
+            damage in transit, an installation concern or a warranty issue.
+          </li>
+        </ul>
+
+        <h3>3.10 Technical and usage information</h3>
+        <p>As you use the Website, some information is gathered automatically, including:</p>
+        <ul>
+          <li>your IP address and an approximate location worked out from it;</li>
+          <li>the type and version of your browser;</li>
+          <li>your device type and operating system;</li>
+          <li>the pages you look at and the website that referred you;</li>
+          <li>the date and time of each visit;</li>
+          <li>session information and clickstream data;</li>
+          <li>error logs and security logs;</li>
+          <li>performance data.</li>
+        </ul>
+
+        <h3>3.11 Cookies and tracking</h3>
+        <p>
+          Cookies and similar tools can tell us about your browsing, your preferences, what you do with your
+          cart and how you interact with analytics and, if you agree to it, with marketing or advertising.
+          Our <a href="/policies/cookies">Cookie Notice</a> explains this in more detail.
+        </p>
+
+        <h3>3.12 Marketing preferences</h3>
+        <p>If you sign up for marketing or engage with our promotional messages, we may hold:</p>
+        <ul>
+          <li>your email address;</li>
+          <li>whether you are subscribed, and your marketing consent;</li>
+          <li>a record of any unsubscribe request;</li>
+          <li>your communication preferences;</li>
+          <li>
+            data about how you engage with our emails, for example whether they were opened or clicked,
+            where our marketing tools support this.
+          </li>
+        </ul>
+
+        <h3>3.13 Fraud prevention and compliance</h3>
+        <p>
+          To safeguard our business, our customers and our payment systems, and to meet our legal duties, we
+          may use:
+        </p>
+        <ul>
+          <li>indicators of risk attached to an order;</li>
+          <li>the results of payment verification;</li>
+          <li>differences between billing and delivery details;</li>
+          <li>IP address and location signals;</li>
+          <li>checks against sanctions or restricted destinations;</li>
+          <li>chargeback history;</li>
+          <li>records of suspected fraud;</li>
+          <li>notes made during compliance reviews.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    id: "sensitive-data-and-children",
+    title: "Sensitive information and children",
+    body: (
+      <>
+        <p>
+          4.1 It is not our intention to collect special category personal data, for example details of your
+          health, race or ethnic origin, political views, religious beliefs, trade union membership, biometric
+          data or sexual orientation.
+        </p>
+        <p>
+          4.2 Please do not send us information of that kind unless we have asked for it and it is strictly
+          needed for a particular matter.
+        </p>
+        <p>
+          4.3 The Website is not aimed at children, and we do not knowingly collect personal data from
+          children.
+        </p>
+        <p>
+          4.4 The Website is meant for people aged 18 or over, because what we sell includes lamps, light
+          fittings and other electrical items that call for some technical understanding and must be used
+          safely.
+        </p>
+        <p>
+          4.5 If you think a child has given us personal data, please let us know at{" "}
+          <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>. We will look into it and, where required,
+          delete the information.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "where-data-comes-from",
+    title: "Where your information comes from",
+    body: (
+      <>
+        <p>5.1 Much of what we hold comes straight from you, for example when you:</p>
+        <ul>
+          <li>visit the Website or open an account;</li>
+          <li>place an order, give us billing or delivery details, or make a payment;</li>
+          <li>get in touch with us or ask for support;</li>
+          <li>send in a return, refund or warranty request;</li>
+          <li>sign up for marketing;</li>
+          <li>fill in a form or otherwise give us information through the Website.</li>
+        </ul>
+        <p>
+          5.2 Some information is captured automatically while you use the Website, for instance by cookies,
+          analytics tools, logs, security systems and comparable technologies.
+        </p>
+        <p>5.3 We may also be given personal data by others, such as:</p>
+        <ul>
+          <li>payment processors;</li>
+          <li>card networks and fraud prevention providers;</li>
+          <li>couriers and delivery partners;</li>
+          <li>customs brokers and customs authorities;</li>
+          <li>the providers of our e-commerce platform;</li>
+          <li>analytics providers;</li>
+          <li>providers of marketing and communication services;</li>
+          <li>providers of IT, hosting, security and infrastructure services;</li>
+          <li>our professional advisers;</li>
+          <li>public authorities, where the law requires it.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    id: "how-we-use-data",
+    title: "What we use your information for",
+    body: (
+      <>
+        <p>6.1 The purposes for which we use personal data are set out below.</p>
+
+        <h3>6.2 Handling and fulfilling your orders</h3>
+        <ul>
+          <li>receiving and processing your order and confirming payment;</li>
+          <li>sending order confirmations, receipts and invoices;</li>
+          <li>getting your goods ready for dispatch and arranging their delivery;</li>
+          <li>giving you tracking details;</li>
+          <li>dealing with customs paperwork where it is needed;</li>
+          <li>handling cancellations, returns, refunds and warranty claims.</li>
+        </ul>
+
+        <h3>6.3 Helping you as a customer</h3>
+        <ul>
+          <li>answering your questions;</li>
+          <li>helping with queries about products, orders or delivery;</li>
+          <li>looking into goods that arrive damaged, faulty, wrong or not at all;</li>
+          <li>dealing with complaints;</li>
+          <li>processing returns and warranty requests;</li>
+          <li>keeping in touch with you about your order or your account.</li>
+        </ul>
+
+        <h3>6.4 Running and developing the Website</h3>
+        <ul>
+          <li>keeping the Website working properly;</li>
+          <li>making it easier to navigate and pleasanter to use;</li>
+          <li>keeping an eye on performance and putting errors right;</li>
+          <li>trying out and refining Website features;</li>
+          <li>learning how customers use the Website.</li>
+        </ul>
+
+        <h3>6.5 Managing accounts and trade access</h3>
+        <ul>
+          <li>setting up and running customer accounts;</li>
+          <li>checking business or trade details where relevant;</li>
+          <li>providing the features that come with an account;</li>
+          <li>administering trade pricing or business access where we offer it;</li>
+          <li>keeping accounts secure.</li>
+        </ul>
+
+        <h3>6.6 Preventing fraud and keeping things secure</h3>
+        <ul>
+          <li>spotting and stopping fraud;</li>
+          <li>watching for suspicious activity;</li>
+          <li>protecting our payment systems;</li>
+          <li>stopping the Website from being misused;</li>
+          <li>securing accounts and systems;</li>
+          <li>investigating abuse or access that was not authorised;</li>
+          <li>dealing with chargebacks and payment disputes.</li>
+        </ul>
+
+        <h3>6.7 Meeting our legal and regulatory duties</h3>
+        <ul>
+          <li>
+            complying with our obligations under tax, accounting, company, consumer protection, customs,
+            sanctions and financial crime law, and our other legal obligations;
+          </li>
+          <li>keeping the records the law requires;</li>
+          <li>answering lawful requests from the authorities;</li>
+          <li>handling disputes and legal claims.</li>
+        </ul>
+
+        <h3>6.8 Sending you marketing</h3>
+        <p>
+          If the law allows it, we may use your contact details to tell you about products, offers,
+          promotions, news or services we think could interest you. You can opt out of marketing whenever you
+          like.
+        </p>
+
+        <h3>6.9 Cookies and analytics</h3>
+        <ul>
+          <li>running the parts of the Website that cannot work without them;</li>
+          <li>remembering your preferences;</li>
+          <li>keeping your cart working;</li>
+          <li>measuring visits to the Website and analysing how it performs;</li>
+          <li>making the Website better;</li>
+          <li>supporting marketing or advertising, where you have given any consent that is required.</li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    id: "lawful-bases",
+    title: "Our lawful grounds for using your data",
+    body: (
+      <>
+        <p>7.1 We will only use personal data where the law gives us a valid ground for doing so. The table matches each activity to the ground we rely on.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>What we are doing</th>
+              <th>Lawful ground</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Handling and fulfilling orders</td>
+              <td>Necessary to perform our contract with you</td>
+            </tr>
+            <tr>
+              <td>Taking payment and confirming the transaction</td>
+              <td>Necessary to perform our contract with you</td>
+            </tr>
+            <tr>
+              <td>Delivering your goods</td>
+              <td>Necessary to perform our contract with you</td>
+            </tr>
+            <tr>
+              <td>Dealing with returns, refunds and warranty claims</td>
+              <td>Necessary to perform our contract with you; legal obligation; legitimate interests</td>
+            </tr>
+            <tr>
+              <td>Supporting you as a customer</td>
+              <td>Necessary to perform our contract with you; legitimate interests</td>
+            </tr>
+            <tr>
+              <td>Opening and managing accounts</td>
+              <td>Necessary to perform our contract with you; legitimate interests</td>
+            </tr>
+            <tr>
+              <td>Checking business or trade account details</td>
+              <td>Necessary to perform our contract with you; legitimate interests</td>
+            </tr>
+            <tr>
+              <td>Preventing fraud and keeping the Website secure</td>
+              <td>Legitimate interests; legal obligation</td>
+            </tr>
+            <tr>
+              <td>Customs, tax, accounting and legal record-keeping</td>
+              <td>Legal obligation</td>
+            </tr>
+            <tr>
+              <td>Dealing with legal claims or disputes</td>
+              <td>Legitimate interests; legal obligation</td>
+            </tr>
+            <tr>
+              <td>Website analytics and improving our service</td>
+              <td>Legitimate interests; consent where the law requires it</td>
+            </tr>
+            <tr>
+              <td>Cookies and tracking that are not essential</td>
+              <td>Consent where the law requires it</td>
+            </tr>
+            <tr>
+              <td>Marketing by email</td>
+              <td>Consent, or legitimate interests where the law permits</td>
+            </tr>
+            <tr>
+              <td>Sanctions and compliance checks</td>
+              <td>Legal obligation; legitimate interests</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          7.2 We rely on legitimate interests only where we are satisfied that your rights and freedoms do not
+          outweigh them.
+        </p>
+        <p>
+          7.3 The legitimate interests we pursue can include running an online shop, fulfilling orders,
+          improving the Website, preventing fraud, protecting our systems, looking after our customer
+          relationships, enforcing our <a href="/policies/terms">Terms of Sale</a> and protecting our legal
+          and commercial position.
+        </p>
+        <p>
+          7.4 Where consent is the ground we rely on, you can withdraw it whenever you wish. Anything we did
+          with your data before you withdrew it remains lawful.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "marketing",
+    title: "Marketing messages",
+    body: (
+      <>
+        <p>
+          8.1 We will only send you marketing if you have agreed to receive it or the law otherwise allows us
+          to send it.
+        </p>
+        <p>
+          8.2 These messages might cover new products, offers, promotions, stock availability, service news,
+          or products similar to ones you have bought or looked at.
+        </p>
+        <p>
+          8.3 To stop receiving marketing at any point, click the unsubscribe link in any of our emails or
+          write to us at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
+        </p>
+        <p>
+          8.4 Opting out of marketing does not stop service messages. We may still contact you with order
+          confirmations, delivery news, payment notices, refund updates, warranty correspondence, and
+          important notices about your account or our policies.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "cookies",
+    title: "Cookies and similar tools",
+    body: (
+      <>
+        <p>
+          9.1 We use cookies on the Website together with comparable technologies such as pixels, tags, local
+          storage and analytics tools.
+        </p>
+        <p>
+          9.2 Certain cookies are essential to make the Website work, for example those that support the
+          cart, checkout, security, fraud prevention and access to your account.
+        </p>
+        <p>
+          9.3 Cookies that are not essential may be used for analytics, measuring performance,
+          personalisation, advertising or marketing, where the law permits this and where consent is needed.
+        </p>
+        <p>
+          9.4 The first time you visit, a cookie banner or consent tool may appear so that you can control
+          non-essential cookies.
+        </p>
+        <p>9.5 Your browser settings also let you control cookies.</p>
+        <p>
+          9.6 Our <a href="/policies/cookies">Cookie Notice</a> gives fuller information.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "sharing",
+    title: "Who we share your information with",
+    body: (
+      <>
+        <p>10.1 Your personal data is never sold by us.</p>
+        <p>
+          10.2 We do pass personal data to carefully chosen third parties where this is needed to run the
+          Website, process orders, deliver goods, meet our legal obligations or protect our business.
+        </p>
+        <p>10.3 Those third parties may include:</p>
+        <ul>
+          <li>payment processors and card payment providers;</li>
+          <li>banks, card networks and fraud prevention providers;</li>
+          <li>the providers of our e-commerce platform;</li>
+          <li>providers of hosting, IT, infrastructure and security services;</li>
+          <li>couriers, delivery partners, postal operators, customs brokers and logistics providers;</li>
+          <li>customs authorities and other public bodies, where required;</li>
+          <li>providers of email, communication and customer support services;</li>
+          <li>providers of analytics and cookie technology;</li>
+          <li>marketing service providers, where relevant;</li>
+          <li>our professional advisers, such as accountants, auditors, insurers, lawyers and consultants;</li>
+          <li>
+            regulators, courts, law enforcement agencies, tax authorities or government bodies, where the law
+            requires it;
+          </li>
+          <li>
+            business partners or successors if all or part of our business is restructured, merged, sold,
+            financed or transferred.
+          </li>
+        </ul>
+        <p>
+          10.4 Our service providers must use personal data only for the purposes we have authorised and must
+          keep it secure and confidential by applying appropriate measures.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "international-transfers",
+    title: "Transfers outside the UK",
+    body: (
+      <>
+        <p>
+          11.1 Solvetashop sells to customers in many countries and relies on outside service providers, so
+          your personal data may be handled outside the United Kingdom, outside the European Economic Area, or
+          outside the country where you live.
+        </p>
+        <p>
+          11.2 This can happen when the hosting, e-commerce, payment, analytics, communication, delivery,
+          customs or support providers we use are based abroad.
+        </p>
+        <p>11.3 Where data protection law requires it, such transfers are protected by suitable safeguards, which may include:</p>
+        <ul>
+          <li>adequacy regulations or adequacy decisions;</li>
+          <li>the UK International Data Transfer Agreement;</li>
+          <li>the UK Addendum to the EU Standard Contractual Clauses;</li>
+          <li>the EU Standard Contractual Clauses;</li>
+          <li>contractual and organisational safeguards;</li>
+          <li>any other transfer mechanism that applicable law allows.</li>
+        </ul>
+        <p>
+          11.4 We take reasonable steps so that data sent abroad continues to be protected to the standard
+          that data protection law requires.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "retention",
+    title: "How long we keep your information",
+    body: (
+      <>
+        <p>
+          12.1 Personal data is kept only for as long as is reasonably needed for the purposes in this notice,
+          unless the law requires or allows us to keep it longer.
+        </p>
+        <p>
+          12.2 How long that is will depend on the kind of data, why we hold it, legal requirements, our
+          accounting obligations, tax rules, warranty periods, the risk of disputes, fraud prevention needs
+          and operational needs.
+        </p>
+        <p>12.3 The table below gives a general indication.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Type of information</th>
+              <th>Usual retention period</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Order, transaction, invoice, accounting and tax records</td>
+              <td>Up to 7 years</td>
+            </tr>
+            <tr>
+              <td>Customer account information</td>
+              <td>While the account stays active, and for a reasonable period after that</td>
+            </tr>
+            <tr>
+              <td>Customer support correspondence</td>
+              <td>Up to 3 years after the matter has been closed, unless we need to keep it longer</td>
+            </tr>
+            <tr>
+              <td>Records of returns, refunds, complaints and warranty claims</td>
+              <td>For the applicable warranty, limitation or dispute period</td>
+            </tr>
+            <tr>
+              <td>Marketing consents and unsubscribe records</td>
+              <td>Until consent is withdrawn, and afterwards for as long as needed to respect your opt-out</td>
+            </tr>
+            <tr>
+              <td>Analytics and technical information</td>
+              <td>Normally 12&ndash;26 months, depending on the tool concerned</td>
+            </tr>
+            <tr>
+              <td>Fraud, chargeback, sanctions and compliance records</td>
+              <td>For as long as reasonably needed to prevent and investigate fraud and to comply with the law</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          12.4 We may keep information for longer where we need it to bring, pursue or defend legal claims, to
+          comply with the law, to look into fraud or abuse, to settle disputes or to enforce our{" "}
+          <a href="/policies/terms">Terms of Sale</a>.
+        </p>
+        <p>
+          12.5 Once we no longer need personal data, we will delete or anonymise it, or archive it securely
+          where that is appropriate.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "security",
+    title: "Keeping your information safe",
+    body: (
+      <>
+        <p>
+          13.1 We use reasonable technical and organisational measures to guard personal data against loss,
+          misuse, alteration, destruction, disclosure or access that has not been authorised.
+        </p>
+        <p>
+          13.2 Depending on the circumstances, these may include access controls, secure payment processing,
+          encryption, monitoring of our systems, account security features, checks on our providers and
+          internal controls.
+        </p>
+        <p>
+          13.3 However, no website, payment system, method of transmission or storage system can ever be
+          guaranteed to be entirely secure.
+        </p>
+        <p>
+          13.4 It is your responsibility to keep your account sign-in details private and to tell us straight
+          away if you suspect someone has got into your account without your permission.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "automated-decisions",
+    title: "Automated decisions and profiling",
+    body: (
+      <>
+        <p>
+          14.1 At present we do not take decisions about you based solely on automated processing that have a
+          legal effect on you or affect you in a similarly significant way.
+        </p>
+        <p>
+          14.2 Automated tools may help us with fraud prevention, payment and Website security, risk scoring
+          and monitoring transactions.
+        </p>
+        <p>
+          14.3 Their role is to flag activity that may be suspicious. They do not normally make final decisions
+          with legal or similarly significant effects without suitable review.
+        </p>
+        <p>
+          14.4 Should we start using automated decision-making with legal or similarly significant effects, we
+          will update this notice and give you the information the law requires.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "your-rights",
+    title: "Your rights over your data",
+    body: (
+      <>
+        <p>
+          15.1 Depending on where you are and which data protection law applies, you may be entitled to:
+        </p>
+        <ul>
+          <li>be told how your personal data is being used;</li>
+          <li>obtain a copy of your personal data;</li>
+          <li>have personal data that is wrong or incomplete corrected;</li>
+          <li>have your personal data erased in some circumstances;</li>
+          <li>have the processing of your data restricted in some circumstances;</li>
+          <li>object to processing that relies on legitimate interests;</li>
+          <li>object to direct marketing at any time;</li>
+          <li>data portability in some circumstances;</li>
+          <li>withdraw your consent where we rely on it;</li>
+          <li>
+            exercise the rights that relate to automated decision-making and profiling, where they apply (see
+            section 14);
+          </li>
+          <li>complain to a supervisory authority.</li>
+        </ul>
+        <p>
+          15.2 These rights are not unlimited. They can be subject to legal conditions and exemptions, to
+          checks on your identity and to our own legal obligations.
+        </p>
+        <p>
+          15.3 To use any of these rights, email us at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
+          We may have to confirm your identity before we reply.
+        </p>
+        <p>15.4 We aim to answer every valid request within the time limit set by the law that applies.</p>
+      </>
+    ),
+  },
+  {
+    id: "complaints",
+    title: "Raising a concern",
+    body: (
+      <>
+        <p>
+          16.1 If you are unhappy with the way we have handled your personal data, please contact us first at{" "}
+          <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a> and give us the chance to put things right.
+        </p>
+        <p>
+          16.2 Customers in the United Kingdom are entitled to complain to the Information Commissioner&rsquo;s
+          Office.
+        </p>
+        <p>
+          16.3 Customers in the European Union or the European Economic Area may be entitled to complain to the
+          data protection supervisory authority in their own country.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "third-party-sites",
+    title: "Other websites and services",
+    body: (
+      <>
+        <p>
+          17.1 The Website may link to sites and services run by others, such as manufacturers&rsquo; sites,
+          payment pages, courier tracking pages and social media pages.
+        </p>
+        <p>
+          17.2 We have no responsibility for the privacy practices, security, content or policies of those
+          third-party sites or services.
+        </p>
+        <p>
+          17.3 Please read their own privacy policies before you give them any personal data.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "changes",
+    title: "Updates to this notice",
+    body: (
+      <>
+        <p>
+          18.1 This notice may be revised from time to time to reflect changes to our business, the way the
+          Website works, the providers we use, how we handle data, the law or regulatory guidance.
+        </p>
+        <p>18.2 Each time we revise it, we will change the &ldquo;Last updated&rdquo; date shown at the top of the page.</p>
+        <p>
+          18.3 Unless we say otherwise, a revised version takes effect from the day it is published on the
+          Website.
+        </p>
+        <p>18.4 It is a good idea to look at this notice now and then so that you know how we handle personal data.</p>
+      </>
+    ),
+  },
+  {
+    id: "contact",
+    title: "Getting in touch",
+    body: (
+      <>
+        <p>
+          For any question, request or concern about this notice or the way we use personal data, you can
+          reach us here:
+        </p>
+        <ContactBlock />
+      </>
+    ),
+  },
+];
+
+export default function PrivacyNoticePage() {
   return (
-    <PolicyLayout title="Privacy Policy" lastUpdated="29 May 2026">
-      <p>
-        This Privacy Policy explains how {COMPANY.legalName}, trading as Solvetashop, collects, uses, stores, shares,
-        and protects personal data when you visit www.solvetashop.com, create an account, place an order,
-        contact us, use our services, or otherwise interact with us.
-      </p>
-      <p>The Website is operated by:</p>
-      <ContactBlock />
-      <p>
-        In this Privacy Policy, &ldquo;Solvetashop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; or
-        &ldquo;our&rdquo; means {COMPANY.legalName}. &ldquo;Customer&rdquo;, &ldquo;you&rdquo; or
-        &ldquo;your&rdquo; means any person using the Website, placing an order, creating an account,
-        contacting us, or interacting with our services.
-      </p>
-      <p>
-        We are committed to protecting your privacy and handling your personal data lawfully, fairly, and
-        transparently.
-      </p>
-
-      <h2>1. Scope of This Privacy Policy</h2>
-      <p>1.1 This Privacy Policy applies to personal data processed in connection with:</p>
-      <ul>
-        <li>visiting or browsing the Website;</li>
-        <li>creating or using a customer account;</li>
-        <li>placing, managing, or receiving an order;</li>
-        <li>purchasing electrical goods, electrical materials, wiring accessories, lighting-related products, installation components, and related goods;</li>
-        <li>applying for or using trade, business, or professional customer access;</li>
-        <li>contacting customer support;</li>
-        <li>requesting delivery updates, returns, refunds, warranty support, or product assistance;</li>
-        <li>subscribing to marketing communications;</li>
-        <li>interacting with cookies, analytics, advertising, or similar technologies;</li>
-        <li>communicating with us by email, phone, forms, or other channels.</li>
-      </ul>
-      <p>1.2 This Privacy Policy applies to both Consumers and Business Customers.</p>
-      <p>
-        1.3 This Privacy Policy should be read together with our Terms and Conditions, Shipping Policy,
-        Returns and Refunds Policy, Cookie Policy, and any other policy or notice made available on the
-        Website.
-      </p>
-
-      <h2>2. Data Controller</h2>
-      <p>
-        2.1 For the purposes of applicable data protection laws, including the UK General Data Protection
-        Regulation, the Data Protection Act 2018, and, where applicable, the EU General Data Protection
-        Regulation, {COMPANY.legalName} is the data controller of your personal data.
-      </p>
-      <p>2.2 This means we determine why and how your personal data is processed.</p>
-      <p>2.3 You can contact us about privacy matters using the following details:</p>
-      <ContactBlock />
-      <p>
-        2.4 We have not appointed a Data Protection Officer because we are not currently required to do so.
-        However, privacy-related enquiries may be sent to the contact details above.
-      </p>
-
-      <h2>3. Personal Data We Collect</h2>
-      <p>3.1 The personal data we collect depends on how you interact with Solvetashop.</p>
-      <p>3.2 We may collect and process the following categories of personal data.</p>
-
-      <h3>3.2.1 Identity and Contact Data</h3>
-      <p>This may include:</p>
-      <ul>
-        <li>full name;</li>
-        <li>billing address;</li>
-        <li>delivery address;</li>
-        <li>email address;</li>
-        <li>phone number;</li>
-        <li>company name, where applicable;</li>
-        <li>VAT number, tax number, or business details, where applicable;</li>
-        <li>account username or customer reference.</li>
-      </ul>
-
-      <h3>3.2.2 Account Data</h3>
-      <p>If you create an account or use customer account features, we may process:</p>
-      <ul>
-        <li>account login details;</li>
-        <li>account preferences;</li>
-        <li>saved addresses;</li>
-        <li>order history;</li>
-        <li>wishlist or saved products, where available;</li>
-        <li>account status;</li>
-        <li>communication preferences.</li>
-      </ul>
-      <p>
-        We do not have access to your password in readable form where secure password systems are used.
-      </p>
-
-      <h3>3.2.3 Order and Transaction Data</h3>
-      <p>When you place an order, we may process:</p>
-      <ul>
-        <li>products ordered;</li>
-        <li>order number;</li>
-        <li>order value;</li>
-        <li>selected currency;</li>
-        <li>payment status;</li>
-        <li>delivery method;</li>
-        <li>dispatch and tracking information;</li>
-        <li>invoice and receipt information;</li>
-        <li>refund, return, cancellation, or warranty records;</li>
-        <li>customer service history related to the order.</li>
-      </ul>
-
-      <h3>3.2.4 Payment Data</h3>
-      <p>Payments are processed by secure third-party payment providers.</p>
-      <p>
-        We do not store your full card number, full card security code, or complete card credentials.
-      </p>
-      <p>We may receive and store limited payment-related information, such as:</p>
-      <ul>
-        <li>payment confirmation;</li>
-        <li>transaction ID;</li>
-        <li>payment provider reference;</li>
-        <li>last four digits of a card where provided by the payment provider;</li>
-        <li>card brand, such as Visa or Mastercard;</li>
-        <li>fraud screening status;</li>
-        <li>refund or chargeback information.</li>
-      </ul>
-
-      <h3>3.2.5 Delivery and Customs Data</h3>
-      <p>To fulfil your order, we may process:</p>
-      <ul>
-        <li>delivery address;</li>
-        <li>recipient name;</li>
-        <li>phone number;</li>
-        <li>email address;</li>
-        <li>tracking number;</li>
-        <li>courier records;</li>
-        <li>proof of delivery;</li>
-        <li>customs declaration information;</li>
-        <li>commercial invoice information;</li>
-        <li>import/export information required for international shipments.</li>
-      </ul>
-      <p>
-        For international orders, certain order and delivery details may be provided to couriers, customs
-        brokers, customs authorities, or local delivery partners.
-      </p>
-
-      <h3>3.2.6 Business and Trade Customer Data</h3>
-      <p>
-        If you purchase as a Business Customer, apply for trade access, or interact with us in a
-        professional capacity, we may process:
-      </p>
-      <ul>
-        <li>company name;</li>
-        <li>trading name;</li>
-        <li>registration details;</li>
-        <li>VAT/tax details;</li>
-        <li>business address;</li>
-        <li>business contact person;</li>
-        <li>professional role;</li>
-        <li>trade or contractor information;</li>
-        <li>order history;</li>
-        <li>business communication records.</li>
-      </ul>
-
-      <h3>3.2.7 Customer Support and Communication Data</h3>
-      <p>When you contact us, we may process:</p>
-      <ul>
-        <li>email correspondence;</li>
-        <li>phone call details;</li>
-        <li>contact form submissions;</li>
-        <li>support request details;</li>
-        <li>product questions;</li>
-        <li>complaint details;</li>
-        <li>return or refund requests;</li>
-        <li>warranty claim information;</li>
-        <li>photos, videos, documents, or other files you provide to evidence product issues, delivery damage, installation concerns, or warranty claims.</li>
-      </ul>
-
-      <h3>3.2.8 Technical and Usage Data</h3>
-      <p>When you use the Website, we may automatically collect:</p>
-      <ul>
-        <li>IP address;</li>
-        <li>browser type and version;</li>
-        <li>device type;</li>
-        <li>operating system;</li>
-        <li>approximate location based on IP address;</li>
-        <li>pages visited;</li>
-        <li>referring website;</li>
-        <li>time and date of visits;</li>
-        <li>session information;</li>
-        <li>clickstream data;</li>
-        <li>error logs;</li>
-        <li>security logs;</li>
-        <li>performance data.</li>
-      </ul>
-
-      <h3>3.2.9 Cookie and Tracking Data</h3>
-      <p>
-        We may use cookies and similar technologies to collect information about your browsing activity,
-        preferences, cart activity, analytics interactions, and, where you consent, marketing or advertising
-        interactions.
-      </p>
-      <p>More details are provided in our Cookie Policy.</p>
-
-      <h3>3.2.10 Marketing Preference Data</h3>
-      <p>If you subscribe to marketing or interact with promotional communications, we may process:</p>
-      <ul>
-        <li>email address;</li>
-        <li>subscription status;</li>
-        <li>marketing consent;</li>
-        <li>unsubscribe records;</li>
-        <li>communication preferences;</li>
-        <li>email engagement data, such as opens and clicks, where supported by our marketing tools.</li>
-      </ul>
-
-      <h3>3.2.11 Fraud Prevention and Compliance Data</h3>
-      <p>
-        To protect our business, customers, payment systems, and legal obligations, we may process:
-      </p>
-      <ul>
-        <li>order risk indicators;</li>
-        <li>payment verification results;</li>
-        <li>billing and delivery mismatches;</li>
-        <li>IP address and location indicators;</li>
-        <li>sanctions or restricted destination checks;</li>
-        <li>chargeback history;</li>
-        <li>suspected fraud records;</li>
-        <li>compliance review notes.</li>
-      </ul>
-
-      <h2>4. Personal Data We Do Not Intend to Collect</h2>
-      <p>
-        4.1 We do not intentionally collect special category personal data, such as information about health,
-        race, ethnicity, political opinions, religious beliefs, trade union membership, biometric data, or
-        sexual orientation.
-      </p>
-      <p>
-        4.2 Please do not send us special category data unless it is strictly necessary for a specific matter
-        and we have requested it.
-      </p>
-      <p>4.3 We do not knowingly collect personal data from children.</p>
-      <p>
-        4.4 The Website is intended for users aged 18 or over because our goods include electrical products
-        and materials that may require technical understanding and safe use.
-      </p>
-
-      <h2>5. How We Collect Personal Data</h2>
-      <p>5.1 We may collect personal data directly from you when you:</p>
-      <ul>
-        <li>visit the Website;</li>
-        <li>create an account;</li>
-        <li>place an order;</li>
-        <li>enter billing or delivery details;</li>
-        <li>make a payment;</li>
-        <li>contact us;</li>
-        <li>request support;</li>
-        <li>submit a return, refund, or warranty request;</li>
-        <li>subscribe to marketing;</li>
-        <li>complete forms or provide information through the Website.</li>
-      </ul>
-      <p>
-        5.2 We may collect personal data automatically when you use the Website, including through cookies,
-        analytics tools, logs, security systems, and similar technologies.
-      </p>
-      <p>5.3 We may receive personal data from third parties, including:</p>
-      <ul>
-        <li>payment processors;</li>
-        <li>card networks and fraud prevention providers;</li>
-        <li>couriers and delivery partners;</li>
-        <li>customs brokers and customs authorities;</li>
-        <li>e-commerce platform providers;</li>
-        <li>analytics providers;</li>
-        <li>marketing and communication service providers;</li>
-        <li>IT, hosting, security, and infrastructure providers;</li>
-        <li>professional advisers;</li>
-        <li>public authorities where legally required.</li>
-      </ul>
-
-      <h2>6. How We Use Your Personal Data</h2>
-      <p>6.1 We use your personal data for the purposes described below.</p>
-
-      <h3>6.1.1 To Process and Fulfil Orders</h3>
-      <p>We use personal data to:</p>
-      <ul>
-        <li>receive and process orders;</li>
-        <li>confirm payment;</li>
-        <li>issue confirmations, receipts, and invoices;</li>
-        <li>prepare goods for dispatch;</li>
-        <li>arrange delivery;</li>
-        <li>provide tracking details;</li>
-        <li>handle customs documentation where required;</li>
-        <li>manage cancellations, returns, refunds, and warranty claims.</li>
-      </ul>
-
-      <h3>6.1.2 To Provide Customer Support</h3>
-      <p>We use personal data to:</p>
-      <ul>
-        <li>respond to enquiries;</li>
-        <li>assist with product, order, or delivery questions;</li>
-        <li>investigate damaged, faulty, incorrect, or missing goods;</li>
-        <li>manage complaints;</li>
-        <li>process return and warranty requests;</li>
-        <li>communicate about your order or account.</li>
-      </ul>
-
-      <h3>6.1.3 To Operate and Improve the Website</h3>
-      <p>We use personal data to:</p>
-      <ul>
-        <li>maintain Website functionality;</li>
-        <li>improve navigation and user experience;</li>
-        <li>monitor performance;</li>
-        <li>fix errors;</li>
-        <li>test and improve Website features;</li>
-        <li>understand how customers use the Website.</li>
-      </ul>
-
-      <h3>6.1.4 To Manage Accounts and Trade Access</h3>
-      <p>We use personal data to:</p>
-      <ul>
-        <li>create and manage customer accounts;</li>
-        <li>verify business or trade information where applicable;</li>
-        <li>provide account features;</li>
-        <li>manage trade pricing or business access where available;</li>
-        <li>maintain account security.</li>
-      </ul>
-
-      <h3>6.1.5 To Prevent Fraud and Protect Security</h3>
-      <p>We use personal data to:</p>
-      <ul>
-        <li>detect and prevent fraud;</li>
-        <li>monitor suspicious activity;</li>
-        <li>protect payment systems;</li>
-        <li>prevent misuse of the Website;</li>
-        <li>secure accounts and systems;</li>
-        <li>investigate unauthorised access or abuse;</li>
-        <li>manage chargebacks and payment disputes.</li>
-      </ul>
-
-      <h3>6.1.6 To Comply With Legal and Regulatory Obligations</h3>
-      <p>We use personal data to:</p>
-      <ul>
-        <li>comply with tax, accounting, company, consumer protection, customs, sanctions, financial crime, and legal obligations;</li>
-        <li>keep legally required records;</li>
-        <li>respond to lawful requests from authorities;</li>
-        <li>manage disputes and legal claims.</li>
-      </ul>
-
-      <h3>6.1.7 To Send Marketing Communications</h3>
-      <p>
-        Where permitted by law, we may use your contact details to send marketing communications about
-        products, offers, promotions, updates, or services that may be relevant to you.
-      </p>
-      <p>You can unsubscribe from marketing at any time.</p>
-
-      <h3>6.1.8 To Use Cookies and Analytics</h3>
-      <p>We use cookies and similar technologies to:</p>
-      <ul>
-        <li>operate essential Website functions;</li>
-        <li>remember preferences;</li>
-        <li>maintain cart functionality;</li>
-        <li>measure Website traffic;</li>
-        <li>analyse performance;</li>
-        <li>improve the Website;</li>
-        <li>support marketing or advertising where you have given consent where required.</li>
-      </ul>
-
-      <h2>7. Legal Bases for Processing</h2>
-      <p>7.1 We process personal data only where we have a lawful basis to do so.</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Purpose</th>
-            <th>Legal basis</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Processing and fulfilling orders</td><td>Contractual necessity</td></tr>
-          <tr><td>Taking payment and confirming transactions</td><td>Contractual necessity</td></tr>
-          <tr><td>Delivering goods</td><td>Contractual necessity</td></tr>
-          <tr><td>Handling returns, refunds, and warranty claims</td><td>Contractual necessity; legal obligation; legitimate interests</td></tr>
-          <tr><td>Customer support</td><td>Contractual necessity; legitimate interests</td></tr>
-          <tr><td>Account creation and account management</td><td>Contractual necessity; legitimate interests</td></tr>
-          <tr><td>Business or trade account verification</td><td>Contractual necessity; legitimate interests</td></tr>
-          <tr><td>Fraud prevention and Website security</td><td>Legitimate interests; legal obligation</td></tr>
-          <tr><td>Customs, tax, accounting, and legal records</td><td>Legal obligation</td></tr>
-          <tr><td>Responding to legal claims or disputes</td><td>Legitimate interests; legal obligation</td></tr>
-          <tr><td>Service improvement and Website analytics</td><td>Legitimate interests; consent where required</td></tr>
-          <tr><td>Non-essential cookies and tracking</td><td>Consent where required</td></tr>
-          <tr><td>Marketing emails</td><td>Consent or legitimate interests where permitted by law</td></tr>
-          <tr><td>Sanctions and compliance checks</td><td>Legal obligation; legitimate interests</td></tr>
-        </tbody>
-      </table>
-      <p>
-        7.2 Where we rely on legitimate interests, we do so only where we believe our interests are not
-        overridden by your rights and freedoms.
-      </p>
-      <p>
-        7.3 Our legitimate interests may include operating an online store, fulfilling customer orders,
-        improving our Website, preventing fraud, protecting our systems, managing customer relationships,
-        enforcing our Terms, and protecting our legal and commercial interests.
-      </p>
-      <p>
-        7.4 Where we rely on consent, you may withdraw your consent at any time. Withdrawal of consent does
-        not affect processing carried out before consent was withdrawn.
-      </p>
-
-      <h2>8. Marketing Communications</h2>
-      <p>
-        8.1 We may send you marketing communications where you have consented or where applicable law allows
-        us to do so.
-      </p>
-      <p>
-        8.2 Marketing communications may include product updates, offers, promotions, availability notices,
-        service updates, or information about products similar to those you have purchased or viewed.
-      </p>
-      <p>
-        8.3 You can unsubscribe from marketing communications at any time by using the unsubscribe link in
-        the relevant email or contacting us at info@solvetashop.com.
-      </p>
-      <p>
-        8.4 Even if you unsubscribe from marketing, we may still send you service messages, such as order
-        confirmations, delivery updates, payment notices, refund updates, warranty communications, or
-        important account and policy notices.
-      </p>
-
-      <h2>9. Cookies and Similar Technologies</h2>
-      <p>
-        9.1 The Website uses cookies and similar technologies, such as pixels, tags, local storage, and
-        analytics tools.
-      </p>
-      <p>
-        9.2 Some cookies are essential for the Website to function, including cookies used for cart
-        functionality, checkout, security, fraud prevention, and account access.
-      </p>
-      <p>
-        9.3 Non-essential cookies may be used for analytics, performance measurement, personalisation,
-        advertising, or marketing where permitted by law and where consent is required.
-      </p>
-      <p>
-        9.4 When you first visit the Website, you may be presented with a cookie banner or consent tool
-        allowing you to manage non-essential cookies.
-      </p>
-      <p>9.5 You can also manage cookies through your browser settings.</p>
-      <p>9.6 For more information, please see our Cookie Policy.</p>
-
-      <h2>10. Sharing Your Personal Data</h2>
-      <p>10.1 We do not sell your personal data.</p>
-      <p>
-        10.2 We may share your personal data with trusted third parties where necessary to operate the
-        Website, process orders, deliver goods, comply with law, or protect our business.
-      </p>
-      <p>10.3 We may share personal data with:</p>
-      <ul>
-        <li>payment processors and card payment providers;</li>
-        <li>banks, card networks, and fraud prevention providers;</li>
-        <li>e-commerce platform providers;</li>
-        <li>hosting, IT, infrastructure, and security providers;</li>
-        <li>couriers, delivery partners, postal operators, customs brokers, and logistics providers;</li>
-        <li>customs authorities and other public authorities where required;</li>
-        <li>email, communication, and customer support providers;</li>
-        <li>analytics and cookie technology providers;</li>
-        <li>marketing service providers, where applicable;</li>
-        <li>professional advisers, including accountants, auditors, insurers, lawyers, and consultants;</li>
-        <li>regulators, courts, law enforcement, tax authorities, or government bodies where required by law;</li>
-        <li>business partners or successors in the event of a restructuring, merger, sale, financing, or transfer of all or part of our business.</li>
-      </ul>
-      <p>
-        10.4 We require service providers to process personal data only for authorised purposes and to apply
-        appropriate security and confidentiality measures.
-      </p>
-
-      <h2>11. International Data Transfers</h2>
-      <p>
-        11.1 Because Solvetashop sells internationally and uses third-party service providers, your personal
-        data may be processed outside the United Kingdom, the European Economic Area, or your country of
-        residence.
-      </p>
-      <p>
-        11.2 International transfers may occur where we use hosting, e-commerce, payment, analytics,
-        communication, delivery, customs, or support providers located in other countries.
-      </p>
-      <p>
-        11.3 Where required by data protection law, we use appropriate safeguards for international
-        transfers. These may include:
-      </p>
-      <ul>
-        <li>adequacy regulations or adequacy decisions;</li>
-        <li>the UK International Data Transfer Agreement;</li>
-        <li>the UK Addendum to the EU Standard Contractual Clauses;</li>
-        <li>EU Standard Contractual Clauses;</li>
-        <li>contractual and organisational safeguards;</li>
-        <li>other lawful transfer mechanisms permitted by applicable law.</li>
-      </ul>
-      <p>
-        11.4 We take reasonable steps to ensure that personal data transferred internationally remains
-        protected in accordance with applicable data protection requirements.
-      </p>
-
-      <h2>12. Data Retention</h2>
-      <p>
-        12.1 We keep personal data only for as long as reasonably necessary for the purposes described in
-        this Privacy Policy, unless a longer retention period is required or permitted by law.
-      </p>
-      <p>
-        12.2 Our retention periods may vary depending on the type of data, purpose of processing, legal
-        requirements, accounting obligations, tax rules, warranty periods, dispute risks, fraud prevention
-        needs, and operational requirements.
-      </p>
-      <p>12.3 As a general guide:</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Data category</th>
-            <th>Typical retention period</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Order, transaction, invoice, accounting, and tax records</td><td>Up to 7 years</td></tr>
-          <tr><td>Customer account data</td><td>For as long as the account remains active, then for a reasonable period afterwards</td></tr>
-          <tr><td>Customer support communications</td><td>Up to 3 years after the matter is closed, unless longer retention is needed</td></tr>
-          <tr><td>Return, refund, complaint, and warranty records</td><td>For the relevant warranty, limitation, or dispute period</td></tr>
-          <tr><td>Marketing consent and unsubscribe records</td><td>Until withdrawn, then retained as needed to honour suppression preferences</td></tr>
-          <tr><td>Analytics and technical data</td><td>Usually 12&ndash;26 months, depending on the relevant tool</td></tr>
-          <tr><td>Fraud, chargeback, sanctions, or compliance records</td><td>As long as reasonably necessary for prevention, investigation, and legal compliance</td></tr>
-        </tbody>
-      </table>
-      <p>
-        12.4 We may retain data for longer where necessary to establish, exercise, or defend legal claims,
-        comply with legal obligations, investigate fraud or abuse, resolve disputes, or enforce our Terms and
-        Conditions.
-      </p>
-      <p>
-        12.5 When personal data is no longer required, we will delete it, anonymise it, or securely archive
-        it where appropriate.
-      </p>
-
-      <h2>13. Security of Personal Data</h2>
-      <p>
-        13.1 We take reasonable technical and organisational measures to protect personal data against
-        unauthorised access, loss, misuse, alteration, disclosure, or destruction.
-      </p>
-      <p>
-        13.2 These measures may include access controls, secure payment processing, encryption where
-        appropriate, system monitoring, account security measures, provider due diligence, and internal
-        controls.
-      </p>
-      <p>
-        13.3 No website, payment system, transmission method, or storage system can be guaranteed to be
-        completely secure.
-      </p>
-      <p>
-        13.4 You are responsible for keeping your account login details confidential and for notifying us
-        promptly if you believe your account has been accessed without authorisation.
-      </p>
-
-      <h2>14. Your Data Protection Rights</h2>
-      <p>
-        14.1 Depending on your location and applicable data protection law, you may have the following rights
-        in relation to your personal data:
-      </p>
-      <ul>
-        <li>the right to be informed about how your personal data is used;</li>
-        <li>the right to access a copy of your personal data;</li>
-        <li>the right to request correction of inaccurate or incomplete personal data;</li>
-        <li>the right to request deletion of your personal data in certain circumstances;</li>
-        <li>the right to request restriction of processing in certain circumstances;</li>
-        <li>the right to object to processing based on legitimate interests;</li>
-        <li>the right to object to direct marketing at any time;</li>
-        <li>the right to data portability in certain circumstances;</li>
-        <li>the right to withdraw consent where processing is based on consent;</li>
-        <li>rights relating to automated decision-making and profiling where applicable;</li>
-        <li>the right to lodge a complaint with a supervisory authority.</li>
-      </ul>
-      <p>
-        14.2 These rights are not absolute and may be subject to legal conditions, exemptions, identity
-        verification, and our legal obligations.
-      </p>
-      <p>14.3 To exercise your rights, please contact us at info@solvetashop.com.</p>
-      <p>14.4 We may need to verify your identity before responding to a request.</p>
-      <p>
-        14.5 We aim to respond to valid data protection requests within the timeframe required by applicable
-        law.
-      </p>
-
-      <h2>15. Complaints</h2>
-      <p>
-        15.1 If you have concerns about how we handle your personal data, please contact us first at
-        info@solvetashop.com so we can try to resolve the matter.
-      </p>
-      <p>
-        15.2 If you are in the United Kingdom, you have the right to lodge a complaint with the Information
-        Commissioner&rsquo;s Office.
-      </p>
-      <p>
-        15.3 If you are in the European Union or European Economic Area, you may have the right to lodge a
-        complaint with your local data protection supervisory authority.
-      </p>
-
-      <h2>16. Automated Decision-Making and Profiling</h2>
-      <p>
-        16.1 We do not currently use personal data to make decisions that are solely automated and that
-        produce legal or similarly significant effects on you.
-      </p>
-      <p>
-        16.2 We may use automated tools to support fraud prevention, payment security, Website security,
-        risk scoring, or transaction monitoring.
-      </p>
-      <p>
-        16.3 These tools help identify potentially suspicious activity but do not normally make final
-        decisions that have legal or similarly significant effects without appropriate review.
-      </p>
-      <p>
-        16.4 If we introduce automated decision-making that has legal or similarly significant effects, we
-        will update this Privacy Policy and provide the information required by applicable law.
-      </p>
-
-      <h2>17. Third-Party Websites and Services</h2>
-      <p>
-        17.1 The Website may contain links to third-party websites, manufacturer websites, payment pages,
-        courier tracking pages, social media pages, or other external services.
-      </p>
-      <p>
-        17.2 We are not responsible for the privacy practices, security, content, or policies of third-party
-        websites or services.
-      </p>
-      <p>
-        17.3 You should review the privacy policies of any third-party website or service before providing
-        personal data to them.
-      </p>
-
-      <h2>18. Children&rsquo;s Privacy</h2>
-      <p>18.1 The Website is not directed at children.</p>
-      <p>18.2 We do not knowingly collect personal data from children.</p>
-      <p>
-        18.3 If you believe that a child has provided personal data to us, please contact us at
-        info@solvetashop.com and we will take appropriate steps to review and delete the information where
-        required.
-      </p>
-
-      <h2>19. Changes to This Privacy Policy</h2>
-      <p>
-        19.1 We may update this Privacy Policy from time to time to reflect changes in our business, Website
-        functionality, service providers, data processing practices, legal requirements, or regulatory
-        guidance.
-      </p>
-      <p>
-        19.2 When we update this Privacy Policy, we will revise the &ldquo;Last updated&rdquo; date at the
-        top of the page.
-      </p>
-      <p>
-        19.3 The updated version will apply from the date it is published on the Website, unless stated
-        otherwise.
-      </p>
-      <p>
-        19.4 We recommend that you review this Privacy Policy periodically to stay informed about how we
-        handle personal data.
-      </p>
-
-      <h2>20. Contact Information</h2>
-      <p>
-        If you have any questions, requests, or concerns about this Privacy Policy or how we process
-        personal data, please contact us:
-      </p>
-      <ContactBlock />
-    </PolicyLayout>
+    <PolicyLayout
+      title="Privacy Notice"
+      lastUpdated="12 October 2026"
+      summary="What personal data Solvetashop collects, why we use it, who we share it with, how long we keep it and the rights you have over it."
+      intro={
+        <>
+          <p>
+            {COMPANY.legalName}, which trades as Solvetashop, uses this notice to explain what happens to your
+            personal data &ndash; how it is collected, used, stored, shared and protected &ndash; when you
+            visit www.solvetashop.com, open an account, order from us, contact us, use our services or deal
+            with us in any other way.
+          </p>
+          <p>The Website is run by:</p>
+          <ContactBlock />
+          <p>
+            Throughout this notice, &ldquo;Solvetashop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; and
+            &ldquo;our&rdquo; refer to {COMPANY.legalName}. &ldquo;Customer&rdquo;, &ldquo;you&rdquo; and
+            &ldquo;your&rdquo; refer to anyone who uses the Website, orders from us, opens an account, contacts
+            us or otherwise uses our services.
+          </p>
+          <p>
+            We take the protection of your privacy seriously and handle your personal data lawfully, fairly and
+            openly.
+          </p>
+        </>
+      }
+      sections={sections}
+    />
   );
 }

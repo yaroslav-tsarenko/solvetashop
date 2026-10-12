@@ -41,21 +41,21 @@ export function Button({
   ...rest
 }: ButtonProps) {
   const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { padding: isIconOnly ? "0.375rem" : "0.375rem 0.75rem", fontSize: "0.8125rem" },
-    md: { padding: isIconOnly ? "0.5rem" : "0.5rem 1rem", fontSize: "0.875rem" },
-    lg: { padding: isIconOnly ? "0.625rem" : "0.625rem 1.5rem", fontSize: "1rem" },
+    sm: { padding: isIconOnly ? "0.5rem" : "0 1rem", minHeight: "2.25rem", fontSize: "0.8125rem" },
+    md: { padding: isIconOnly ? "0.625rem" : "0 1.375rem", minHeight: "2.75rem", fontSize: "0.875rem" },
+    lg: { padding: isIconOnly ? "0.75rem" : "0 2rem", minHeight: "3.25rem", fontSize: "0.9375rem" },
   };
 
   const resolvedVariant = resolveVariant(variant, color);
 
   const variantStyles: Record<string, React.CSSProperties> = {
-    primary: { background: "var(--color-accent)", color: "#fff", border: "none" },
-    secondary: { background: "var(--color-bg-secondary)", color: "var(--color-text)", border: "1px solid var(--color-border)" },
-    tertiary: { background: "transparent", color: "var(--color-text-secondary)", border: "none" },
-    outline: { background: "transparent", color: "var(--color-text)", border: "1px solid var(--color-border)" },
-    ghost: { background: "transparent", color: "var(--color-text)", border: "none" },
-    danger: { background: "var(--color-danger)", color: "#fff", border: "none" },
-    "danger-soft": { background: "var(--color-danger-bg, rgba(239,68,68,0.1))", color: "var(--color-danger)", border: "none" },
+    primary: { background: "var(--color-ink)", color: "var(--color-on-ink)", border: "1px solid var(--color-ink)" },
+    secondary: { background: "transparent", color: "var(--color-ink)", border: "1px solid var(--color-line-strong)" },
+    tertiary: { background: "transparent", color: "var(--color-muted)", border: "1px solid transparent" },
+    outline: { background: "transparent", color: "var(--color-ink)", border: "1px solid var(--color-line-strong)" },
+    ghost: { background: "transparent", color: "var(--color-ink)", border: "1px solid transparent" },
+    danger: { background: "var(--color-brick)", color: "var(--color-paper)", border: "1px solid var(--color-brick)" },
+    "danger-soft": { background: "var(--color-brick-soft)", color: "var(--color-brick)", border: "1px solid transparent" },
   };
 
   const baseStyle: React.CSSProperties = {
@@ -63,11 +63,12 @@ export function Button({
     alignItems: "center",
     justifyContent: "center",
     gap: "0.5rem",
-    borderRadius: "var(--radius-lg)",
-    fontWeight: 600,
+    borderRadius: "var(--radius-pill)",
+    fontWeight: 500,
+    whiteSpace: "nowrap",
     cursor: isDisabled || isLoading ? "not-allowed" : "pointer",
     opacity: isDisabled || isLoading ? 0.6 : 1,
-    transition: "all 0.2s ease",
+    transition: "background-color 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s",
     textDecoration: "none",
     width: fullWidth ? "100%" : undefined,
     ...sizeStyles[size],

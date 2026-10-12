@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, useCallback, type React
 import type { Cart, CartItem } from "@/types/cart";
 import { toast } from "sonner";
 import { CartToast } from "@/components/cart/CartToast/CartToast";
+import { DEFAULT_SHIPPING_METHOD, shippingCost as shippingCostFor } from "@/lib/shipping";
 
 interface CartContextType {
   cart: Cart;
@@ -31,7 +32,9 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 function calculateTotals(items: CartItem[], taxRate: number = 21): Cart {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const taxAmount = subtotal * (taxRate / 100);
-  const shippingCost = subtotal > 0 ? (subtotal >= 100 ? 0 : 5.99) : 0;
+  // Estimate with the default (standard) method before discounts; the checkout
+  // recalculates with the chosen method and any discount.
+  const shippingCost = subtotal > 0 ? shippingCostFor(DEFAULT_SHIPPING_METHOD, subtotal) : 0;
   const total = subtotal + taxAmount + shippingCost;
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 

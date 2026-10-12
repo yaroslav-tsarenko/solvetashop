@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SHIPPING_METHOD_KEYS } from "@/lib/shipping";
 
 export const checkoutContactSchema = z.object({
   email: z.string().email("Valid email is required"),
@@ -32,7 +33,7 @@ export const cardSchema = z.object({
 export const checkoutSchema = z.object({
   contact: checkoutContactSchema,
   shipping: checkoutShippingSchema,
-  shippingMethod: z.string().min(1, "Shipping method is required"),
+  shippingMethod: z.enum(SHIPPING_METHOD_KEYS, { message: "Choose a valid shipping method" }),
   termsAccepted: z.boolean().refine((v) => v === true, {
     message: "You must accept the Terms and Conditions and the Privacy Policy",
   }),

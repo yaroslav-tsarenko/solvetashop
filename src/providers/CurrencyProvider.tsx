@@ -2,22 +2,20 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 
-export type Currency = "GBP" | "EUR" | "USD";
+import {
+  BASE_CURRENCY,
+  SUPPORTED_CURRENCIES,
+  DEFAULT_RATES,
+  convertFromBase,
+  type Currency,
+  type Rates,
+} from "@/lib/currency";
 
-/** The store's base currency: what the numbers in the database mean. Every
- *  other currency is derived from it at display time, so this is the one value
- *  that has to agree with how prices were imported and what the checkout
- *  charges. */
-export const BASE_CURRENCY: Currency = "GBP";
-
-/** Currencies the switcher offers, base first. */
-export const SUPPORTED_CURRENCIES: Currency[] = ["GBP", "EUR", "USD"];
-
-interface Rates {
-  GBP: number;
-  EUR: number;
-  USD: number;
-}
+// The store's base currency (GBP) is what the numbers in the database mean.
+// Every other currency is derived from it at display time with the same maths
+// /api/checkout uses to charge, so displayed and charged totals agree.
+export { BASE_CURRENCY, SUPPORTED_CURRENCIES };
+export type { Currency };
 
 interface CurrencyContextType {
   currency: Currency;
@@ -26,8 +24,6 @@ interface CurrencyContextType {
   convert: (amountInBase: number) => number;
   rates: Rates;
 }
-
-const DEFAULT_RATES: Rates = { GBP: 1, EUR: 1.17, USD: 1.27 };
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
@@ -61,10 +57,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   };
 
   const convert = useCallback(
-    (amountInBase: number) => {
-      if (currency === BASE_CURRENCY) return amountInBase;
-      return Math.round(amountInBase * rates[currency] * 100) / 100;
-    },
+    (amountInBase: number) => convertFromBase(amountInBase, currency, rates),
     [currency, rates]
   );
 

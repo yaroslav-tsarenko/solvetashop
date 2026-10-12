@@ -5,6 +5,9 @@ import { getSessionUser } from "@/lib/auth";
 import { sendOrderConfirmationEmail, sendOrderInvoiceEmail } from "@/lib/email";
 import { scheduleEmail } from "@/lib/email-jobs";
 import { resolveDiscount, markDiscountUsed } from "@/lib/discounts";
+import { shippingCost as shippingCostFor } from "@/lib/shipping";
+import { BASE_CURRENCY, convertFromBase, isCurrency, type Currency } from "@/lib/currency";
+import { getGbpRates } from "@/lib/exchange-rates";
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,34 +61,27 @@ export async function POST(request: NextRequest) {
     const discountedSubtotal = subtotal - discountAmount;
 
     const settings = await prisma.storeSettings.findFirst();
-    const baseCurrency = settings?.currency || "GBP";
+    // Product prices are stored in GBP (the storefront's base currency); this
+    // does not depend on settings.currency.
     const currencyCookie = request.cookies.get("currency")?.value;
-    const selectedCurrency = (body.currency && ["GBP", "EUR", "USD"].includes(body.currency))
+    const selectedCurrency: Currency = isCurrency(body.currency)
       ? body.currency
-      : ((currencyCookie && ["GBP", "EUR", "USD"].includes(currencyCookie))
+      : isCurrency(currencyCookie)
         ? currencyCookie
-        : baseCurrency);
+        : BASE_CURRENCY;
 
     const taxRate = Number(settings?.taxRate ?? 21);
     const taxAmount = +(discountedSubtotal * (taxRate / 100)).toFixed(2);
-    const shippingCost = discountedSubtotal >= Number(settings?.freeShippingMin ?? 100) ? 0 : 5.99;
+    // Delivery terms live in src/lib/shipping.ts (the DB freeShippingMin is ignored).
+    const shippingCost = shippingCostFor(validated.shippingMethod, discountedSubtotal);
     const total = +(discountedSubtotal + taxAmount + shippingCost).toFixed(2);
 
-    // Convert total to the selected currency for Oppwa
+    // Convert the GBP total to the selected currency with the same GBP-based
+    // rates and rounding the storefront displays with.
     let totalInSelectedCurrency = total;
-    let rates = { EUR: 1, USD: 1.08, GBP: 0.85 };
-    if (selectedCurrency !== "EUR") {
-      try {
-        const res = await fetch("https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD,GBP");
-        if (res.ok) {
-          const data = await res.json();
-          rates = { EUR: 1, USD: data.rates.USD, GBP: data.rates.GBP };
-        }
-      } catch (e) {
-        console.warn("Failed to fetch exchange rates, using fallback:", e);
-      }
-      const rate = rates[selectedCurrency as keyof typeof rates] || 1;
-      totalInSelectedCurrency = total * rate;
+    if (selectedCurrency !== BASE_CURRENCY) {
+      const rates = await getGbpRates();
+      totalInSelectedCurrency = convertFromBase(total, selectedCurrency, rates);
     }
 
     const order = await prisma.order.create({

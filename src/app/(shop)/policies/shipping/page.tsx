@@ -1,479 +1,627 @@
-import { PolicyLayout, ContactBlock } from "@/components/layout/PolicyLayout/PolicyLayout";
+import type { Metadata } from "next";
+import { PolicyLayout, ContactBlock, type PolicySection } from "@/components/layout/PolicyLayout/PolicyLayout";
 import { COMPANY } from "@/lib/company";
+import { DELIVERY_ZONES } from "@/lib/shipping";
 
-export const metadata = { title: "Shipping Policy — Solvetashop" };
+export const metadata: Metadata = { title: "Shipping & Delivery Policy" };
+
+const sections: PolicySection[] = [
+  {
+    id: "what-this-covers",
+    title: "What this policy covers",
+    body: (
+      <>
+        <p>1.1 This document governs how we deliver the physical goods you buy from Solvetashop.</p>
+        <p>
+          1.2 Our range is made up of lighting, lamps, light fittings, light bulbs, home d&eacute;cor and
+          related electrical and lighting accessories.
+        </p>
+        <p>
+          1.3 The delivery options, charges, timescales and destinations available to you can differ
+          according to:
+        </p>
+        <ul>
+          <li>the country you are ordering to;</li>
+          <li>the type, size and weight of the products;</li>
+          <li>the value of your order;</li>
+          <li>which couriers are available;</li>
+          <li>customs requirements; and</li>
+          <li>other operational considerations.</li>
+        </ul>
+        <p>
+          1.4 Any delivery estimate we give is a guide, not a promised date. A date is only guaranteed if
+          Solvetashop expressly confirms it to you in writing.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "getting-your-order-ready",
+    title: "Getting your order ready",
+    body: (
+      <>
+        <p>
+          2.1 In most cases we process an order within 1&ndash;2 business days of your payment being
+          successfully confirmed.
+        </p>
+        <p>
+          2.2 &ldquo;Processing&rdquo; covers everything that happens before the parcel leaves us: checking
+          the order, confirming payment, preparing the goods, carrying out our fulfilment checks and handing
+          the parcel over to the carrier.
+        </p>
+        <p>2.3 Processing can take longer than usual:</p>
+        <ul>
+          <li>in peak seasons, during promotions, over public holidays and at other busy times;</li>
+          <li>where a supplier is running late or we need to check stock;</li>
+          <li>while a payment or fraud-prevention review is carried out; or</li>
+          <li>where we need to verify the order further.</li>
+        </ul>
+        <p>
+          2.4 If something you ordered turns out to be unavailable, delayed, discontinued, wrongly listed or
+          otherwise impossible to supply, we may get in touch to suggest an alternative, hold the order back,
+          send the rest of the order without it, or cancel that item and refund you for it.
+        </p>
+        <h3>Orders sent in more than one parcel</h3>
+        <p>
+          2.5 An order with several products may travel together or in separate parcels. We decide this
+          according to stock availability, product type, packaging needs, warehouse handling, size, weight,
+          carrier restrictions and what is most efficient or necessary for the shipment.
+        </p>
+        <p>
+          2.6 When an order is split, each parcel may have its own tracking number and may arrive on a
+          different day.
+        </p>
+        <p>
+          2.7 Splitting an order does not normally mean you pay more for delivery, unless we made this clear
+          to you before you completed your purchase.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "dispatch-tracking-carriers",
+    title: "Dispatch, tracking and carriers",
+    body: (
+      <>
+        <p>3.1 All Solvetashop orders are sent out from the United Kingdom.</p>
+        <p>
+          3.2 The delivery timescales in this document run from the day your order is dispatched, not the
+          day you place it.
+        </p>
+        <p>
+          3.3 When your order leaves us, we may email you a dispatch confirmation and, where the service
+          offers it, tracking details.
+        </p>
+        <p>
+          3.4 Whether tracking is available depends on the courier, the destination, the delivery method and
+          the particular service used.
+        </p>
+        <p>3.5 Deliveries are made through courier and postal partners we trust.</p>
+        <p>
+          3.6 Within the UK, your order may be carried by Royal Mail, DHL or another appropriate domestic
+          carrier, depending on the size of the parcel, where it is going, what it contains and our
+          operational needs.
+        </p>
+        <p>
+          3.7 Orders going abroad are usually carried by DHL&rsquo;s international services, by partner or
+          local couriers, or by another logistics provider suited to the destination.
+        </p>
+        <p>
+          3.8 The carrier may be chosen automatically, based on the delivery address, the characteristics of
+          the parcel, which services are available and which option is most efficient.
+        </p>
+        <p>
+          3.9 Where we need to, we may switch to a different carrier or delivery method so that your order
+          reaches you safely and efficiently.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "delivery-timescales",
+    title: "Delivery timescales",
+    body: (
+      <>
+        <p>
+          4.1 We offer two delivery methods: Standard delivery and Express delivery. After dispatch, you can
+          usually expect your parcel within the following periods:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Destination</th>
+              <th>Standard delivery (from dispatch)</th>
+              <th>Express delivery (from dispatch)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {DELIVERY_ZONES.map((z) => (
+              <tr key={z.zone}>
+                <td>{z.zone}</td>
+                <td>{z.standard} business days</td>
+                <td>{z.express} business days</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p>
+          4.2 Express delivery shortens the journey after dispatch; it does not shorten the processing time
+          described in section 2. At checkout these times are summarised as: Standard &mdash; UK 1&ndash;3
+          business days, Europe 3&ndash;7, elsewhere 5&ndash;15; Express &mdash; UK 1&ndash;2 business days,
+          Europe 2&ndash;4, elsewhere 3&ndash;8, in each case after dispatch.
+        </p>
+        <p>
+          4.3 These periods are estimates. The actual time can be affected by courier capacity, customs
+          processing, the country of destination, how local couriers handle the parcel, remote or rural
+          locations, public holidays, the weather, transport disruption, security checks, import controls
+          and other matters we cannot control.
+        </p>
+        <p>
+          4.4 Expect delivery to take longer to remote islands, rural addresses, military addresses,
+          industrial sites, construction sites, freight-forwarding addresses and anywhere couriers find hard
+          to reach.
+        </p>
+        <p>
+          4.5 Solvetashop is not liable for delay that results from customs authorities, local postal
+          operators, courier networks, incorrect delivery details, unsuccessful delivery attempts, import
+          charges left unpaid, or events beyond our reasonable control.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "delivery-charges",
+    title: "Delivery charges and free delivery",
+    body: (
+      <>
+        <p>
+          5.1 You will see the delivery charge for your order at checkout, before you confirm the purchase.
+        </p>
+        <p>5.2 Our delivery charges are:</p>
+        <ul>
+          <li>
+            Standard delivery: &pound;4.95, or free of charge when your order subtotal, after any discounts,
+            is &pound;75 or more;
+          </li>
+          <li>Express delivery: &pound;9.95 for every order, whatever its value.</li>
+        </ul>
+        <p>
+          5.3 We measure the order subtotal against the &pound;75 threshold after any discounts have been
+          applied, but without counting tax, the delivery charge itself, customs duties, import VAT,
+          brokerage fees or any other local charges.
+        </p>
+        <p>
+          5.4 Our prices and delivery charges are set in pounds sterling (GBP). If you shop in euros (EUR) or
+          US dollars (USD), you will see the equivalent of these amounts &mdash; including the &pound;75
+          threshold &mdash; converted at checkout at the current exchange rate; whether your order qualifies
+          for free standard delivery is always decided on the GBP amount.
+        </p>
+        <p>
+          5.5 Our delivery charges may be revised over time to reflect carrier prices, fuel surcharges,
+          restrictions on particular destinations, logistics costs, customs requirements or changes in how
+          we operate.
+        </p>
+        <p>
+          5.6 If a technical fault causes the wrong delivery charge to be shown, we may contact you before
+          dispatch either to correct the charge or to give you the option of cancelling the order.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "delivery-address",
+    title: "Your delivery address",
+    body: (
+      <>
+        <p>
+          6.1 It is your responsibility to give us, at checkout, a delivery address that is complete,
+          correct and one a courier can actually deliver to.
+        </p>
+        <p>6.2 Please include everything the courier may need, namely:</p>
+        <ul>
+          <li>the recipient&rsquo;s name and, if relevant, the company name;</li>
+          <li>the street, building number and any flat, apartment or unit number;</li>
+          <li>the postcode, town or city and country;</li>
+          <li>a contact phone number; and</li>
+          <li>any instructions needed to gain access for delivery.</li>
+        </ul>
+        <p>
+          6.3 We are not liable for delay, unsuccessful delivery, lost parcels, return charges or extra costs
+          that arise because the address details you supplied were wrong, incomplete, out of date or
+          incorrectly formatted.
+        </p>
+        <p>6.4 After dispatch, it may no longer be possible for us to change the delivery address.</p>
+        <p>
+          6.5 Where a parcel comes back to us because the address was wrong, incomplete or inaccessible, or
+          because the parcel was refused or never collected, we may take the original delivery charge, the
+          cost of the return journey, courier and customs charges and any other reasonable costs out of any
+          refund we owe you, except where the law does not allow this.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "shipping-abroad",
+    title: "Shipping outside the United Kingdom",
+    body: (
+      <>
+        <p>
+          7.1 We may accept orders for delivery abroad to the destinations we support, as shown on the
+          Website or at checkout.
+        </p>
+        <p>
+          7.2 Whether we can deliver abroad may depend on the destination country, which courier services
+          operate there, product restrictions, customs requirements, sanctions, export controls, payment
+          processing rules and operational limits.
+        </p>
+        <p>
+          7.3 We cannot promise to deliver to every country, region, island or territory, or to remote or
+          restricted destinations.
+        </p>
+        <p>
+          7.4 If, after you have ordered, it turns out we cannot deliver to your destination, we may cancel
+          the order and return the money paid for the delivery we could not make, unless the transaction is
+          under legal, fraud, sanctions or compliance review.
+        </p>
+        <p>
+          7.5 Parcels sent abroad may need customs declarations, commercial invoices, product classification
+          details and other export or import information.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "customs-and-import-taxes",
+    title: "Customs duties and import taxes",
+    body: (
+      <>
+        <p>
+          8.1 When an order is delivered outside the United Kingdom, it may have to clear customs and may
+          attract import duties, import VAT, taxes, brokerage, handling or disbursement fees, customs
+          clearance fees or other local charges.
+        </p>
+        <p>
+          8.2 You pay these charges yourself, unless checkout expressly tells you otherwise. They are not
+          built into the product price or the delivery charge unless checkout expressly says so.
+        </p>
+        <p>
+          8.3 We have no control over customs authorities, how import tax is assessed, the rates of duty
+          applied, customs inspections, couriers&rsquo; customs procedures or charges imposed by local
+          government.
+        </p>
+        <p>
+          8.4 You may be contacted directly by the courier or the customs authority and asked to pay duties,
+          taxes or clearance charges before the parcel can be handed over.
+        </p>
+        <p>
+          8.5 If customs charges, import taxes, courier fees or other required local charges go unpaid, the
+          delivery may be held up, or the goods may be sent back, abandoned, seized or destroyed.
+        </p>
+        <p>
+          8.6 If a parcel comes back to us because you did not pay customs charges, did not complete the
+          customs formalities, refused the delivery or did not cooperate with the courier or customs
+          authority, we may take delivery and return costs, customs charges, courier fees and other
+          reasonable costs out of any refund, except where the law does not allow this.
+        </p>
+        <p>
+          8.7 It is up to you to check that the goods you order may lawfully be imported into, and used in,
+          the country they are being sent to.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "electrical-items",
+    title: "Lamps, light fittings and other electrical items",
+    body: (
+      <>
+        <p>
+          9.1 Lamps, light fittings, light bulbs and other electrical items may have to meet rules in the
+          destination country on import, safety, certification, voltage, plugs, labelling or installation.
+        </p>
+        <p>
+          9.2 You are responsible for making sure that whatever you order is suitable to be imported,
+          installed, used, resold or used professionally where you are.
+        </p>
+        <p>
+          9.3 Before you order, please check every relevant specification, including the voltage, current,
+          wattage, IP rating, dimensions, cable type, connector type, product code, the environment in which
+          the item will be installed, and any compliance requirements.
+        </p>
+        <p>
+          9.4 We are not liable for delay, refusal by customs, unsuccessful installation, non-compliance or
+          rejection that results from local rules at the destination or from a product being chosen
+          incorrectly.
+        </p>
+        <p>
+          9.5 Where a light fitting or other electrical item needs to be installed, wired, connected, tested,
+          commissioned or integrated into an electrical system, it should be installed only by a qualified
+          electrician or other competent professional wherever that is required or appropriate.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "missed-and-refused-deliveries",
+    title: "Missed, refused and uncollected deliveries",
+    body: (
+      <>
+        <p>
+          10.1 Depending on the destination and the courier&rsquo;s own rules, the courier may try to
+          deliver to the address you gave us or may divert the parcel to a collection point, parcel shop,
+          depot, locker or local delivery partner.
+        </p>
+        <p>
+          10.2 You are expected to keep an eye on tracking updates and to respond to courier notifications
+          where this is needed.
+        </p>
+        <p>
+          10.3 If a delivery is missed, refused or does not succeed, follow the courier&rsquo;s instructions
+          to arrange another delivery or to collect the parcel within the time the courier allows.
+        </p>
+        <p>10.4 We are not liable for an unsuccessful delivery where you:</p>
+        <ul>
+          <li>do not respond to the courier&rsquo;s notices;</li>
+          <li>do not collect the parcel;</li>
+          <li>refuse the parcel;</li>
+          <li>give an address that cannot be accessed; or</li>
+          <li>do not pay customs or local charges.</li>
+        </ul>
+        <p>
+          10.5 Where the law permits, extra fees for redelivery, storage, return or handling may be taken out
+          of any refund or charged to you separately.
+        </p>
+        <h3>Refusing a delivery</h3>
+        <p>
+          10.6 If you turn a delivery away without good reason, do not accept it, or do not collect it from
+          the courier, the parcel may be sent back to us.
+        </p>
+        <p>
+          10.7 In that case we may take the original delivery charge, the cost of the return journey,
+          courier fees, customs charges, storage fees, handling charges and any other reasonable costs out of
+          your refund, except where the law does not allow this.
+        </p>
+        <p>
+          10.8 If you are a Consumer and you refuse the delivery as a way of using your legal right to
+          cancel, your refund will be dealt with under our{" "}
+          <a href="/policies/returns">Returns &amp; Refunds Policy</a> and the applicable law.
+        </p>
+        <p>
+          10.9 Turning a parcel away does not by itself cancel any customs charges, courier charges or local
+          fees that may already have been assessed.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "damaged-or-incorrect-deliveries",
+    title: "Damaged, incomplete or incorrect deliveries",
+    body: (
+      <>
+        <p>11.1 Wherever you can, check the parcel when it is delivered.</p>
+        <p>
+          11.2 If the outside of the parcel looks damaged, opened, wet, crushed, tampered with or incomplete,
+          photograph it before you open it and hold on to all of the packaging.
+        </p>
+        <p>
+          11.3 If any goods arrive damaged, missing, incomplete or wrong, let us know as soon as you can by
+          emailing <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
+        </p>
+        <p>
+          11.4 In your message, give your order number, explain what is wrong and attach clear photos or
+          videos showing the product, the packaging, the shipping label and any visible damage.
+        </p>
+        <p>
+          11.5 Where damage from delivery is visible, please tell us within 48 hours of delivery if you can.
+          This lets us take the matter up with the courier promptly; it does not take away any mandatory
+          legal rights you may have.
+        </p>
+        <p>
+          11.6 Keep the goods, packaging, labels, accessories, manuals and delivery materials until we have
+          looked into the problem.
+        </p>
+        <p>
+          11.7 Before we agree to a replacement, refund or other remedy, we may ask for the damaged or
+          incorrect goods to be sent back or inspected.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "late-or-missing-parcels",
+    title: "Late or missing parcels",
+    body: (
+      <>
+        <p>
+          12.1 If your parcel has not arrived by the end of the estimated delivery period, start by looking
+          at the tracking information and any messages from the courier.
+        </p>
+        <p>
+          12.2 If the tracking shows an unusual delay, an unsuccessful delivery, a customs hold, or no
+          movement for a long time, email us at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
+        </p>
+        <p>
+          12.3 Before a parcel can be treated as lost, we may have to open an investigation with the courier.
+        </p>
+        <p>
+          12.4 These investigations can take a while, particularly for parcels sent abroad, parcels held up
+          in customs, parcels to remote destinations and parcels passed between several delivery partners.
+        </p>
+        <p>
+          12.5 We will do what is reasonable to help, but we are not liable for delay caused by customs
+          processing, courier investigations, local delivery partners, incorrect address details, unpaid
+          import charges or events beyond our control.
+        </p>
+        <p>
+          12.6 Where the courier confirms the parcel is lost and the loss was not the customer&rsquo;s fault,
+          we may offer a replacement, a refund or another suitable remedy.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "third-party-addresses",
+    title: "Forwarders, collection points and other third-party addresses",
+    body: (
+      <>
+        <p>
+          13.1 You may ask us to send your order to a freight forwarder, parcel-forwarding service, hotel,
+          workplace, construction site, collection point or other third-party address. If you do, delivery
+          is complete once the carrier hands the parcel over at that address or to the authorised recipient.
+        </p>
+        <p>
+          13.2 From that point on, Solvetashop is not liable for loss, damage, delay, customs problems,
+          difficulties with onward shipping or failed delivery once the parcel is with the third party,
+          forwarding service, collection point or authorised recipient you chose.
+        </p>
+        <p>
+          13.3 It is your responsibility to make sure that the third party has authority to accept the
+          parcel and is able to handle it safely.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "trade-and-business-orders",
+    title: "Trade and business orders",
+    body: (
+      <>
+        <p>
+          14.1 If you are a Business Customer, trade customer, contractor, installer or other professional
+          buyer, it is for you to make sure that delivery dates, product availability, import requirements
+          and installation schedules fit your project.
+        </p>
+        <p>14.2 A delivery estimate is not a guaranteed project deadline and should not be relied on as one.</p>
+        <p>
+          14.3 Except where the law does not allow liability to be excluded, Solvetashop is not liable for
+          labour, electrician, contractor or installation costs, project delays, missed appointments,
+          downtime, loss of profit, loss of contract or other indirect losses arising from a delivery delay,
+          customs delay, courier problem or product being unavailable.
+        </p>
+        <p>
+          14.4 Business Customers should not book installation, labour or site work, or commit to project
+          deadlines, until the goods have arrived, been inspected and been confirmed as correct and
+          suitable.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "sanctions-and-restricted-destinations",
+    title: "Sanctions, restricted destinations and compliance",
+    body: (
+      <>
+        <p>
+          15.1 We may refuse, cancel, suspend or block an order if delivering it would, or might, breach
+          sanctions, export controls, customs restrictions, payment processor rules, courier restrictions,
+          legal requirements or our internal compliance controls.
+        </p>
+        <p>
+          15.2 We may check orders, billing details, delivery addresses, customers, countries, regions and
+          payment information against the relevant sanctions, restricted-party, fraud-prevention and
+          compliance requirements.
+        </p>
+        <p>
+          15.3 We do not deliver anywhere that delivery is prohibited by applicable law, sanctions, carrier
+          or payment processor restrictions, or our compliance requirements.
+        </p>
+        <p>
+          15.4 Trying to get around our destination restrictions through a freight forwarder, a third-party
+          or false address, altered billing details or misleading order information may lead to the order
+          being cancelled and your access to the Website being restricted.
+        </p>
+        <p>
+          15.5 We are not liable for loss, delay, cancellation, blocked delivery, seizure by customs or extra
+          costs that result from sanctions, export controls, customs restrictions, courier restrictions or
+          legal compliance requirements.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "events-beyond-our-control",
+    title: "Events beyond our reasonable control",
+    body: (
+      <>
+        <p>
+          16.1 We are not liable where delivery fails or is delayed because of something beyond our
+          reasonable control.
+        </p>
+        <p>
+          16.2 Examples include severe weather, natural disasters, transport disruption, carrier failure,
+          customs delay, strikes and other labour disputes, public holidays, government action, changes in
+          regulation, sanctions, war, civil unrest, epidemics and pandemics, power cuts, technical failures,
+          security checks, supply chain disruption and other force majeure events.
+        </p>
+        <p>
+          16.3 If your order is affected by such an event, we will take reasonable steps to keep the
+          disruption to a minimum and will keep you updated where appropriate.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "updates-to-this-policy",
+    title: "Updates to this policy",
+    body: (
+      <>
+        <p>
+          17.1 We may revise this Shipping &amp; Delivery Policy from time to time to reflect changes to our
+          delivery methods, courier partners, delivery regions, delivery charges, customs processes, ways of
+          working or legal requirements.
+        </p>
+        <p>
+          17.2 Your order is governed by the version of this policy that was in force when you placed it,
+          unless the law requires a change or a correction has to be applied.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "contact-us",
+    title: "Questions about your delivery",
+    body: (
+      <>
+        <p>
+          If you would like to ask about shipping, where your order has got to, customs, a damaged parcel, a
+          missed delivery or anything else to do with delivery, you can reach us here:
+        </p>
+        <ContactBlock />
+      </>
+    ),
+  },
+];
 
 export default function ShippingPolicyPage() {
   return (
-    <PolicyLayout title="Shipping Policy" lastUpdated="29 May 2026">
-      <p>
-        This Shipping Policy explains how orders placed through www.solvetashop.com are processed,
-        dispatched, delivered, and handled in the event of delivery issues.
-      </p>
-      <p>The Website is operated by:</p>
-      <ContactBlock />
-      <p>
-        In this Policy, &ldquo;Solvetashop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; or &ldquo;our&rdquo;
-        means {COMPANY.legalName}. &ldquo;Customer&rdquo;, &ldquo;you&rdquo; or &ldquo;your&rdquo; means the
-        person or business placing an order through the Website.
-      </p>
-      <p>
-        This Shipping Policy should be read together with our Terms and Conditions, Returns and Refunds
-        Policy, Privacy Policy, and any additional information displayed at checkout.
-      </p>
-
-      <h2>1. Scope of This Policy</h2>
-      <p>1.1 This Policy applies to the delivery of physical goods purchased through Solvetashop.</p>
-      <p>
-        1.2 Solvetashop supplies electrical products, electrical materials, wiring accessories,
-        lighting-related products, installation components, distribution and circuit protection products,
-        sockets, switches, cables, mounting accessories, and other related goods.
-      </p>
-      <p>
-        1.3 Delivery options, shipping rates, estimated delivery times, and supported destinations may vary
-        depending on the destination country, product type, order value, product size, weight, courier
-        availability, customs requirements, and other operational factors.
-      </p>
-      <p>
-        1.4 Delivery estimates are not guaranteed delivery dates unless expressly stated otherwise in writing
-        by Solvetashop.
-      </p>
-
-      <h2>2. Order Processing Time</h2>
-      <p>
-        2.1 Orders are typically processed within 1&ndash;2 business days after successful payment
-        confirmation.
-      </p>
-      <p>
-        2.2 Processing time means the time required to review the order, confirm payment, prepare the goods,
-        complete fulfilment checks, and hand the parcel to the carrier.
-      </p>
-      <p>
-        2.3 Processing times may be longer during peak seasons, promotional periods, public holidays,
-        high-volume periods, supplier delays, stock checks, payment reviews, fraud prevention reviews, or
-        where additional order verification is required.
-      </p>
-      <p>
-        2.4 Orders containing multiple products may be dispatched together or in separate parcels depending
-        on stock availability, product type, packaging requirements, and logistics efficiency.
-      </p>
-      <p>
-        2.5 If an item is unavailable, delayed, discontinued, incorrectly listed, or cannot be supplied, we
-        may contact you to offer an alternative, delay the order, partially fulfil the order, or cancel and
-        refund the unavailable item.
-      </p>
-
-      <h2>3. Dispatch Location</h2>
-      <p>3.1 Solvetashop dispatches orders from the United Kingdom.</p>
-      <p>
-        3.2 Delivery times shown in this Policy are calculated from the date of dispatch, not from the date
-        the order is placed.
-      </p>
-      <p>
-        3.3 Once your order has been dispatched, you may receive a shipping confirmation email or tracking
-        information where available.
-      </p>
-      <p>
-        3.4 Tracking availability depends on the courier, destination, delivery method, and service used.
-      </p>
-
-      <h2>4. Delivery Methods and Carriers</h2>
-      <p>4.1 We use trusted courier and postal partners to deliver orders.</p>
-      <p>
-        4.2 Domestic UK orders may be delivered by Royal Mail, DHL, or another suitable domestic carrier
-        depending on the parcel size, destination, product type, and operational requirements.
-      </p>
-      <p>
-        4.3 International orders are generally delivered using DHL international services, partner carriers,
-        local couriers, or other logistics providers suitable for the destination.
-      </p>
-      <p>
-        4.4 The specific carrier may be selected automatically based on the delivery address, parcel
-        characteristics, service availability, and shipping efficiency.
-      </p>
-      <p>
-        4.5 We reserve the right to change the carrier or delivery method where necessary to complete
-        delivery safely and efficiently.
-      </p>
-
-      <h2>5. Estimated Delivery Times</h2>
-      <p>5.1 Once dispatched, estimated delivery times are generally as follows:</p>
-      <table>
-        <thead>
-          <tr>
-            <th>Destination</th>
-            <th>Estimated delivery time from dispatch</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>United Kingdom</td><td>1&ndash;3 business days</td></tr>
-          <tr><td>Europe</td><td>3&ndash;7 business days</td></tr>
-          <tr><td>North America</td><td>5&ndash;10 business days</td></tr>
-          <tr><td>Asia &amp; Oceania</td><td>7&ndash;14 business days</td></tr>
-          <tr><td>Africa &amp; South America</td><td>8&ndash;15 business days</td></tr>
-        </tbody>
-      </table>
-      <p>
-        5.2 These delivery times are estimates only and may vary depending on courier capacity, customs
-        processing, destination country, local courier handling, remote or rural delivery areas, public
-        holidays, weather conditions, transport disruption, security checks, import controls, and other
-        circumstances outside our control.
-      </p>
-      <p>
-        5.3 Deliveries to remote islands, rural addresses, military addresses, industrial sites,
-        construction sites, freight forwarding addresses, or locations with limited courier access may take
-        longer.
-      </p>
-      <p>
-        5.4 Solvetashop is not responsible for delays caused by customs authorities, local postal operators,
-        courier networks, incorrect delivery information, failed delivery attempts, unpaid import charges,
-        or events outside our reasonable control.
-      </p>
-
-      <h2>6. Shipping Rates and Free Delivery</h2>
-      <p>
-        6.1 Shipping costs are calculated and displayed at checkout before you complete your order.
-      </p>
-      <p>
-        6.2 Unless stated otherwise, eligible orders qualify for free delivery when the product subtotal
-        exceeds:
-      </p>
-      <ul>
-        <li>&euro;100 for EUR orders;</li>
-        <li>&pound;100 for GBP orders;</li>
-        <li>$100 for USD orders.</li>
-      </ul>
-      <p>
-        6.3 The free delivery threshold is calculated based on the product subtotal after discounts and
-        before any customs duties, import VAT, taxes, brokerage fees, courier surcharges, special handling
-        fees, or other local charges.
-      </p>
-      <p>
-        6.4 Free delivery may not apply to all destinations, oversized goods, heavy goods, restricted goods,
-        special order items, split shipments, remote delivery areas, or products requiring special handling.
-      </p>
-      <p>
-        6.5 Shipping rates may change from time to time due to carrier pricing, fuel surcharges, destination
-        restrictions, logistics costs, customs requirements, or operational changes.
-      </p>
-      <p>
-        6.6 If a shipping rate has been incorrectly displayed due to a technical error, we may contact you
-        before dispatch to correct the shipping charge or offer cancellation of the order.
-      </p>
-
-      <h2>7. Delivery Address and Customer Details</h2>
-      <p>
-        7.1 You are responsible for providing a complete, accurate, and deliverable shipping address at
-        checkout.
-      </p>
-      <p>
-        7.2 The delivery address should include all relevant details, including the recipient name, company
-        name where applicable, street address, building number, apartment or unit number, postcode, city,
-        country, phone number, and any access instructions required for delivery.
-      </p>
-      <p>
-        7.3 Solvetashop is not responsible for delays, failed deliveries, lost parcels, return charges, or
-        additional costs caused by incorrect, incomplete, outdated, or improperly formatted address
-        information provided by you.
-      </p>
-      <p>7.4 Once an order has been dispatched, we may be unable to change the delivery address.</p>
-      <p>
-        7.5 If a parcel is returned to us because the address was incorrect, incomplete, inaccessible,
-        refused, or not collected, we may deduct the original shipping cost, return shipping cost, courier
-        charges, customs charges, and other reasonable costs from any refund, unless prohibited by law.
-      </p>
-
-      <h2>8. International Shipping</h2>
-      <p>
-        8.1 Solvetashop may accept international orders to supported delivery destinations shown on the
-        Website or at checkout.
-      </p>
-      <p>
-        8.2 International delivery availability may depend on destination country, courier service
-        availability, product restrictions, customs requirements, sanctions, export controls, payment
-        processing rules, and operational limitations.
-      </p>
-      <p>
-        8.3 We do not guarantee delivery to every country, region, island, territory, remote location, or
-        restricted destination.
-      </p>
-      <p>
-        8.4 If delivery to your destination is unavailable after your order has been placed, we may cancel
-        the order and refund the amount paid for the unavailable delivery, unless the transaction is subject
-        to legal, fraud, sanctions, or compliance review.
-      </p>
-      <p>
-        8.5 International shipments may require customs declarations, commercial invoices, product
-        classification details, and other export or import information.
-      </p>
-
-      <h2>9. Customs, Import Duties, and Local Taxes</h2>
-      <p>
-        9.1 Orders delivered outside the United Kingdom may be subject to customs clearance, import duties,
-        import VAT, taxes, brokerage fees, handling charges, disbursement fees, customs clearance fees, or
-        other local charges.
-      </p>
-      <p>
-        9.2 Unless expressly stated otherwise at checkout, these charges are the responsibility of the
-        customer.
-      </p>
-      <p>
-        9.3 Solvetashop does not control customs authorities, import tax assessments, duty rates, customs
-        inspections, courier customs procedures, or local government charges.
-      </p>
-      <p>
-        9.4 Customs charges and import taxes are not included in the product price or shipping price unless
-        expressly stated otherwise at checkout.
-      </p>
-      <p>
-        9.5 The courier or customs authority may contact you directly to collect payment of duties, taxes, or
-        clearance charges before delivery can be completed.
-      </p>
-      <p>
-        9.6 Failure to pay customs charges, import taxes, courier fees, or required local charges may result
-        in delivery delay, return of the parcel, abandonment, seizure, or disposal of the goods.
-      </p>
-      <p>
-        9.7 If a parcel is returned to us because you did not pay customs charges, did not complete customs
-        requirements, refused delivery, or failed to cooperate with the courier or customs authority, we may
-        deduct shipping costs, return costs, customs charges, courier fees, and other reasonable costs from
-        any refund, unless prohibited by law.
-      </p>
-      <p>
-        9.8 You are responsible for checking whether the goods you order can lawfully be imported into and
-        used in your destination country.
-      </p>
-
-      <h2>10. Product Restrictions and Electrical Goods</h2>
-      <p>
-        10.1 Some electrical goods may be subject to destination-specific import, safety, certification,
-        voltage, plug, labelling, or installation requirements.
-      </p>
-      <p>
-        10.2 You are responsible for ensuring that any product ordered is suitable for import, installation,
-        use, resale, or professional application in your country or region.
-      </p>
-      <p>
-        10.3 Before placing an order, you should check all product specifications, including voltage,
-        current, wattage, IP rating, dimensions, cable type, connector type, product code, installation
-        environment, and compliance requirements.
-      </p>
-      <p>
-        10.4 We are not responsible for delays, customs refusal, failed installation, non-compliance, or
-        rejection caused by destination-specific rules or incorrect product selection.
-      </p>
-      <p>
-        10.5 Products requiring installation, wiring, connection, testing, commissioning, or integration
-        into an electrical system should be installed only by a qualified electrician or competent
-        professional where required or appropriate.
-      </p>
-
-      <h2>11. Split Shipments</h2>
-      <p>
-        11.1 We may dispatch an order in multiple parcels or separate shipments where this is more efficient
-        or necessary due to product availability, size, weight, packaging requirements, warehouse handling,
-        or carrier restrictions.
-      </p>
-      <p>
-        11.2 If your order is split into multiple shipments, you may receive separate tracking numbers and
-        different delivery dates.
-      </p>
-      <p>
-        11.3 Split shipments do not normally increase the shipping charge payable by you unless clearly
-        stated before you complete the order.
-      </p>
-
-      <h2>12. Delivery Attempts and Missed Deliveries</h2>
-      <p>
-        12.1 The courier may attempt delivery at the address provided or may redirect the parcel to a
-        collection point, parcel shop, depot, locker, or local delivery partner depending on the destination
-        and courier rules.
-      </p>
-      <p>
-        12.2 You are responsible for monitoring tracking updates and responding to courier notifications
-        where required.
-      </p>
-      <p>
-        12.3 If delivery is missed, refused, or unsuccessful, you must follow the courier&rsquo;s
-        instructions to rearrange delivery or collect the parcel within the stated timeframe.
-      </p>
-      <p>
-        12.4 Solvetashop is not responsible for failed delivery where you do not respond to courier notices, do
-        not collect the parcel, refuse the parcel, provide an inaccessible address, or fail to pay customs
-        or local charges.
-      </p>
-      <p>
-        12.5 Additional redelivery, storage, return, or handling fees may be deducted from any refund or
-        charged separately where permitted by law.
-      </p>
-
-      <h2>13. Damaged Parcels and Delivery Issues</h2>
-      <p>13.1 You should inspect the parcel upon delivery where possible.</p>
-      <p>
-        13.2 If the parcel appears visibly damaged, opened, wet, crushed, tampered with, or incomplete, you
-        should take photos before opening it and keep all packaging materials.
-      </p>
-      <p>
-        13.3 If goods arrive damaged, missing, incomplete, or incorrect, please contact us as soon as
-        possible at info@solvetashop.com.
-      </p>
-      <p>
-        13.4 Please include your order number, a description of the issue, and clear photos or videos of the
-        product, packaging, shipping label, and any visible damage.
-      </p>
-      <p>
-        13.5 For visible delivery damage, please notify us within 48 hours of delivery where possible. This
-        helps us investigate courier claims quickly, but it does not remove any mandatory legal rights you
-        may have.
-      </p>
-      <p>
-        13.6 You must keep the goods, packaging, labels, accessories, manuals, and delivery materials until
-        we have reviewed the issue.
-      </p>
-      <p>
-        13.7 We may require the damaged or incorrect goods to be returned or inspected before approving a
-        replacement, refund, or other remedy.
-      </p>
-
-      <h2>14. Lost or Delayed Parcels</h2>
-      <p>
-        14.1 If your parcel has not arrived within the estimated delivery timeframe, please first check the
-        tracking information and any courier notifications.
-      </p>
-      <p>
-        14.2 If tracking shows an unusual delay, failed delivery, customs hold, or no movement for an
-        extended period, please contact us at info@solvetashop.com.
-      </p>
-      <p>
-        14.3 We may need to open an investigation with the courier before confirming that a parcel is lost.
-      </p>
-      <p>
-        14.4 Courier investigations may take time, especially for international shipments, customs delays,
-        remote destinations, or parcels handled by multiple delivery partners.
-      </p>
-      <p>
-        14.5 We will take reasonable steps to assist you, but we are not responsible for delays caused by
-        customs processing, courier investigations, local delivery partners, incorrect address details,
-        unpaid import charges, or events outside our control.
-      </p>
-      <p>
-        14.6 If a parcel is confirmed as lost by the courier and the loss is not caused by customer error, we
-        may offer a replacement, refund, or other appropriate remedy.
-      </p>
-
-      <h2>15. Refused Deliveries</h2>
-      <p>
-        15.1 If you refuse delivery without a valid reason, fail to accept the parcel, or fail to collect the
-        parcel from the courier, the parcel may be returned to us.
-      </p>
-      <p>
-        15.2 If the parcel is returned to us, we may deduct the original shipping cost, return shipping
-        cost, courier fees, customs charges, storage fees, handling charges, and any other reasonable costs
-        from your refund, unless prohibited by law.
-      </p>
-      <p>
-        15.3 If you are a Consumer and you refuse delivery as part of exercising your legal cancellation
-        rights, your refund will be handled in accordance with our Returns and Refunds Policy and applicable
-        law.
-      </p>
-      <p>
-        15.4 Refusing delivery does not automatically cancel customs charges, courier charges, or local fees
-        that may have already been assessed.
-      </p>
-
-      <h2>16. Orders Delivered to Third Parties or Forwarding Addresses</h2>
-      <p>
-        16.1 If you choose to have an order delivered to a freight forwarder, parcel forwarding service,
-        hotel, workplace, construction site, third-party address, or collection point, delivery is considered
-        completed when the carrier delivers the parcel to that address or authorised recipient.
-      </p>
-      <p>
-        16.2 Solvetashop is not responsible for loss, damage, delay, customs issues, onward shipping problems,
-        or failed delivery after the parcel has been delivered to a third party, forwarding service,
-        collection point, or authorised recipient chosen by you.
-      </p>
-      <p>
-        16.3 You are responsible for ensuring that the third party is authorised to receive the parcel and
-        can handle it safely.
-      </p>
-
-      <h2>17. Business and Trade Orders</h2>
-      <p>
-        17.1 Business Customers, trade customers, contractors, installers, and professional buyers are
-        responsible for ensuring that delivery dates, product availability, import requirements, and
-        installation schedules are suitable for their projects.
-      </p>
-      <p>17.2 Delivery estimates should not be treated as guaranteed project deadlines.</p>
-      <p>
-        17.3 Solvetashop is not responsible for labour costs, electrician costs, contractor costs, installation
-        costs, project delay, missed appointments, downtime, loss of profit, loss of contract, or other
-        indirect losses caused by delivery delay, customs delay, courier issue, or product unavailability,
-        except where liability cannot lawfully be excluded.
-      </p>
-      <p>
-        17.4 Business Customers should not schedule installation, labour, site work, or project deadlines
-        until the goods have been received, inspected, and confirmed as correct and suitable.
-      </p>
-
-      <h2>18. Restricted Destinations and Compliance</h2>
-      <p>
-        18.1 We may refuse, cancel, suspend, or block any order where delivery would breach or may breach
-        sanctions, export controls, customs restrictions, payment processor rules, courier restrictions,
-        legal requirements, or internal compliance controls.
-      </p>
-      <p>
-        18.2 We may screen orders, billing details, delivery addresses, customers, countries, regions, and
-        payment information against applicable sanctions, restricted party, fraud prevention, and compliance
-        requirements.
-      </p>
-      <p>
-        18.3 We do not ship to destinations where delivery is prohibited by applicable law, sanctions,
-        carrier restrictions, payment processor restrictions, or our compliance requirements.
-      </p>
-      <p>
-        18.4 Attempting to bypass restricted destination controls by using a freight forwarder, third-party
-        address, false address, altered billing information, or misleading order details may result in
-        cancellation of the order and restriction of access to the Website.
-      </p>
-      <p>
-        18.5 We are not responsible for loss, delay, cancellation, blocked delivery, customs seizure, or
-        additional costs caused by sanctions, export controls, customs restrictions, courier restrictions, or
-        legal compliance requirements.
-      </p>
-
-      <h2>19. Events Outside Our Control</h2>
-      <p>
-        19.1 We are not responsible for failure or delay in delivery caused by events outside our reasonable
-        control.
-      </p>
-      <p>
-        19.2 Such events may include severe weather, natural disasters, transport disruption, carrier
-        failure, customs delay, strikes, labour disputes, public holidays, government action, regulatory
-        changes, sanctions, war, civil unrest, epidemic, pandemic, power failure, technical failure, security
-        checks, supply chain disruption, or other force majeure events.
-      </p>
-      <p>
-        19.3 If such an event affects your order, we will take reasonable steps to minimise disruption and
-        provide updates where appropriate.
-      </p>
-
-      <h2>20. Changes to This Shipping Policy</h2>
-      <p>
-        20.1 We may update this Shipping Policy from time to time to reflect changes in our delivery
-        methods, courier partners, delivery regions, shipping rates, customs processes, operational
-        practices, or legal requirements.
-      </p>
-      <p>
-        20.2 The version of the Shipping Policy in force at the time you place your order will apply to that
-        order, unless a change is required by law or relates to a correction that must be applied.
-      </p>
-
-      <h2>21. Contact Information</h2>
-      <p>
-        If you have any questions about shipping, delivery status, customs, damaged parcels, missed
-        delivery, or any delivery-related issue, please contact us:
-      </p>
-      <ContactBlock />
-    </PolicyLayout>
+    <PolicyLayout
+      title="Shipping & Delivery Policy"
+      lastUpdated="12 October 2026"
+      summary="How we prepare, send and deliver orders placed on Solvetashop, what delivery costs, and what happens if a parcel is late, lost, damaged or held at customs."
+      intro={
+        <>
+          <p>
+            This Shipping &amp; Delivery Policy sets out how we prepare, send and deliver orders placed on
+            www.solvetashop.com, and what happens if something goes wrong along the way. The website is run
+            by:
+          </p>
+          <ContactBlock />
+          <p>
+            Throughout this document, &ldquo;Solvetashop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; and
+            &ldquo;our&rdquo; refer to {COMPANY.legalName}, and &ldquo;Customer&rdquo;, &ldquo;you&rdquo; and
+            &ldquo;your&rdquo; refer to the individual or business ordering through the Website.
+            &ldquo;Consumer&rdquo; and &ldquo;Business Customer&rdquo; have the meanings given in our{" "}
+            <a href="/policies/terms">Terms of Sale</a>.
+          </p>
+          <p>
+            Please read this policy alongside our <a href="/policies/terms">Terms of Sale</a>, our{" "}
+            <a href="/policies/returns">Returns &amp; Refunds Policy</a>, our{" "}
+            <a href="/policies/privacy">Privacy Notice</a> and any further information shown to you at
+            checkout.
+          </p>
+        </>
+      }
+      sections={sections}
+    />
   );
 }

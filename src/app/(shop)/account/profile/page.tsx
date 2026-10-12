@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema, type ProfileFormData } from "@/lib/validators/profile";
 import { useAuth } from "@/providers/AuthProvider";
 import { toast } from "sonner";
+import { accountClasses as styles } from "../account-classes";
 
 export default function ProfilePage() {
   const t = useTranslations("account");
-  const common = useTranslations("common");
   const { user, refresh } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -40,33 +39,69 @@ export default function ProfilePage() {
         body: JSON.stringify({ id: user?.id, email: user?.email, name: data.name }),
       });
       await refresh();
-      toast.success(t("editProfile"));
+      toast.success(t("profileSaved"));
     } catch {
-      toast.error("Failed to update profile");
+      toast.error(t("profileSaveFailed"));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: "32rem" }}>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1.5rem" }}>{t("editProfile")}</h1>
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] lg:gap-20">
+      <div>
+        <h2 className={styles.pageTitle}>{t("profileTitle")}</h2>
+        <p className={styles.pageLede}>{t("profileLede")}</p>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex max-w-lg flex-col gap-6" noValidate>
         <div>
-          <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.25rem" }}>Email</label>
-          <input value={user?.email || ""} readOnly style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text)", fontSize: "0.875rem", opacity: 0.6 }} />
+          <label htmlFor="profile-email" className="field-label">
+            {t("emailLabel")}
+          </label>
+          <input
+            id="profile-email"
+            value={user?.email || ""}
+            readOnly
+            aria-describedby="profile-email-hint"
+            className="field cursor-not-allowed bg-surface text-muted"
+          />
+          <p id="profile-email-hint" className="mt-1.5 text-[0.8125rem] text-muted">
+            {t("emailHint")}
+          </p>
         </div>
+
         <div>
-          <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.25rem" }}>Name</label>
-          <input {...register("name")} style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-md)", border: errors.name ? "1px solid red" : "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text)", fontSize: "0.875rem" }} />
-          {errors.name && <p style={{ color: "red", fontSize: "0.75rem", marginTop: "0.25rem" }}>{errors.name.message}</p>}
+          <label htmlFor="profile-name" className="field-label">
+            {t("nameLabel")}
+          </label>
+          <input
+            id="profile-name"
+            autoComplete="name"
+            {...register("name")}
+            aria-invalid={errors.name ? true : undefined}
+            aria-describedby={errors.name ? "profile-name-error" : undefined}
+            className={`field ${errors.name ? "!border-brick" : ""}`}
+          />
+          {errors.name && (
+            <p id="profile-name-error" className="mt-1.5 text-[0.8125rem] text-brick">
+              {t("nameRequired")}
+            </p>
+          )}
         </div>
+
         <div>
-          <label style={{ display: "block", fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.25rem" }}>Phone</label>
-          <input {...register("phone")} style={{ width: "100%", padding: "0.5rem 0.75rem", borderRadius: "var(--radius-md)", border: "1px solid var(--color-border)", background: "var(--color-bg)", color: "var(--color-text)", fontSize: "0.875rem" }} />
+          <label htmlFor="profile-phone" className="field-label">
+            {t("phoneLabel")} <span className="font-normal text-faint">· {t("optional")}</span>
+          </label>
+          <input id="profile-phone" type="tel" autoComplete="tel" {...register("phone")} className="field" />
         </div>
-        <Button type="submit" color="primary" isLoading={loading}>{common("save")}</Button>
+
+        <div className="border-t border-line pt-6">
+          <button type="submit" className="btn-ink" disabled={loading} aria-busy={loading}>
+            {loading ? t("saving") : t("saveDetails")}
+          </button>
+        </div>
       </form>
     </div>
   );

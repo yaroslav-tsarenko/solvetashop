@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Check, ShoppingCart } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Check, Lamp } from "lucide-react";
 
 interface CartToastProps {
   name: string;
@@ -11,42 +11,28 @@ interface CartToastProps {
 }
 
 export function CartToast({ name, imageUrl, quantity }: CartToastProps) {
-  return (
-    <motion.div
-      className="flex min-w-[280px] items-center gap-3 px-4 py-3"
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      transition={{ type: "spring", damping: 25, stiffness: 350 }}
-    >
-      <motion.div
-        className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-success)] text-white"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ delay: 0.1, type: "spring", damping: 15, stiffness: 400 }}
-      >
-        <Check size={14} strokeWidth={3} />
-      </motion.div>
+  const t = useTranslations("cart");
 
-      <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--color-bg-tertiary)] text-[var(--color-text-tertiary)]">
+  return (
+    <div className="flex min-w-[280px] items-center gap-3.5 rounded-[var(--radius-lg)] border border-line bg-paper px-4 py-3 shadow-[var(--shadow-md)]">
+      <div className="relative flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-md)] bg-surface text-faint">
         {imageUrl ? (
-          <Image src={imageUrl} alt={name} fill sizes="48px" style={{ objectFit: "contain" }} />
+          <Image src={imageUrl} alt={name} fill sizes="48px" style={{ objectFit: "contain", padding: "4px" }} />
         ) : (
-          <ShoppingCart size={20} />
+          <Lamp size={18} strokeWidth={1.5} />
         )}
       </div>
 
       <div className="flex min-w-0 flex-col gap-0.5">
-        <span className="text-xs font-bold uppercase tracking-[0.04em] text-[var(--color-success)]">
-          Added to cart
+        <span className="flex items-center gap-1.5 text-xs font-medium text-sage">
+          <Check size={13} strokeWidth={1.5} />
+          {t("toastAdded")}
         </span>
-        <span className="max-w-[200px] truncate text-[0.8125rem] font-semibold text-[var(--color-text)]">
-          {name}
-        </span>
+        <span className="max-w-[200px] truncate text-[0.8125rem] text-ink">{name}</span>
         {quantity > 1 && (
-          <span className="text-[0.6875rem] text-[var(--color-text-tertiary)]">Qty: {quantity}</span>
+          <span className="text-[0.6875rem] text-muted">{t("toastQuantity", { count: quantity })}</span>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }

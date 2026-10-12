@@ -9,11 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-geist-sans)"],
-        mono: ["var(--font-geist-mono)"],
+        sans: ["var(--font-manrope)"],
       },
       maxWidth: {
-        container: "1280px",
+        container: "1360px",
       },
     },
   },

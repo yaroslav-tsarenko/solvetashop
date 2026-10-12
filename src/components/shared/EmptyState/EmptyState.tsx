@@ -1,8 +1,6 @@
 "use client";
 
 import { Link } from "@/i18n/routing";
-import { Button } from "@/components/ui/Button";
-import { PackageOpen } from "lucide-react";
 
 interface EmptyStateProps {
   title: string;
@@ -12,41 +10,21 @@ interface EmptyStateProps {
   icon?: React.ReactNode;
 }
 
-export function EmptyState({
-  title,
-  subtitle,
-  actionLabel,
-  actionHref,
-  icon,
-}: EmptyStateProps) {
+/**
+ * Quiet empty state: a thin rule, a light headline and one pill action.
+ * No illustration by default — an icon is only shown when a caller passes one.
+ */
+export function EmptyState({ title, subtitle, actionLabel, actionHref, icon }: EmptyStateProps) {
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "4rem 1rem",
-        textAlign: "center",
-        gap: "1rem",
-      }}
-    >
-      <div style={{ color: "var(--color-text-tertiary)" }}>
-        {icon || <PackageOpen size={48} />}
-      </div>
-      <h3 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--color-text)" }}>
-        {title}
-      </h3>
-      {subtitle && (
-        <p style={{ color: "var(--color-text-secondary)", maxWidth: "24rem" }}>
-          {subtitle}
-        </p>
-      )}
-      {actionLabel && actionHref && (
-        <Button as={Link} href={actionHref} color="primary" variant="flat">
+    <section className="mx-auto flex max-w-xl flex-col items-start gap-5 border-t border-line py-16 sm:py-24">
+      {icon ? <div className="text-faint">{icon}</div> : null}
+      <h2 className="text-2xl font-light tracking-[-0.02em] text-ink sm:text-3xl">{title}</h2>
+      {subtitle ? <p className="text-[0.9375rem] leading-relaxed text-muted">{subtitle}</p> : null}
+      {actionLabel && actionHref ? (
+        <Link href={actionHref} className="btn-ink mt-2">
           {actionLabel}
-        </Button>
-      )}
-    </div>
+        </Link>
+      ) : null}
+    </section>
   );
 }

@@ -2,61 +2,84 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface ProductGalleryProps {
   images: { id: string; url: string; alt?: string | null }[];
   productName: string;
 }
 
+/**
+ * Large image on a warm surface with a thin strip of square thumbnails —
+ * vertical on desktop (left of the image), horizontal below it on mobile.
+ */
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
+  const t = useTranslations("product");
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   if (images.length === 0) {
     return (
-      <div className="flex flex-col gap-3">
-        <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-2 text-[var(--color-text-tertiary)] sm:aspect-[4/3] sm:rounded-[var(--radius-xl)] sm:p-4">
-          No Image
-        </div>
-      </div>
+      <figure className="m-0 flex aspect-[4/5] items-center justify-center rounded-[var(--radius-md)] bg-surface text-sm text-faint">
+        {t("galleryEmpty")}
+      </figure>
     );
   }
 
+  const current = images[Math.min(selectedIndex, images.length - 1)];
+  const hasStrip = images.length > 1;
+
   return (
-    <div className="flex flex-col gap-3">
-      <div className="relative aspect-square cursor-zoom-in overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-2 sm:aspect-[4/3] sm:rounded-[var(--radius-xl)] sm:p-4">
+    <div className={hasStrip ? "flex flex-col-reverse gap-3 md:flex-row md:gap-4" : ""}>
+      {hasStrip && (
+        <ul
+          className="m-0 flex list-none gap-2 overflow-x-auto p-0 [scrollbar-width:none] md:max-h-[640px] md:w-16 md:flex-none md:flex-col md:overflow-y-auto md:overflow-x-visible [&::-webkit-scrollbar]:hidden"
+          aria-label={t("galleryLabel")}
+        >
+          {images.map((image, index) => {
+            const active = index === selectedIndex;
+            return (
+              <li key={image.id} className="flex-none">
+                <button
+                  type="button"
+                  onClick={() => setSelectedIndex(index)}
+                  aria-label={t("galleryShow", { index: index + 1, total: images.length })}
+                  aria-current={active ? "true" : undefined}
+                  className={[
+                    "relative block h-14 w-14 cursor-pointer overflow-hidden rounded-[var(--radius-md)] bg-surface md:h-16 md:w-16",
+                    "border transition-colors duration-150",
+                    active ? "border-ink" : "border-transparent hover:border-line-strong",
+                  ].join(" ")}
+                >
+                  <Image
+                    src={image.url}
+                    alt=""
+                    fill
+                    sizes="64px"
+                    className="object-contain p-1.5"
+                  />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <figure className="relative m-0 aspect-[4/5] w-full overflow-hidden rounded-[var(--radius-md)] bg-surface md:flex-1">
         <Image
-          src={images[selectedIndex].url}
-          alt={images[selectedIndex].alt || productName}
+          key={current.id}
+          src={current.url}
+          alt={current.alt || productName}
           fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          style={{ objectFit: "contain" }}
+          sizes="(max-width: 768px) 100vw, 55vw"
+          className="object-contain p-6 sm:p-10"
           priority
         />
-      </div>
-      {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto">
-          {images.map((image, index) => (
-            <button
-              key={image.id}
-              onClick={() => setSelectedIndex(index)}
-              className={[
-                "relative h-14 w-14 flex-shrink-0 cursor-pointer overflow-hidden rounded-[var(--radius-lg)] border-2 bg-[var(--color-bg-tertiary)] transition-[border-color,transform] duration-200 hover:border-[var(--color-border-hover)] hover:scale-105 sm:h-[72px] sm:w-[72px]",
-                index === selectedIndex
-                  ? "border-[var(--color-accent)]"
-                  : "border-transparent",
-              ].join(" ")}
-            >
-              <Image
-                src={image.url}
-                alt={image.alt || `${productName} ${index + 1}`}
-                fill
-                sizes="64px"
-                style={{ objectFit: "contain" }}
-              />
-            </button>
-          ))}
-        </div>
-      )}
+        {hasStrip && (
+          <figcaption className="absolute bottom-3 right-4 text-xs tabular-nums text-muted">
+            {selectedIndex + 1} / {images.length}
+          </figcaption>
+        )}
+      </figure>
     </div>
   );
 }

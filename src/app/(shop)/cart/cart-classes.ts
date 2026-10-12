@@ -1,41 +1,33 @@
 /**
- * Tailwind class constants for the cart page — replaces cart.module.css.
+ * Tailwind class constants for the bag page.
  */
 export const cartClasses = {
-  wrapper: "mx-auto max-w-[var(--max-width)] px-4 pb-16",
+  wrapper: "wrap pb-24 pt-6 sm:pb-32",
 
-  title:
-    "mb-4 text-[1.375rem] font-extrabold tracking-[-0.03em] min-[481px]:mb-6 min-[481px]:text-[1.75rem]",
+  head: "mb-2 mt-8 flex flex-wrap items-end justify-between gap-4 sm:mt-12",
+
+  title: "display",
+
+  count: "text-sm text-muted",
 
   layout:
-    "grid grid-cols-1 items-start gap-5 lg:grid-cols-[1fr_380px] lg:gap-10",
+    "grid grid-cols-1 items-start gap-14 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-20 xl:grid-cols-[minmax(0,1fr)_400px]",
 
-  itemsBlock:
-    "overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg)]",
+  list: "flex flex-col",
 
-  itemsHeader:
-    "flex flex-wrap items-center justify-between gap-2 border-b border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-3 text-[0.8125rem] min-[481px]:px-6 min-[481px]:py-4 min-[481px]:text-base",
+  summary: "flex flex-col pt-6 lg:sticky lg:top-[calc(var(--header-height)+var(--announcement-height)+2rem)]",
 
-  itemRow:
-    "flex items-start gap-3.5 border-t border-[var(--color-border)] p-4 first:border-t-0 min-[641px]:items-center min-[641px]:gap-5 min-[641px]:px-6 min-[641px]:py-5",
+  summaryTitle: "eyebrow mb-5",
 
-  itemImage:
-    "relative h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white min-[641px]:h-[100px] min-[641px]:w-[100px]",
+  row: "flex items-baseline justify-between gap-4 py-2 text-sm",
 
-  itemContent: "flex min-w-0 flex-1 flex-col gap-1.5",
+  rowLabel: "text-muted",
 
-  itemName:
-    "line-clamp-2 break-words text-sm font-semibold text-[var(--color-text)] no-underline [overflow-wrap:anywhere] min-[641px]:text-[0.9375rem]",
+  totalRow: "mt-3 flex items-baseline justify-between gap-4 border-t border-line pt-5",
 
-  itemFooter:
-    "mt-auto flex flex-wrap items-center justify-between gap-2.5 pt-1 min-[481px]:flex-nowrap min-[481px]:gap-3 min-[481px]:pt-2",
+  checkoutBtn: "btn-ink btn-lg mt-8 w-full",
 
-  itemPriceRow:
-    "ml-auto flex items-center gap-2 min-[481px]:ml-0 min-[481px]:gap-4",
+  continueLink: "btn-quiet mx-auto mt-4 text-muted",
 
-  summary:
-    "static h-fit rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] p-5 lg:sticky lg:top-[calc(var(--header-height)+var(--announcement-height)+1rem)] lg:rounded-[var(--radius-xl)] lg:p-7",
-
-  checkoutBtn:
-    "flex w-full items-center justify-center gap-2 rounded-[var(--radius-xl)] bg-[var(--color-accent)] p-4 text-base font-bold text-white no-underline shadow-[0_4px_14px_rgba(38, 97, 143,0.3)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[0_6px_18px_rgba(38, 97, 143,0.4)]",
+  footnote: "mt-8 text-xs leading-relaxed text-faint",
 } as const;

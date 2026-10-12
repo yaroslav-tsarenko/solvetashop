@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { Button } from "@/components/ui/Button";
-import { Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Lamp } from "lucide-react";
+import { Link } from "@/i18n/routing";
 import { QuantitySelector } from "@/components/shared/QuantitySelector/QuantitySelector";
 import { PriceDisplay } from "@/components/shared/PriceDisplay/PriceDisplay";
 import { useCart } from "@/providers/CartProvider";
@@ -12,52 +13,66 @@ interface CartItemProps {
   item: CartItemType;
 }
 
+/**
+ * One line of the bag: small image on surface, name + details, a text stepper,
+ * the line price and an underlined "Remove".
+ */
 export function CartItem({ item }: CartItemProps) {
+  const t = useTranslations("cart");
   const { updateQuantity, removeItem } = useCart();
 
   return (
-    <div className="flex gap-4 border-b border-[var(--color-border)] py-5 first:pt-0">
-      <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-[var(--radius-lg)] [background:linear-gradient(135deg,var(--color-bg-tertiary)_0%,var(--color-bg-secondary)_100%)]">
+    <li className="grid grid-cols-[72px_minmax(0,1fr)] gap-x-5 gap-y-4 border-b border-line py-6 sm:grid-cols-[96px_minmax(0,1fr)_auto] sm:items-center sm:gap-x-8">
+      <Link
+        href={`/product/${item.slug}`}
+        className="relative block aspect-square w-full overflow-hidden rounded-[var(--radius-md)] bg-surface"
+        tabIndex={-1}
+        aria-hidden="true"
+      >
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}
-            alt={item.name}
+            alt=""
             fill
-            sizes="80px"
-            style={{ objectFit: "contain", padding: "4px" }}
+            sizes="96px"
+            style={{ objectFit: "contain", padding: "8px" }}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-[0.625rem] text-[var(--color-text-tertiary)]">
-            No Image
-          </div>
+          <span className="flex h-full w-full items-center justify-center text-faint">
+            <Lamp size={20} strokeWidth={1.25} />
+          </span>
         )}
-      </div>
-      <div className="flex flex-1 flex-col gap-1">
-        <h3 className="text-[0.9375rem] font-semibold">{item.name}</h3>
-        {item.variantName && (
-          <span className="text-xs text-[var(--color-text-tertiary)]">{item.variantName}</span>
-        )}
-        <div className="mt-auto flex items-center justify-between">
+      </Link>
+
+      <div className="flex min-w-0 flex-col gap-1">
+        <Link
+          href={`/product/${item.slug}`}
+          className="line-clamp-2 text-[0.9375rem] text-ink [overflow-wrap:anywhere] hover:text-sage"
+        >
+          {item.name}
+        </Link>
+        {item.variantName && <span className="text-[0.8125rem] text-muted">{item.variantName}</span>}
+        <span className="text-xs text-faint">{t("reference", { sku: item.sku })}</span>
+
+        <div className="mt-3 flex items-center gap-5">
           <QuantitySelector
             quantity={item.quantity}
             maxQuantity={item.maxQuantity}
             onChange={(qty) => updateQuantity(item.productId, qty, item.variantId)}
           />
-          <div className="flex items-center gap-3">
-            <PriceDisplay price={item.price * item.quantity} size="sm" />
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              color="danger"
-              onPress={() => removeItem(item.productId, item.variantId)}
-              aria-label="Remove"
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
+          <button
+            type="button"
+            onClick={() => removeItem(item.productId, item.variantId)}
+            className="text-[0.8125rem] text-muted underline decoration-1 underline-offset-4 transition-colors hover:text-brick"
+          >
+            {t("remove")}
+          </button>
         </div>
       </div>
-    </div>
+
+      <div className="col-start-2 sm:col-start-auto sm:text-right">
+        <PriceDisplay price={item.price * item.quantity} size="sm" />
+      </div>
+    </li>
   );
 }

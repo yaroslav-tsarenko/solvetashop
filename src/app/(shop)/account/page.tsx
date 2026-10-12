@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
-import { Chip } from "@heroui/react";
-import { Package, MapPin, Heart, User as UserIcon, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner/LoadingSpinner";
 import { formatPrice } from "@/lib/utils/format-price";
-import { format } from "date-fns";
 import { accountClasses as styles } from "./account-classes";
+import { OrderStatusPill } from "./OrderStatus";
 
 interface Order {
   id: string;
@@ -20,18 +19,15 @@ interface Order {
   createdAt: string;
 }
 
-const statusColors: Record<string, "default" | "accent" | "success" | "warning" | "danger"> = {
-  PENDING: "warning",
-  CONFIRMED: "accent",
-  PROCESSING: "accent",
-  SHIPPED: "default",
-  DELIVERED: "success",
-  CANCELLED: "danger",
-  REFUNDED: "danger",
-};
+const shortcuts = [
+  { href: "/account/wishlist", titleKey: "tabs.wishlist", blurbKey: "wishlistBlurb" },
+  { href: "/account/addresses", titleKey: "tabs.addresses", blurbKey: "addressesBlurb" },
+  { href: "/account/profile", titleKey: "tabs.profile", blurbKey: "detailsBlurb" },
+] as const;
 
 export default function AccountPage() {
   const t = useTranslations("account");
+  const format = useFormatter();
   const { user, loading } = useAuth();
   const { currency, convert } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -52,90 +48,111 @@ export default function AccountPage() {
   const recentOrders = orders.slice(0, 3);
 
   return (
-    <div>
-      <h1 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "0.25rem" }}>
-        {t("title")}
-      </h1>
-      <p style={{ color: "var(--color-text-secondary)", marginBottom: "1.5rem", fontSize: "0.9375rem" }}>
-        {t("welcome", { name: user?.name || user?.email || "" })}
-      </p>
-
-      <div className={styles.cardsGrid}>
-        <div className={styles.statCard}>
-          <span className={styles.statCardLabel}>Orders</span>
-          <span className={styles.statCardValue}>{orders.length}</span>
-          <span className={styles.statCardSub}>All-time</span>
-        </div>
-        <div className={styles.statCard}>
-          <span className={styles.statCardLabel}>Total Spent</span>
-          <span className={styles.statCardValue}>{formatPrice(convert(totalSpent), currency)}</span>
-          <span className={styles.statCardSub}>Across all orders</span>
-        </div>
-        <div className={styles.statCard}>
-          <span className={styles.statCardLabel}>Account</span>
-          <span className={styles.statCardValue} style={{ fontSize: "1rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.email}</span>
-          <span className={styles.statCardSub}>{user?.name || "No name set"}</span>
-        </div>
-      </div>
-
-      <div className={styles.dashboardGrid}>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.75rem" }}>
-            <h2 style={{ fontSize: "1.0625rem", fontWeight: 700 }}>Recent Orders</h2>
-            <Link href="/account/orders" style={{ fontSize: "0.8125rem", color: "var(--color-accent)", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-              View all <ChevronRight size={14} />
-            </Link>
+    <div className="flex flex-col gap-16">
+      <section aria-labelledby="glance-title">
+        <h2 id="glance-title" className="sr-only">
+          {t("glanceTitle")}
+        </h2>
+        <dl className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-line">
+          <div className="sm:pr-8">
+            <dt className={styles.term}>{t("ordersCount")}</dt>
+            <dd className="mt-3 text-[2.25rem] font-light leading-none tracking-[-0.03em] text-ink">
+              {ordersLoading ? "—" : orders.length}
+            </dd>
           </div>
-          {ordersLoading ? (
-            <div style={{ padding: "1.5rem", textAlign: "center", color: "var(--color-text-tertiary)" }}>Loading...</div>
-          ) : recentOrders.length === 0 ? (
-            <div style={{ padding: "2rem", textAlign: "center", border: "1px dashed var(--color-border)", borderRadius: "var(--radius-lg)", color: "var(--color-text-tertiary)" }}>
-              <Package size={32} style={{ margin: "0 auto 0.5rem", opacity: 0.5 }} />
-              <p style={{ fontSize: "0.875rem" }}>No orders yet</p>
-              <Link href="/catalog" style={{ display: "inline-block", marginTop: "0.75rem", color: "var(--color-accent)", fontSize: "0.875rem", fontWeight: 600, textDecoration: "none" }}>
-                Start shopping →
-              </Link>
-            </div>
-          ) : (
-            <div className={styles.orderList}>
-              {recentOrders.map((order) => (
-                <Link key={order.id} href={`/account/orders/${order.id}`} className={styles.orderCard}>
-                  <div className={styles.orderCardMain}>
-                    <div className={styles.orderCardNumber}>#{order.orderNumber.slice(-8)}</div>
-                    <div className={styles.orderCardDate}>{format(new Date(order.createdAt), "MMM d, yyyy")}</div>
-                  </div>
-                  <Chip size="sm" color={statusColors[order.status] || "default"}>{order.status}</Chip>
-                  <span className={styles.orderCardPrice}>{formatPrice(convert(Number(order.total)), currency)}</span>
-                </Link>
-              ))}
-            </div>
+          <div className="sm:px-8">
+            <dt className={styles.term}>{t("spentSoFar")}</dt>
+            <dd className="mt-3 text-[2.25rem] font-light leading-none tracking-[-0.03em] text-ink">
+              {ordersLoading ? "—" : formatPrice(convert(totalSpent), currency)}
+            </dd>
+          </div>
+          <div className="min-w-0 sm:pl-8">
+            <dt className={styles.term}>{t("signedInAs")}</dt>
+            <dd className="mt-3 truncate text-base text-ink">{user?.email}</dd>
+            {user?.name && <dd className="mt-1 truncate text-sm text-muted">{user.name}</dd>}
+          </div>
+        </dl>
+      </section>
+
+      <section className={styles.section} aria-labelledby="latest-title">
+        <div className={styles.sectionHead}>
+          <h2 id="latest-title" className={styles.sectionTitle}>
+            {t("latestTitle")}
+          </h2>
+          {recentOrders.length > 0 && (
+            <Link href="/account/orders" className={styles.textLink}>
+              {t("seeAllOrders")}
+            </Link>
           )}
         </div>
 
-        <div className={styles.quickLinks}>
-          <h2 style={{ fontSize: "1.0625rem", fontWeight: 700, marginBottom: "0.75rem" }}>Quick Links</h2>
-          <Link href="/account/orders" className={styles.quickLink}>
-            <span className={styles.quickLinkIcon}><Package size={16} /></span>
-            <span style={{ flex: 1 }}>{t("orders")}</span>
-            <ChevronRight size={16} color="var(--color-text-tertiary)" />
-          </Link>
-          <Link href="/account/profile" className={styles.quickLink}>
-            <span className={styles.quickLinkIcon}><UserIcon size={16} /></span>
-            <span style={{ flex: 1 }}>{t("profile")}</span>
-            <ChevronRight size={16} color="var(--color-text-tertiary)" />
-          </Link>
-          <Link href="/account/addresses" className={styles.quickLink}>
-            <span className={styles.quickLinkIcon}><MapPin size={16} /></span>
-            <span style={{ flex: 1 }}>{t("addresses")}</span>
-            <ChevronRight size={16} color="var(--color-text-tertiary)" />
-          </Link>
-          <Link href="/account/wishlist" className={styles.quickLink}>
-            <span className={styles.quickLinkIcon}><Heart size={16} /></span>
-            <span style={{ flex: 1 }}>{t("wishlist")}</span>
-            <ChevronRight size={16} color="var(--color-text-tertiary)" />
-          </Link>
-        </div>
-      </div>
+        {ordersLoading ? (
+          <p className="py-6 text-sm text-muted">{t("loadingOrders")}</p>
+        ) : recentOrders.length === 0 ? (
+          <div className="flex flex-wrap items-center justify-between gap-4 py-2">
+            <p className="text-[0.9375rem] text-muted">{t("noOrdersShort")}</p>
+            <Link href="/catalog" className="btn-line btn-sm">
+              {t("shopCta")}
+            </Link>
+          </div>
+        ) : (
+          <ul className="divide-y divide-line border-t border-line">
+            {recentOrders.map((order) => (
+              <li key={order.id}>
+                <Link
+                  href={`/account/orders/${order.id}`}
+                  className="group grid grid-cols-[1fr_auto] items-center gap-x-6 gap-y-2 py-5 text-ink no-underline sm:grid-cols-[1fr_auto_auto_auto]"
+                >
+                  <span className="min-w-0">
+                    <span className="block text-[0.9375rem] font-medium tabular-nums">
+                      {t("orderNumber", { number: order.orderNumber.slice(-8) })}
+                    </span>
+                    <span className="mt-1 block text-[0.8125rem] text-muted">
+                      {format.dateTime(new Date(order.createdAt), { dateStyle: "medium" })}
+                    </span>
+                  </span>
+                  <span className="hidden sm:block">
+                    <OrderStatusPill status={order.status} />
+                  </span>
+                  <span className="text-[0.9375rem] tabular-nums">
+                    {formatPrice(convert(Number(order.total)), currency)}
+                  </span>
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={1.5}
+                    className="hidden text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink sm:block"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className={styles.section} aria-labelledby="elsewhere-title">
+        <h2 id="elsewhere-title" className={`${styles.sectionTitle} mb-6`}>
+          {t("elsewhereTitle")}
+        </h2>
+        <ul className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {shortcuts.map((s) => (
+            <li key={s.href}>
+              <Link href={s.href} className="group block text-ink no-underline">
+                <span className="flex items-center gap-2 text-[0.9375rem] font-medium">
+                  {t(s.titleKey)}
+                  <ArrowRight
+                    size={15}
+                    strokeWidth={1.5}
+                    className="text-faint transition-transform group-hover:translate-x-0.5 group-hover:text-ink"
+                    aria-hidden="true"
+                  />
+                </span>
+                <span className="mt-1.5 block text-sm leading-relaxed text-muted">{t(s.blurbKey)}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
