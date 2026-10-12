@@ -1,181 +1,140 @@
 /*
- * Solvetashop — Design Tokens (Steel Blue / Stone palette)
+ * solveta·shop — design tokens ("Nordic Minimal")
  * -------------------------------------------------------
- * The store sells electrical materials to trade buyers, so the palette reads
- * like a supplier's counter rather than a consumer shop: one steel-blue accent
- * doing all the work over warm stone neutrals, with brass as the second voice
- * for tags and informational marks. Sale red is deliberately its own colour
- * and never the brand's, so a discount cannot be mistaken for a button.
+ * Lighting and home décor want a quiet room to sit in: paper-white ground,
+ * a warm stone surface for imagery, near-black ink for type and primary
+ * actions, and one muted sage voice for links, tags and focus. Sale is a
+ * subdued brick so a reduction reads clearly without shouting.
  *
- * Semantic variable names are preserved, so every component already styled
- * against these tokens is re-coloured with no structural change. Accent values
- * are chosen to clear WCAG AA on the surface they are used against: #26618F
- * carries white text at 5.6:1, and the dark theme lifts to #5D9BCB so it still
- * separates from stone at night.
+ * No gradients and no heavy shadows anywhere: separation comes from
+ * hairlines and whitespace. Older semantic names (--color-accent, --color-bg,
+ * --color-text…) are kept as aliases so every component styled against them
+ * picks up the new system.
  */
 
 :root {
-  /* ── Primary scale (steel blue) ───────────────────────── */
-  --color-primary-50:  #EEF4F9;
-  --color-primary-100: #D3E3F0;
-  --color-primary-200: #A7C6E0;
-  --color-primary-300: #77A6CC;
-  --color-primary-400: #4A85B3;
-  --color-primary-500: #26618F;
-  --color-primary-600: #1E4E74;
-  --color-primary-700: #183E5C;
-  --color-primary-800: #123047;
-  --color-primary-900: #0C2131;
+  /* ── Core palette ─────────────────────────────────────── */
+  --color-paper: #FFFFFF;
+  --color-surface: #F2F2EF;
+  --color-surface-2: #E9E8E3;
+  /* Image plate: product shots sit on this; stays light in dark mode so
+   * white-background packshots blend in (mix-blend: multiply). */
+  --color-plate: #F2F2EF;
+  --color-ink: #111111;
+  --color-ink-soft: #2A2A28;
+  --color-on-ink: #FFFFFF;
+  --color-line: #E4E2DC;
+  --color-line-strong: #CFCDC5;
+  --color-muted: #6B6B66;
+  --color-faint: #9A9992;
 
-  /* ── Accent scale (brass) ─────────────────────────────── */
-  --color-accent-50:  #FAF3E9;
-  --color-accent-100: #F1E1C7;
-  --color-accent-200: #E3C79A;
-  --color-accent-300: #D2AC6D;
-  --color-accent-400: #C1954F;
-  --color-accent-500: #B08347;
-  --color-accent-600: #8E6836;
-  --color-accent-700: #6C4F29;
-  --color-accent-800: #4A361C;
-  --color-accent-900: #2A1F10;
+  --color-sage: #6F7F68;
+  --color-sage-hover: #56644F;
+  --color-sage-soft: #E8ECE5;
 
-  /* ── Warm neutral scale (stone family) ────────────────── */
-  --color-neutral-50:  #FAFAF9;
-  --color-neutral-100: #F5F5F4;
-  --color-neutral-200: #E7E5E4;
-  --color-neutral-300: #D6D3D1;
-  --color-neutral-400: #A8A29E;
-  --color-neutral-500: #78716C;
-  --color-neutral-600: #57534E;
-  --color-neutral-700: #44403C;
-  --color-neutral-800: #292524;
-  --color-neutral-900: #1C1917;
+  --color-brick: #A4493A;
+  --color-brick-soft: #F3E6E2;
 
-  /* ── Brand primitives ─────────────────────────────────── */
-  --color-primary: #1A1D21;            /* deep graphite as neutral primary */
-  --color-secondary: #ffffff;
+  /* ── Semantic aliases (used across components) ────────── */
+  --color-primary: var(--color-ink);
+  --color-secondary: var(--color-paper);
 
-  /* Steel blue accent (main brand action colour) */
-  --color-accent: #26618F;
-  --color-accent-hover: #1E4E74;
-  --color-accent-light: rgba(38, 97, 143, 0.10);
+  --color-accent: var(--color-sage);
+  --color-accent-hover: var(--color-sage-hover);
+  --color-accent-light: var(--color-sage-soft);
+  --color-accent-2: var(--color-sage);
+  --color-accent-3: var(--color-ink-soft);
 
-  /* Supporting accents */
-  --color-accent-2: #B08347;           /* brass — informational / tags */
-  --color-accent-3: #292524;           /* graphite — micro-highlights */
+  --color-success: #4F7A5A;
+  --color-success-light: #E6EFE8;
+  --color-warning: #A07A2E;
+  --color-danger: #A4493A;
+  --color-danger-bg: #F3E6E2;
+  --color-sale: var(--color-brick);
 
-  /* State colours */
-  --color-success: #0F8F63;
-  --color-warning: #B5761E;
-  --color-danger: #C8352A;
+  --color-bg: var(--color-paper);
+  --color-bg-secondary: #F8F8F6;
+  --color-bg-tertiary: var(--color-surface);
+  --color-bg-warm: var(--color-surface);
 
-  /* Sale / discount — its own colour, never the brand's */
-  --color-sale: #C8352A;
+  --color-text: var(--color-ink);
+  --color-text-secondary: var(--color-muted);
+  --color-text-tertiary: var(--color-faint);
 
-  /* ── Gradients ────────────────────────────────────────── */
-  --gradient-primary: linear-gradient(135deg, #1E4E74 0%, #26618F 55%, #4A85B3 100%);
-  --gradient-accent: linear-gradient(135deg, #26618F 0%, #4A85B3 100%);
-  --gradient-warm: linear-gradient(135deg, #8E6836 0%, #C1954F 100%);
-  --gradient-cool: linear-gradient(135deg, #292524 0%, #26618F 100%);
-  --gradient-hero: linear-gradient(135deg, #F7F6F4 0%, #EEF4F9 40%, #FAFAF9 70%, #F5F5F4 100%);
-  --gradient-card-hover: linear-gradient(135deg, rgba(38, 97, 143, 0.05) 0%, rgba(176, 131, 71, 0.05) 100%);
-  --gradient-badge: linear-gradient(135deg, #C8352A 0%, #E0685C 100%);
+  --color-border: var(--color-line);
+  --color-border-hover: var(--color-line-strong);
 
-  /* ── Surfaces ─────────────────────────────────────────── */
-  --color-bg: #ffffff;
-  --color-bg-secondary: #FAFAF9;
-  --color-bg-tertiary: #F5F5F4;
-  --color-bg-warm: #EEF4F9;
-
-  /* ── Text ─────────────────────────────────────────────── */
-  --color-text: #1A1D21;
-  --color-text-secondary: #57534E;
-  --color-text-tertiary: #A8A29E;
-
-  /* ── Borders ──────────────────────────────────────────── */
-  --color-border: #E7E5E4;
-  --color-border-hover: #D6D3D1;
-
-  /* ── Shadows (with graphite undertone) ────────────────── */
-  --shadow-sm: 0 1px 3px rgba(26, 29, 33, 0.05), 0 1px 2px rgba(26, 29, 33, 0.03);
-  --shadow-md: 0 4px 16px rgba(26, 29, 33, 0.07), 0 2px 4px rgba(26, 29, 33, 0.04);
-  --shadow-lg: 0 12px 40px rgba(26, 29, 33, 0.09), 0 4px 12px rgba(26, 29, 33, 0.05);
-  --shadow-xl: 0 24px 60px rgba(26, 29, 33, 0.12), 0 8px 20px rgba(26, 29, 33, 0.06);
-  --shadow-accent: 0 8px 30px rgba(38, 97, 143, 0.24);
-  --shadow-card: 0 2px 8px rgba(26, 29, 33, 0.05), 0 0 1px rgba(26, 29, 33, 0.07);
-  --shadow-card-hover: 0 12px 32px rgba(26, 29, 33, 0.12), 0 4px 8px rgba(26, 29, 33, 0.05);
+  /* ── Elevation: hairlines first, a whisper of shadow at most ── */
+  --shadow-sm: 0 1px 2px rgba(17, 17, 17, 0.04);
+  --shadow-md: 0 6px 24px rgba(17, 17, 17, 0.06);
+  --shadow-lg: 0 12px 40px rgba(17, 17, 17, 0.08);
+  --shadow-xl: 0 20px 60px rgba(17, 17, 17, 0.10);
+  --shadow-card: none;
+  --shadow-card-hover: none;
+  --shadow-accent: none;
 
   /* ── Radii ────────────────────────────────────────────── */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.25rem;
-  --radius-2xl: 1.5rem;
-  --radius-pill: 9999px;
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+  --radius-pill: 999px;
 
-  /* ── Layout constants ─────────────────────────────────── */
-  --max-width: 1320px;
-  --header-height: 64px;
-  --announcement-height: 36px;
+  /* ── Layout ───────────────────────────────────────────── */
+  --max-width: 1360px;
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --header-height: 72px;
+  --announcement-height: 32px;
 
   /* ── Typography ───────────────────────────────────────── */
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-geist-mono), monospace;
+  --font-sans: var(--font-manrope), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --tracking-display: -0.035em;
+  --tracking-heading: -0.02em;
+  --tracking-label: 0.12em;
 
-  /* ── Easings ──────────────────────────────────────────── */
+  /* ── Motion ───────────────────────────────────────────── */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
 
-  /* ── Promo tints (paired with palette) ────────────────── */
-  --promo-bg-blue: #EEF4F9;
-  --promo-bg-warm: #FAF3E9;
-  --promo-bg-green: #F5F5F4;
+  /* ── Quiet tints for content blocks ───────────────────── */
+  --promo-bg-blue: var(--color-surface);
+  --promo-bg-warm: var(--color-surface);
+  --promo-bg-green: var(--color-sage-soft);
 }
 
 [data-theme="dark"] {
-  --color-primary: #ffffff;
-  --color-secondary: #1A1D21;
+  --color-paper: #141414;
+  --color-surface: #1C1C1A;
+  --color-surface-2: #252522;
+  --color-plate: #E4E3DE;
+  --color-ink: #F2F2EF;
+  --color-ink-soft: #D9D8D2;
+  --color-on-ink: #141414;
+  --color-line: #2C2C29;
+  --color-line-strong: #3A3A36;
+  --color-muted: #A3A39C;
+  --color-faint: #75756F;
 
-  --color-accent: #5D9BCB;
-  --color-accent-hover: #8ABEE3;
-  --color-accent-light: rgba(93, 155, 203, 0.16);
+  --color-sage: #9AAE92;
+  --color-sage-hover: #B4C6AC;
+  --color-sage-soft: #232A21;
 
-  --color-accent-2: #D2AC6D;
-  --color-accent-3: #A8A29E;
+  --color-brick: #D07A68;
+  --color-brick-soft: #2C1D19;
 
-  --color-success: #34C596;
-  --color-warning: #D2AC6D;
-  --color-danger: #E8776B;
-  --color-sale: #E8776B;
+  --color-success: #8DB497;
+  --color-success-light: #1E2A21;
+  --color-warning: #CDA65A;
+  --color-danger: #D07A68;
+  --color-danger-bg: #2C1D19;
 
-  --gradient-primary: linear-gradient(135deg, #4A85B3 0%, #5D9BCB 55%, #8ABEE3 100%);
-  --gradient-accent: linear-gradient(135deg, #4A85B3 0%, #8ABEE3 100%);
-  --gradient-warm: linear-gradient(135deg, #8E6836 0%, #D2AC6D 100%);
-  --gradient-hero: linear-gradient(135deg, #1A1D21 0%, #292524 40%, #1C1917 70%, #1A1D21 100%);
-  --gradient-card-hover: linear-gradient(135deg, rgba(93, 155, 203, 0.10) 0%, rgba(210, 172, 109, 0.08) 100%);
-  --gradient-badge: linear-gradient(135deg, #C8352A 0%, #E8776B 100%);
+  --color-bg-secondary: #181817;
 
-  --color-bg: #1A1D21;
-  --color-bg-secondary: #1C1917;
-  --color-bg-tertiary: #292524;
-  --color-bg-warm: #14212C;
-
-  --color-text: #FAFAF9;
-  --color-text-secondary: #A8A29E;
-  --color-text-tertiary: #78716C;
-
-  --color-border: #292524;
-  --color-border-hover: #44403C;
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.45);
-  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.5);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.35);
-  --shadow-card-hover: 0 12px 32px rgba(0, 0, 0, 0.45);
-  --shadow-accent: 0 8px 30px rgba(93, 155, 203, 0.3);
-
-  --promo-bg-blue: #14212C;
-  --promo-bg-warm: #221A0F;
-  --promo-bg-green: #1C1917;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.45);
 }

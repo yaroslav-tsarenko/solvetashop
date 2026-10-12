@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/routing";
 import Image from "next/image";
 import { Link } from "@/i18n/routing";
-import { Button } from "@/components/ui/Button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/providers/CartProvider";
 import { useAuth } from "@/providers/AuthProvider";
 import { useCurrency } from "@/providers/CurrencyProvider";
@@ -19,11 +17,15 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { MerchantLocation } from "@/components/checkout/MerchantLocation";
 import { TermsConsent } from "@/components/ui/TermsConsent";
 import { toast } from "sonner";
+import { ChevronDown, Lamp } from "lucide-react";
 import { checkoutClasses as styles } from "./checkout-classes";
 import {
-  Mail, Phone, MapPin, Truck, CreditCard,
-  ChevronRight, ShieldCheck, Lock, Check, ImageOff, UserPlus, Tag, X as XIcon,
-} from "lucide-react";
+  SHIPPING_METHODS,
+  DEFAULT_SHIPPING_METHOD,
+  FREE_STANDARD_MIN,
+  qualifiesForFreeStandard,
+  shippingCost,
+} from "@/lib/shipping";
 
 interface AppliedDiscount {
   type: "welcome" | "newsletter";
@@ -32,77 +34,37 @@ interface AppliedDiscount {
   source: "auto" | "code";
 }
 
-const SHIPPING_METHODS = [
-  { key: "standard", label: "Standard Shipping", time: "5-7 business days", price: 5.99, icon: Truck },
-  { key: "express", label: "Express Shipping", time: "2-3 business days", price: 12.99, icon: Truck },
-  { key: "free", label: "Economy Shipping", time: "7-14 business days", price: 0, icon: Truck },
-];
+type StepIndex = 0 | 1 | 2;
 
-const stepIcons = [Mail, MapPin, CreditCard];
-const stepVariants = {
-  enter: { opacity: 0, x: 30 },
-  center: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -30 },
-};
-
-const inputBaseStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "0.75rem 1rem",
-  paddingLeft: "2.75rem",
-  borderRadius: "12px",
-  border: "1.5px solid var(--color-border)",
-  background: "var(--color-bg)",
-  color: "var(--color-text)",
-  fontSize: "0.875rem",
-  outline: "none",
-  transition: "border-color 0.2s, box-shadow 0.2s",
-};
-
-const inputPlainStyle: React.CSSProperties = {
-  ...inputBaseStyle,
-  paddingLeft: "1rem",
-};
-
-const selectStyle: React.CSSProperties = {
-  ...inputPlainStyle,
-  appearance: "none" as const,
-  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239E9EB8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-  backgroundRepeat: "no-repeat",
-  backgroundPosition: "right 0.75rem center",
-  paddingRight: "2rem",
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontSize: "0.8125rem",
-  fontWeight: 600,
-  marginBottom: "0.375rem",
-  color: "var(--color-text-secondary)",
-};
-
-const errorStyle: React.CSSProperties = {
-  color: "var(--color-danger)",
-  fontSize: "0.75rem",
-  marginTop: "0.25rem",
-  display: "flex",
-  alignItems: "center",
-  gap: "0.25rem",
-};
-
-function InputWithIcon({ icon: Icon, error, ...props }: { icon: React.ElementType; error?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+function Field({
+  id,
+  label,
+  optional,
+  error,
+  hint,
+  children,
+}: {
+  id: string;
+  label: string;
+  optional?: string;
+  error?: string;
+  hint?: string;
+  children: ReactNode;
+}) {
   return (
-    <div style={{ position: "relative" }}>
-      <Icon size={16} style={{ position: "absolute", left: "0.875rem", top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)", pointerEvents: "none" }} />
-      <input
-        {...props}
-        style={{
-          ...inputBaseStyle,
-          borderColor: error ? "var(--color-danger)" : undefined,
-        }}
-        onFocus={(e) => { e.currentTarget.style.borderColor = "var(--color-accent)"; e.currentTarget.style.boxShadow = "0 0 0 3px rgba(108,92,231,0.1)"; }}
-        onBlur={(e) => { e.currentTarget.style.borderColor = error ? "var(--color-danger)" : "var(--color-border)"; e.currentTarget.style.boxShadow = "none"; }}
-      />
-      {error && <span style={errorStyle}>{error}</span>}
+    <div>
+      <label htmlFor={id} className="field-label">
+        {label}
+        {optional && <span className="ml-1.5 font-normal text-faint">{optional}</span>}
+      </label>
+      {children}
+      {error ? (
+        <span id={`${id}-error`} className={styles.error}>
+          {error}
+        </span>
+      ) : hint ? (
+        <span className={styles.hint}>{hint}</span>
+      ) : null}
     </div>
   );
 }
@@ -112,15 +74,16 @@ export default function CheckoutPage() {
   const nav = useTranslations("nav");
   const router = useRouter();
   const locale = useLocale();
-  const { cart, clearCart } = useCart();
+  const { cart } = useCart();
   const { user } = useAuth();
   const { currency, convert } = useCurrency();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState<StepIndex>(0);
   const [submitting, setSubmitting] = useState(false);
   const [discount, setDiscount] = useState<AppliedDiscount | null>(null);
   const [promoInput, setPromoInput] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
   const [applyingPromo, setApplyingPromo] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   const {
     register,
@@ -142,18 +105,15 @@ export default function CheckoutPage() {
         postalCode: "",
         country: "",
       },
-      shippingMethod: "standard",
+      shippingMethod: DEFAULT_SHIPPING_METHOD,
       termsAccepted: false,
     },
   });
 
-  const steps = [t("contact"), t("shipping"), t("review")];
   const selectedMethod = watch("shippingMethod");
   const selectedCountry = watch("shipping.country");
-  const availableMethods = cart.subtotal >= 100
-    ? SHIPPING_METHODS
-    : SHIPPING_METHODS.filter((m) => m.key !== "free");
-  const shippingPrice = SHIPPING_METHODS.find((m) => m.key === selectedMethod)?.price ?? 5.99;
+  const contact = watch("contact");
+  const shipping = watch("shipping");
 
   const countryData = COUNTRIES.find((c) => c.code === selectedCountry);
   const phoneHint = countryData ? `${countryData.phone} XX XXX XXXX` : "+44 XX XXX XXXX";
@@ -161,7 +121,11 @@ export default function CheckoutPage() {
   const discountAmount = discount ? +(cart.subtotal * (discount.percent / 100)).toFixed(2) : 0;
   const discountedSubtotal = Math.max(cart.subtotal - discountAmount, 0);
   const taxOnDiscounted = +(discountedSubtotal * 0.21).toFixed(2);
-  const finalShipping = discountedSubtotal >= 100 && selectedMethod === "free" ? 0 : shippingPrice;
+  // Same rules (src/lib/shipping.ts) and rounding as /api/checkout, so the
+  // total shown here is the amount charged.
+  const finalShipping = shippingCost(selectedMethod ?? DEFAULT_SHIPPING_METHOD, discountedSubtotal);
+  const grandTotal = +(discountedSubtotal + taxOnDiscounted + finalShipping).toFixed(2);
+  const freeStandard = qualifiesForFreeStandard(discountedSubtotal);
 
   useEffect(() => {
     let cancelled = false;
@@ -187,12 +151,12 @@ export default function CheckoutPage() {
       if (data?.discount) {
         setDiscount(data.discount);
         setPromoInput("");
-        toast.success(`${data.discount.percent}% discount applied!`);
+        toast.success(t("promoApplied", { percent: data.discount.percent }));
       } else {
-        setPromoError("Invalid or expired code");
+        setPromoError(t("promoInvalid"));
       }
     } catch {
-      setPromoError("Failed to apply code");
+      setPromoError(t("promoFailed"));
     } finally {
       setApplyingPromo(false);
     }
@@ -211,7 +175,7 @@ export default function CheckoutPage() {
       const valid = await trigger(["shipping", "shippingMethod"]);
       if (!valid) return;
     }
-    setStep((s) => Math.min(s + 1, 2));
+    setStep((s) => Math.min(s + 1, 2) as StepIndex);
   };
 
   const onSubmit = async (data: CheckoutFormData) => {
@@ -241,18 +205,18 @@ export default function CheckoutPage() {
           // ignore
         }
         console.error("Checkout submission failed on server:", errorData);
-        throw new Error(errorData?.details || errorData?.error || "Failed to create order");
+        throw new Error(errorData?.details || errorData?.error || t("orderFailed"));
       }
 
       const order = await res.json();
       if (order.paymentLink) {
         window.location.href = order.paymentLink;
       } else {
-        toast.success("Order placed successfully!");
+        toast.success(t("orderPlaced"));
         router.push(`/order/confirmed?orderId=${order.id}`);
       }
-    } catch (err: any) {
-      toast.error(err.message || "Failed to place order. Please try again.");
+    } catch (err: unknown) {
+      toast.error((err instanceof Error && err.message) || t("orderFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -266,604 +230,428 @@ export default function CheckoutPage() {
 
   if (cart.items.length === 0) return null;
 
-  const freeShippingThreshold = convert(100);
-  const subtotalConverted = convert(cart.subtotal);
-  const amountToFreeShipping = freeShippingThreshold - subtotalConverted;
+  // Enter inside an earlier section moves on instead of submitting the order.
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (step < 2) {
+      e.preventDefault();
+      void goNext();
+      return;
+    }
+    void handleSubmit(onSubmit)(e);
+  };
+
+  const methodLabel = (key: string) => t(`methods.${key}.label`);
+  const priceOrFree = (value: number) =>
+    value === 0 ? t("free") : formatPrice(convert(value), currency);
+
+  const sectionHeader = (index: StepIndex, title: string) => {
+    const isActive = step === index;
+    const isDone = step > index;
+    return (
+      <div className={styles.sectionHead}>
+        <h2 className={`${styles.sectionTitle} ${isActive || isDone ? "text-ink" : "text-faint"}`}>
+          <span className={`${styles.sectionNumber} ${isActive ? "text-sage" : "text-faint"}`}>
+            {index + 1}
+          </span>
+          {title}
+        </h2>
+        {isDone && (
+          <button
+            type="button"
+            onClick={() => setStep(index)}
+            className="btn-quiet btn-sm text-muted"
+            aria-label={t("changeSection", { section: title })}
+          >
+            {t("change")}
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  const countryName = COUNTRIES.find((c) => c.code === shipping?.country)?.name ?? shipping?.country;
 
   return (
     <div className={styles.wrapper}>
       <Breadcrumbs items={[{ label: nav("home"), href: "/" }, { label: nav("cart"), href: "/cart" }, { label: t("title") }]} />
 
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={styles.title}
-      >
-        {t("title")}
-      </motion.h1>
-
-      {/* Guest checkout notice */}
-      {!user && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.75rem",
-            padding: "0.875rem 1.25rem",
-            borderRadius: "12px",
-            background: "var(--color-accent-light)",
-            border: "1px solid var(--color-accent)",
-            marginBottom: "1.5rem",
-            fontSize: "0.875rem",
-          }}
-        >
-          <UserPlus size={18} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-          <span>
-            Checking out as guest.{" "}
-            <Link href="/auth/login" style={{ color: "var(--color-accent)", fontWeight: 600, textDecoration: "none" }}>
-              Log in
-            </Link>{" "}
-            or{" "}
-            <Link href="/auth/register" style={{ color: "var(--color-accent)", fontWeight: 600, textDecoration: "none" }}>
-              create an account
-            </Link>{" "}
-            to track orders easily.
-          </span>
-        </motion.div>
-      )}
-
-      {/* Step Indicator */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className={styles.stepIndicator}
-      >
-        {steps.map((s, i) => {
-          const Icon = stepIcons[i];
-          const isActive = i === step;
-          const isDone = i < step;
-          return (
-            <button
-              key={i}
-              onClick={() => i < step && setStep(i)}
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "0.5rem",
-                padding: "0.75rem 1rem",
-                borderRadius: "12px",
-                border: "none",
-                cursor: i <= step ? "pointer" : "default",
-                background: isActive ? "var(--color-bg)" : "transparent",
-                boxShadow: isActive ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                fontWeight: isActive ? 700 : 500,
-                fontSize: "0.8125rem",
-                color: isActive ? "var(--color-text)" : isDone ? "var(--color-accent)" : "var(--color-text-tertiary)",
-                transition: "all 0.2s",
-              }}
-            >
-              {isDone ? (
-                <div style={{ width: "1.25rem", height: "1.25rem", borderRadius: "50%", background: "var(--color-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Check size={12} strokeWidth={3} />
-                </div>
-              ) : (
-                <Icon size={16} />
-              )}
-              <span className={styles.stepLabel}>{s}</span>
-            </button>
-          );
-        })}
-      </motion.div>
+      <header className={styles.head}>
+        <span className="eyebrow">{t("eyebrow")}</span>
+        <h1 className={styles.title}>{t("title")}</h1>
+        {!user && (
+          <p className={styles.guestNote}>
+            {t.rich("guestNote", {
+              login: (chunks) => <Link href="/auth/login">{chunks}</Link>,
+              register: (chunks) => <Link href="/auth/register">{chunks}</Link>,
+            })}
+          </p>
+        )}
+      </header>
 
       <div className={styles.layout}>
-        {/* Form Section */}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <AnimatePresence mode="wait">
-            {step === 0 && (
-              <motion.div
-                key="contact"
-                variants={stepVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.25 }}
-                className={styles.formCard}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                  <div style={{ width: "2rem", height: "2rem", borderRadius: "10px", background: "var(--color-accent-light)", color: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Mail size={16} />
-                  </div>
-                  <h2 style={{ fontSize: "1.125rem", fontWeight: 700 }}>{t("contact")}</h2>
-                </div>
-                <div>
-                  <label style={labelStyle}>{t("email")} *</label>
-                  <InputWithIcon
-                    icon={Mail}
-                    placeholder="your@email.com"
-                    error={errors.contact?.email?.message}
+        <form onSubmit={handleFormSubmit} noValidate className={styles.form}>
+          {/* 1 · Contact */}
+          <section className={styles.section} aria-current={step === 0 ? "step" : undefined}>
+            {sectionHeader(0, t("contact"))}
+            {step === 0 ? (
+              <div className={styles.sectionBody}>
+                <Field
+                  id="co-email"
+                  label={t("email")}
+                  error={errors.contact?.email ? t("errors.email") : undefined}
+                  hint={!user ? t("emailHint") : undefined}
+                >
+                  <input
+                    id="co-email"
+                    type="email"
+                    autoComplete="email"
+                    className={`field ${errors.contact?.email ? "border-brick" : ""}`}
+                    placeholder={t("placeholders.email")}
+                    aria-invalid={errors.contact?.email ? true : undefined}
                     {...register("contact.email")}
                   />
-                  {!user && (
-                    <span style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)", marginTop: "0.25rem", display: "block" }}>
-                      Order confirmation will be sent to this email
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label style={labelStyle}>{t("phone")}</label>
-                  <InputWithIcon
-                    icon={Phone}
+                </Field>
+                <Field id="co-phone" label={t("phone")} optional={t("optional")} hint={t("phoneHint")}>
+                  <input
+                    id="co-phone"
+                    type="tel"
+                    autoComplete="tel"
+                    className="field"
                     placeholder={phoneHint}
-                    error={errors.contact?.phone?.message}
                     {...register("contact.phone")}
                   />
-                  <span style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)", marginTop: "0.25rem", display: "block" }}>
-                    Include country code (e.g. +371, +44, +49)
-                  </span>
+                </Field>
+                <div>
+                  <button type="button" onClick={goNext} className="btn-ink">
+                    {t("toDelivery")}
+                  </button>
                 </div>
-                <Button color="primary" size="lg" onPress={goNext} style={{ marginTop: "0.5rem" }}>
-                  Continue to Shipping <ChevronRight size={16} />
-                </Button>
-              </motion.div>
+              </div>
+            ) : (
+              <p className={styles.sectionRecap}>
+                {contact?.email}
+                {contact?.phone ? <> · {contact.phone}</> : null}
+              </p>
             )}
+          </section>
 
+          {/* 2 · Delivery */}
+          <section className={styles.section} aria-current={step === 1 ? "step" : undefined}>
+            {sectionHeader(1, t("shipping"))}
             {step === 1 && (
-              <motion.div
-                key="shipping"
-                variants={stepVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.25 }}
-                className={styles.formCard}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                  <div style={{ width: "2rem", height: "2rem", borderRadius: "10px", background: "var(--color-accent-light)", color: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <MapPin size={16} />
-                  </div>
-                  <h2 style={{ fontSize: "1.125rem", fontWeight: 700 }}>{t("shipping")}</h2>
+              <div className={styles.sectionBody}>
+                <div className={styles.twoCol}>
+                  <Field id="co-first" label={t("firstName")} error={errors.shipping?.firstName ? t("errors.firstName") : undefined}>
+                    <input
+                      id="co-first"
+                      autoComplete="given-name"
+                      className={`field ${errors.shipping?.firstName ? "border-brick" : ""}`}
+                      placeholder={t("placeholders.firstName")}
+                      {...register("shipping.firstName")}
+                    />
+                  </Field>
+                  <Field id="co-last" label={t("lastName")} error={errors.shipping?.lastName ? t("errors.lastName") : undefined}>
+                    <input
+                      id="co-last"
+                      autoComplete="family-name"
+                      className={`field ${errors.shipping?.lastName ? "border-brick" : ""}`}
+                      placeholder={t("placeholders.lastName")}
+                      {...register("shipping.lastName")}
+                    />
+                  </Field>
                 </div>
+
+                <Field id="co-country" label={t("country")} error={errors.shipping?.country ? t("errors.country") : undefined}>
+                  <select
+                    id="co-country"
+                    autoComplete="country"
+                    className={`field cursor-pointer ${errors.shipping?.country ? "border-brick" : ""}`}
+                    {...register("shipping.country")}
+                  >
+                    <option value="">{t("placeholders.country")}</option>
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.name}</option>
+                    ))}
+                  </select>
+                </Field>
+
+                <Field id="co-address" label={t("address")} error={errors.shipping?.address1 ? t("errors.address") : undefined}>
+                  <input
+                    id="co-address"
+                    autoComplete="address-line1"
+                    className={`field ${errors.shipping?.address1 ? "border-brick" : ""}`}
+                    placeholder={t("placeholders.address")}
+                    {...register("shipping.address1")}
+                  />
+                </Field>
+                <Field id="co-address2" label={t("apartment")} optional={t("optional")}>
+                  <input
+                    id="co-address2"
+                    autoComplete="address-line2"
+                    className="field"
+                    placeholder={t("placeholders.apartment")}
+                    {...register("shipping.address2")}
+                  />
+                </Field>
 
                 <div className={styles.twoCol}>
-                  <div>
-                    <label style={labelStyle}>{t("firstName")} *</label>
-                    <input style={{ ...inputPlainStyle, borderColor: errors.shipping?.firstName ? "var(--color-danger)" : undefined }} placeholder="John" {...register("shipping.firstName")} />
-                    {errors.shipping?.firstName && <span style={errorStyle}>{errors.shipping.firstName.message}</span>}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>{t("lastName")} *</label>
-                    <input style={{ ...inputPlainStyle, borderColor: errors.shipping?.lastName ? "var(--color-danger)" : undefined }} placeholder="Doe" {...register("shipping.lastName")} />
-                    {errors.shipping?.lastName && <span style={errorStyle}>{errors.shipping.lastName.message}</span>}
-                  </div>
+                  <Field id="co-city" label={t("city")} error={errors.shipping?.city ? t("errors.city") : undefined}>
+                    <input
+                      id="co-city"
+                      autoComplete="address-level2"
+                      className={`field ${errors.shipping?.city ? "border-brick" : ""}`}
+                      placeholder={t("placeholders.city")}
+                      {...register("shipping.city")}
+                    />
+                  </Field>
+                  <Field id="co-postal" label={t("postalCode")} error={errors.shipping?.postalCode ? t("errors.postalCode") : undefined}>
+                    <input
+                      id="co-postal"
+                      autoComplete="postal-code"
+                      className={`field ${errors.shipping?.postalCode ? "border-brick" : ""}`}
+                      placeholder={t("placeholders.postalCode")}
+                      {...register("shipping.postalCode")}
+                    />
+                  </Field>
                 </div>
+                <Field id="co-region" label={t("province")} optional={t("optional")}>
+                  <input
+                    id="co-region"
+                    autoComplete="address-level1"
+                    className="field"
+                    placeholder={t("placeholders.province")}
+                    {...register("shipping.province")}
+                  />
+                </Field>
 
-                <div>
-                  <label style={labelStyle}>{t("address")} *</label>
-                  <InputWithIcon icon={MapPin} placeholder="123 Main Street" error={errors.shipping?.address1?.message} {...register("shipping.address1")} />
-                </div>
-                <div>
-                  <label style={labelStyle}>{t("apartment")}</label>
-                  <input style={inputPlainStyle} placeholder="Apt 4B (optional)" {...register("shipping.address2")} />
-                </div>
-
-                <div className={styles.twoCol}>
-                  <div>
-                    <label style={labelStyle}>{t("city")} *</label>
-                    <input style={{ ...inputPlainStyle, borderColor: errors.shipping?.city ? "var(--color-danger)" : undefined }} placeholder="London" {...register("shipping.city")} />
-                    {errors.shipping?.city && <span style={errorStyle}>{errors.shipping.city.message}</span>}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>{t("province")}</label>
-                    <input style={inputPlainStyle} placeholder="Region (optional)" {...register("shipping.province")} />
-                  </div>
-                </div>
-
-                <div className={styles.twoCol}>
-                  <div>
-                    <label style={labelStyle}>{t("postalCode")} *</label>
-                    <input style={{ ...inputPlainStyle, borderColor: errors.shipping?.postalCode ? "var(--color-danger)" : undefined }} placeholder="SW1A 1AA" {...register("shipping.postalCode")} />
-                    {errors.shipping?.postalCode && <span style={errorStyle}>{errors.shipping.postalCode.message}</span>}
-                  </div>
-                  <div>
-                    <label style={labelStyle}>{t("country")} *</label>
-                    <select
-                      style={{
-                        ...selectStyle,
-                        borderColor: errors.shipping?.country ? "var(--color-danger)" : undefined,
-                      }}
-                      {...register("shipping.country")}
-                    >
-                      <option value="">Select country...</option>
-                      {COUNTRIES.map((c) => (
-                        <option key={c.code} value={c.code}>{c.name}</option>
-                      ))}
-                    </select>
-                    {errors.shipping?.country && <span style={errorStyle}>{errors.shipping.country.message}</span>}
-                  </div>
-                </div>
-
-                {/* Shipping Method Cards */}
-                <div>
-                  <label style={{ ...labelStyle, marginBottom: "0.75rem" }}>{t("shippingMethod")}</label>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
-                    {availableMethods.map((m) => {
+                <fieldset className="mt-3">
+                  <legend className="field-label mb-3">{t("shippingMethod")}</legend>
+                  <div className={styles.methodList}>
+                    {SHIPPING_METHODS.map((m) => {
                       const isSelected = selectedMethod === m.key;
                       return (
-                        <label
-                          key={m.key}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "1rem",
-                            padding: "1rem 1.25rem",
-                            borderRadius: "12px",
-                            border: `1.5px solid ${isSelected ? "var(--color-accent)" : "var(--color-border)"}`,
-                            background: isSelected ? "var(--color-accent-light)" : "var(--color-bg)",
-                            cursor: "pointer",
-                            transition: "all 0.15s",
-                          }}
-                        >
-                          <input type="radio" value={m.key} {...register("shippingMethod")} style={{ display: "none" }} />
-                          <div
-                            style={{
-                              width: "1.25rem",
-                              height: "1.25rem",
-                              borderRadius: "50%",
-                              border: `2px solid ${isSelected ? "var(--color-accent)" : "var(--color-border)"}`,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0,
-                            }}
+                        <label key={m.key} className={styles.methodRow}>
+                          <input type="radio" value={m.key} className="sr-only" {...register("shippingMethod")} />
+                          <span
+                            aria-hidden="true"
+                            className={`flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center rounded-full border ${
+                              isSelected ? "border-ink" : "border-line-strong"
+                            }`}
                           >
-                            {isSelected && <div style={{ width: "0.5rem", height: "0.5rem", borderRadius: "50%", background: "var(--color-accent)" }} />}
-                          </div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>{m.label}</div>
-                            <div style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)" }}>{m.time}</div>
-                          </div>
-                          <span style={{ fontSize: "0.875rem", fontWeight: 700, color: m.price === 0 ? "#2E7D32" : "var(--color-text)" }}>
-                            {m.price === 0 ? "Free" : formatPrice(convert(m.price), currency)}
+                            {isSelected && <span className="h-2 w-2 rounded-full bg-ink" />}
+                          </span>
+                          <span className="flex flex-1 flex-col">
+                            <span className="text-sm text-ink">{methodLabel(m.key)}</span>
+                            <span className="text-xs text-muted">{t(m.timeKey)}</span>
+                          </span>
+                          <span className="text-sm tabular-nums text-ink">
+                            {priceOrFree(shippingCost(m.key, discountedSubtotal))}
                           </span>
                         </label>
                       );
                     })}
                   </div>
-                </div>
+                  <p className="mt-3 text-xs text-muted">
+                    {freeStandard
+                      ? t("freeStandardReached")
+                      : t("freeStandardHint", { amount: formatPrice(convert(FREE_STANDARD_MIN), currency) })}
+                  </p>
+                </fieldset>
 
-                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-                  <Button variant="bordered" size="lg" onPress={() => setStep(0)} style={{ flex: "0 0 auto" }}>
-                    Back
-                  </Button>
-                  <Button color="primary" size="lg" onPress={goNext} style={{ flex: 1 }}>
-                    Review Order <ChevronRight size={16} />
-                  </Button>
+                <div>
+                  <button type="button" onClick={goNext} className="btn-ink">
+                    {t("toPayment")}
+                  </button>
                 </div>
-              </motion.div>
+              </div>
             )}
+            {step > 1 && (
+              <p className={styles.sectionRecap}>
+                {shipping?.firstName} {shipping?.lastName}
+                <br />
+                {shipping?.address1}
+                {shipping?.address2 ? `, ${shipping.address2}` : ""}, {shipping?.city} {shipping?.postalCode}, {countryName}
+                <br />
+                {methodLabel(selectedMethod)} · {priceOrFree(finalShipping)}
+              </p>
+            )}
+          </section>
 
+          {/* 3 · Payment */}
+          <section className={styles.section} aria-current={step === 2 ? "step" : undefined}>
+            {sectionHeader(2, t("payment"))}
             {step === 2 && (
-              <motion.div
-                key="review"
-                variants={stepVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.25 }}
-                className={styles.formCard}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                  <div style={{ width: "2rem", height: "2rem", borderRadius: "10px", background: "var(--color-accent-light)", color: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <CreditCard size={16} />
-                  </div>
-                  <h2 style={{ fontSize: "1.125rem", fontWeight: 700 }}>{t("review")}</h2>
-                </div>
-
-                {/* Order Items */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
-                  {cart.items.map((item, i) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "1rem",
-                        padding: "0.875rem 0",
-                        borderBottom: i < cart.items.length - 1 ? "1px solid var(--color-border)" : "none",
-                      }}
-                    >
-                      <div style={{
-                        position: "relative",
-                        width: "56px",
-                        height: "56px",
-                        borderRadius: "10px",
-                        overflow: "hidden",
-                        background: "#fff",
-                        border: "1px solid var(--color-border)",
-                        flexShrink: 0,
-                      }}>
-                        {item.imageUrl ? (
-                          <Image src={item.imageUrl} alt={item.name} fill sizes="56px" style={{ objectFit: "contain", padding: "4px" }} />
-                        ) : (
-                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-tertiary)" }}>
-                            <ImageOff size={18} />
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: "0.8125rem", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.name}</div>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)" }}>Qty: {item.quantity}</div>
-                      </div>
-                      <span style={{ fontSize: "0.875rem", fontWeight: 700, flexShrink: 0 }}>
-                        {formatPrice(convert(item.price * item.quantity), currency)}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
+              <div className={styles.sectionBody}>
+                <p className="max-w-prose text-sm leading-relaxed text-muted">{t("paymentNote")}</p>
 
                 <MerchantLocation
                   title={t("merchantLocationTitle")}
                   description={t("merchantLocationNote")}
                 />
 
-                <TermsConsent
-                  error={errors.termsAccepted ? t("termsRequired") : undefined}
-                  label={t.rich("termsConsent", {
-                    terms: (chunks) => (
-                      <Link href="/policies/terms" target="_blank">{chunks}</Link>
-                    ),
-                    privacy: (chunks) => (
-                      <Link href="/policies/privacy" target="_blank">{chunks}</Link>
-                    ),
-                    returns: (chunks) => (
-                      <Link href="/policies/returns" target="_blank">{chunks}</Link>
-                    ),
-                  })}
-                  {...register("termsAccepted")}
-                />
-
-                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-                  <Button variant="bordered" size="lg" onPress={() => setStep(1)} style={{ flex: "0 0 auto" }}>
-                    Back
-                  </Button>
-                  <motion.div style={{ flex: 1 }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Button
-                      type="submit"
-                      color="primary"
-                      size="lg"
-                      isLoading={submitting}
-                      style={{ width: "100%" }}
-                      startContent={!submitting ? <Lock size={16} /> : undefined}
-                    >
-                      {t("placeOrder")}
-                    </Button>
-                  </motion.div>
+                <div className="border-t border-line pt-5">
+                  <TermsConsent
+                    id="co-terms"
+                    error={errors.termsAccepted ? t("termsRequired") : undefined}
+                    label={t.rich("termsConsent", {
+                      terms: (chunks) => (
+                        <Link href="/policies/terms" target="_blank">{chunks}</Link>
+                      ),
+                      privacy: (chunks) => (
+                        <Link href="/policies/privacy" target="_blank">{chunks}</Link>
+                      ),
+                      returns: (chunks) => (
+                        <Link href="/policies/returns" target="_blank">{chunks}</Link>
+                      ),
+                    })}
+                    {...register("termsAccepted")}
+                  />
                 </div>
-              </motion.div>
+
+                <div className="flex flex-col gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-sm text-muted">{t("toPay")}</span>
+                    <span className="text-2xl font-light tracking-[-0.01em]">
+                      {formatPrice(convert(grandTotal), currency)}
+                    </span>
+                  </div>
+                  <button type="submit" disabled={submitting} className="btn-ink btn-lg w-full sm:w-auto" aria-busy={submitting}>
+                    {submitting ? t("processing") : t("placeOrder")}
+                  </button>
+                </div>
+              </div>
             )}
-          </AnimatePresence>
+          </section>
         </form>
 
-        {/* Order Summary Sidebar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className={styles.sidebar}
-        >
-          <h3 style={{ fontWeight: 700, fontSize: "1.0625rem", marginBottom: "1.25rem" }}>{t("orderSummary")}</h3>
+        {/* Summary column */}
+        <aside className={styles.summary} aria-labelledby="co-summary">
+          <div className="flex items-center justify-between gap-4">
+            <h2 id="co-summary" className="eyebrow">{t("orderSummary")}</h2>
+            <button
+              type="button"
+              onClick={() => setSummaryOpen((o) => !o)}
+              aria-expanded={summaryOpen}
+              aria-controls="co-summary-body"
+              aria-label={summaryOpen ? t("hideSummary") : t("showSummary")}
+              className="flex items-center gap-2 text-sm lg:hidden"
+            >
+              {formatPrice(convert(grandTotal), currency)}
+              <ChevronDown
+                size={16}
+                strokeWidth={1.5}
+                className={`transition-transform ${summaryOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+          </div>
 
-          {/* Free shipping progress */}
-          {amountToFreeShipping > 0 && (
-            <div style={{
-              padding: "0.75rem 1rem",
-              borderRadius: "10px",
-              background: "var(--color-bg-secondary)",
-              marginBottom: "1.25rem",
-              fontSize: "0.8125rem",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-                <Truck size={14} style={{ color: "var(--color-accent)" }} />
-                <span>Add <strong>{formatPrice(amountToFreeShipping, currency)}</strong> more for free shipping</span>
-              </div>
-              <div style={{ height: 4, borderRadius: 2, background: "var(--color-border)", overflow: "hidden" }}>
-                <div style={{
-                  width: `${Math.min((subtotalConverted / freeShippingThreshold) * 100, 100)}%`,
-                  height: "100%",
-                  background: "var(--color-accent)",
-                  borderRadius: 2,
-                  transition: "width 0.3s",
-                }} />
-              </div>
-            </div>
-          )}
+          <div id="co-summary-body" className={`${summaryOpen ? "block" : "hidden"} mt-6 lg:block`}>
+            <ul className="flex flex-col gap-4 border-b border-line pb-6">
+              {cart.items.map((item) => (
+                <li key={item.id} className="flex items-center gap-4">
+                  <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-paper">
+                    {item.imageUrl ? (
+                      <Image src={item.imageUrl} alt="" fill sizes="56px" style={{ objectFit: "contain", padding: "4px" }} />
+                    ) : (
+                      <span className="flex h-full w-full items-center justify-center text-faint">
+                        <Lamp size={16} strokeWidth={1.25} />
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[0.8125rem] text-ink">{item.name}</span>
+                    <span className="text-xs text-muted">
+                      {item.variantName ? `${item.variantName} · ` : ""}
+                      {t("qty", { count: item.quantity })}
+                    </span>
+                  </div>
+                  <span className="flex-shrink-0 text-[0.8125rem] tabular-nums">
+                    {formatPrice(convert(item.price * item.quantity), currency)}
+                  </span>
+                </li>
+              ))}
+            </ul>
 
-          {/* Mini item list */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", marginBottom: "1.25rem", paddingBottom: "1.25rem", borderBottom: "1px solid var(--color-border)" }}>
-            {cart.items.map((item) => (
-              <div key={item.id} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-                <div style={{
-                  position: "relative",
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  background: "#fff",
-                  border: "1px solid var(--color-border)",
-                  flexShrink: 0,
-                }}>
-                  {item.imageUrl ? (
-                    <Image src={item.imageUrl} alt={item.name} fill sizes="40px" style={{ objectFit: "contain", padding: "2px" }} />
-                  ) : (
-                    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#ccc" }}>
-                      <ImageOff size={14} />
-                    </div>
+            {/* Promo code */}
+            <div className="border-b border-line py-6">
+              {discount ? (
+                <div className="flex items-start justify-between gap-3 text-sm">
+                  <div className="flex flex-col">
+                    <span className="text-sage">{t("discountApplied", { percent: discount.percent })}</span>
+                    <span className="text-xs text-muted">
+                      {discount.type === "welcome" ? t("discountWelcome") : t("discountCode", { code: discount.code })}
+                    </span>
+                  </div>
+                  {discount.source === "code" && (
+                    <button type="button" onClick={removeDiscount} className="btn-quiet btn-sm min-h-0 text-muted">
+                      {t("removeDiscount")}
+                    </button>
                   )}
-                  <div style={{
-                    position: "absolute",
-                    top: "-4px",
-                    right: "-4px",
-                    width: "18px",
-                    height: "18px",
-                    borderRadius: "50%",
-                    background: "var(--color-text-secondary)",
-                    color: "#fff",
-                    fontSize: "0.625rem",
-                    fontWeight: 700,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}>
-                    {item.quantity}
-                  </div>
                 </div>
-                <span style={{ fontSize: "0.75rem", flex: 1, minWidth: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "var(--color-text-secondary)" }}>
-                  {item.name}
+              ) : (
+                <div>
+                  <label htmlFor="co-promo" className="field-label">{t("promoLabel")}</label>
+                  <div className="flex gap-2">
+                    <input
+                      id="co-promo"
+                      type="text"
+                      value={promoInput}
+                      onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void applyPromo(); } }}
+                      placeholder="NEWS-XXXXXX"
+                      className="field tracking-[0.04em]"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      disabled={!promoInput.trim() || applyingPromo}
+                      className="btn-line flex-shrink-0"
+                    >
+                      {applyingPromo ? "…" : t("promoApply")}
+                    </button>
+                  </div>
+                  {promoError && <span className={styles.error}>{promoError}</span>}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4">
+              <div className={styles.summaryRow}>
+                <span className="text-muted">{t("subtotal")}</span>
+                <span className="tabular-nums">{formatPrice(convert(cart.subtotal), currency)}</span>
+              </div>
+              {discount && (
+                <div className={`${styles.summaryRow} text-sage`}>
+                  <span>{t("discountLine", { percent: discount.percent })}</span>
+                  <span className="tabular-nums">−{formatPrice(convert(discountAmount), currency)}</span>
+                </div>
+              )}
+              <div className={styles.summaryRow}>
+                <span className="text-muted">{t("deliveryLine")}</span>
+                <span className="tabular-nums">{priceOrFree(finalShipping)}</span>
+              </div>
+              <div className={styles.summaryRow}>
+                <span className="text-muted">{t("tax", { rate: 21 })}</span>
+                <span className="tabular-nums">{formatPrice(convert(taxOnDiscounted), currency)}</span>
+              </div>
+              <div className={styles.summaryTotal}>
+                <span className="text-sm font-medium">{t("total")}</span>
+                <span className="text-2xl font-light tracking-[-0.01em] tabular-nums">
+                  {formatPrice(convert(grandTotal), currency)}
                 </span>
-                <span style={{ fontSize: "0.75rem", fontWeight: 600, flexShrink: 0 }}>
-                  {formatPrice(convert(item.price * item.quantity), currency)}
-                </span>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {/* Promo / discount block */}
-          <div style={{ marginBottom: "1rem", paddingBottom: "1rem", borderBottom: "1px solid var(--color-border)" }}>
-            {discount ? (
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                padding: "0.625rem 0.75rem",
-                borderRadius: "10px",
-                background: "#ECFDF5",
-                border: "1px solid #A7F3D0",
-                fontSize: "0.8125rem",
-              }}>
-                <Tag size={14} style={{ color: "#15803d", flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, color: "#166534" }}>
-                    {discount.percent}% OFF applied
-                  </div>
-                  <div style={{ color: "#15803d", fontSize: "0.6875rem" }}>
-                    {discount.type === "welcome" ? "Welcome discount" : `Code: ${discount.code}`}
-                  </div>
-                </div>
-                {discount.source === "code" && (
-                  <button
-                    type="button"
-                    onClick={removeDiscount}
-                    aria-label="Remove discount"
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#15803d", padding: 4, display: "flex" }}
-                  >
-                    <XIcon size={14} />
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div>
-                <label style={{ ...labelStyle, marginBottom: "0.375rem" }}>Promo code</label>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <input
-                    type="text"
-                    value={promoInput}
-                    onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(null); }}
-                    placeholder="NEWS-XXXXXX"
-                    style={{ ...inputPlainStyle, fontSize: "0.8125rem", letterSpacing: "0.5px" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={applyPromo}
-                    disabled={!promoInput.trim() || applyingPromo}
-                    style={{
-                      padding: "0 0.875rem",
-                      borderRadius: "12px",
-                      border: "none",
-                      background: "var(--color-accent)",
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: "0.8125rem",
-                      cursor: promoInput.trim() && !applyingPromo ? "pointer" : "not-allowed",
-                      opacity: promoInput.trim() && !applyingPromo ? 1 : 0.5,
-                    }}
-                  >
-                    {applyingPromo ? "…" : "Apply"}
-                  </button>
-                </div>
-                {promoError && <span style={errorStyle}>{promoError}</span>}
-              </div>
-            )}
-          </div>
+            <p className="mt-6 text-xs leading-relaxed text-faint">{t("secureNote")}</p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem", fontSize: "0.875rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--color-text-secondary)" }}>Subtotal</span>
-              <span style={{ fontWeight: 500 }}>{formatPrice(convert(cart.subtotal), currency)}</span>
-            </div>
-            {discount && (
-              <div style={{ display: "flex", justifyContent: "space-between", color: "#15803d" }}>
-                <span>Discount ({discount.percent}%)</span>
-                <span style={{ fontWeight: 600 }}>−{formatPrice(convert(discountAmount), currency)}</span>
-              </div>
-            )}
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--color-text-secondary)" }}>Shipping</span>
-              <span style={{ fontWeight: 500, color: finalShipping === 0 ? "#2E7D32" : undefined }}>
-                {finalShipping > 0 ? formatPrice(convert(finalShipping), currency) : "Free"}
-              </span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--color-text-secondary)" }}>Tax (21%)</span>
-              <span style={{ fontWeight: 500 }}>{formatPrice(convert(taxOnDiscounted), currency)}</span>
-            </div>
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              fontWeight: 800,
-              fontSize: "1.125rem",
-              borderTop: "2px solid var(--color-border)",
-              paddingTop: "0.875rem",
-              marginTop: "0.375rem",
-            }}>
-              <span>Total</span>
-              <span>{formatPrice(convert(discountedSubtotal + taxOnDiscounted + finalShipping), currency)}</span>
+            <div className="mt-6">
+              <MerchantLocation
+                title={t("merchantLocationTitle")}
+                description={t("merchantLocationNote")}
+              />
             </div>
           </div>
-
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
-            marginTop: "1.5rem",
-            paddingTop: "1.25rem",
-            borderTop: "1px solid var(--color-border)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem", color: "var(--color-text-tertiary)" }}>
-              <ShieldCheck size={14} />
-              Secure checkout with SSL encryption
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.375rem", fontSize: "0.75rem", color: "var(--color-text-tertiary)" }}>
-              <Lock size={14} />
-              Your data is protected
-            </div>
-          </div>
-
-          <div style={{ marginTop: "1.25rem" }}>
-            <MerchantLocation
-              title={t("merchantLocationTitle")}
-              description={t("merchantLocationNote")}
-            />
-          </div>
-        </motion.div>
+        </aside>
       </div>
     </div>
   );

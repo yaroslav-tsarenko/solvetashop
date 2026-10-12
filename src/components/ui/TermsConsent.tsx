@@ -5,22 +5,33 @@ type TermsConsentProps = ComponentPropsWithRef<"input"> & {
   error?: string;
 };
 
-export function TermsConsent({ label, error, ...inputProps }: TermsConsentProps) {
+export function TermsConsent({ label, error, id, ...inputProps }: TermsConsentProps) {
+  const inputId = id ?? "terms-consent";
+  const errorId = `${inputId}-error`;
+
   return (
-    <div className="flex flex-col gap-1">
-      <label
-        className={`flex cursor-pointer items-start gap-2.5 rounded-[var(--radius-md)] border px-3.5 py-3 text-[0.8125rem] leading-[1.55] text-[var(--color-text-secondary)] transition-colors [&_a]:font-semibold [&_a]:text-[var(--color-accent)] [&_a]:no-underline [&_a:hover]:underline ${
-          error ? "border-[var(--color-danger)]" : "border-[var(--color-border)]"
-        }`}
-      >
+    <div className="flex flex-col gap-2">
+      <div className="flex items-start gap-3">
         <input
           type="checkbox"
+          id={inputId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           {...inputProps}
-          className="mt-[0.15rem] h-4 w-4 flex-shrink-0 cursor-pointer accent-[var(--color-accent)]"
+          className="mt-[0.2rem] h-4 w-4 flex-shrink-0 cursor-pointer rounded-[2px] accent-[var(--color-ink)]"
         />
-        <span>{label}</span>
-      </label>
-      {error && <span className="text-xs text-[var(--color-danger)]">{error}</span>}
+        <label
+          htmlFor={inputId}
+          className="cursor-pointer text-[0.8125rem] leading-[1.65] text-muted [&_a]:text-ink [&_a]:underline [&_a]:decoration-1 [&_a]:underline-offset-[0.25em] [&_a:hover]:text-sage"
+        >
+          {label}
+        </label>
+      </div>
+      {error && (
+        <p id={errorId} className="pl-7 text-xs text-brick">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

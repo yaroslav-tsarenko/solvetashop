@@ -9,43 +9,27 @@ interface PriceDisplayProps {
   size?: "sm" | "md" | "lg";
 }
 
-const sizes = {
-  sm: { price: "0.9375rem", compare: "0.75rem" },
-  md: { price: "1.25rem", compare: "0.875rem" },
-  lg: { price: "1.75rem", compare: "1.0625rem" },
+const sizeCls = {
+  sm: { price: "text-[0.875rem]", compare: "text-[0.75rem]" },
+  md: { price: "text-[1.125rem]", compare: "text-[0.875rem]" },
+  lg: { price: "text-[1.625rem] font-light tracking-[-0.02em]", compare: "text-base" },
 };
 
-export function PriceDisplay({
-  price,
-  comparePrice,
-  size = "md",
-}: PriceDisplayProps) {
+/** Plain-text price: current price first, the former price struck through after it. */
+export function PriceDisplay({ price, comparePrice, size = "md" }: PriceDisplayProps) {
   const { currency, convert } = useCurrency();
-  const isOnSale = comparePrice && comparePrice > price;
+  const isOnSale = !!comparePrice && comparePrice > price;
 
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem" }}>
-      <span
-        style={{
-          fontSize: sizes[size].price,
-          fontWeight: 800,
-          letterSpacing: "-0.02em",
-          color: isOnSale ? "var(--color-danger)" : "var(--color-text)",
-        }}
-      >
+    <span className="inline-flex flex-wrap items-baseline gap-x-2">
+      <span className={`${sizeCls[size].price} ${isOnSale ? "text-brick" : "text-ink"} tabular-nums`}>
         {formatPrice(convert(price), currency)}
       </span>
-      {isOnSale && (
-        <span
-          style={{
-            fontSize: sizes[size].compare,
-            color: "var(--color-text-tertiary)",
-            textDecoration: "line-through",
-          }}
-        >
+      {isOnSale ? (
+        <s className={`${sizeCls[size].compare} text-faint tabular-nums`}>
           {formatPrice(convert(comparePrice), currency)}
-        </span>
-      )}
-    </div>
+        </s>
+      ) : null}
+    </span>
   );
 }

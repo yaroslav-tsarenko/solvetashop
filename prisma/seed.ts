@@ -21,7 +21,7 @@ async function main() {
       email: "store@example.com",
       currency: "EUR",
       taxRate: 21,
-      freeShippingMin: 50,
+      freeShippingMin: 75, // informational only — delivery terms live in src/lib/shipping.ts
     },
   });
   console.log("Store settings:", storeSettings.name);
@@ -76,10 +76,10 @@ async function main() {
     where: { slug: "about-us" },
     update: {},
     create: {
-      title: "About Us",
+      title: "About Solvetashop",
       slug: "about-us",
       content:
-        "<p>Welcome to My Store! We are dedicated to providing quality products at competitive prices.</p><p>Founded in 2024, we have been serving customers worldwide with a focus on sustainability and customer satisfaction.</p>",
+        "<p>Solvetashop is an online shop for lighting and home décor: lamps, pendants, light bulbs and fittings, and the smaller pieces that help a room feel finished.</p><p>Delivery, returns and warranty terms are set out in our policies, and you can reach us through the contact page with any question.</p>",
       isActive: true,
     },
   });

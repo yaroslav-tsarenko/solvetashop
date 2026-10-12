@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import { ProductGallery } from "@/components/product/ProductGallery/ProductGallery";
 import { ProductInfo } from "@/components/product/ProductInfo/ProductInfo";
 import { ProductTabs } from "@/components/product/ProductTabs/ProductTabs";
+import { ProductGrid } from "@/components/product/ProductGrid/ProductGrid";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
 import { JsonLd } from "@/components/shared/SEO/JsonLd";
 import { productClasses as styles } from "./product-classes";
@@ -30,6 +33,41 @@ async function getCategoryChain(categoryId: string): Promise<{ name: string; slu
   }
 
   return chain;
+}
+
+/** A few other active pieces from the same category (and its sub-categories). */
+async function getRelatedProducts(categoryId: string, excludeId: string) {
+  const children = await prisma.category.findMany({
+    where: { parentId: categoryId, isActive: true },
+    select: { id: true },
+  });
+  const ids = [categoryId, ...children.map((c) => c.id)];
+
+  const rows = await prisma.product.findMany({
+    where: {
+      id: { not: excludeId },
+      status: "ACTIVE",
+      categories: { some: { categoryId: { in: ids } } },
+    },
+    include: {
+      images: { orderBy: { sortOrder: "asc" }, take: 1 },
+      categories: { include: { category: { select: { name: true } } } },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 4,
+  });
+
+  return rows.map((p) => ({
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    sku: p.sku,
+    price: Number(p.price),
+    comparePrice: p.comparePrice != null ? Number(p.comparePrice) : null,
+    quantity: p.quantity,
+    images: p.images.map((img) => ({ url: img.url, alt: img.alt })),
+    categories: p.categories.map((c) => ({ category: { name: c.category.name } })),
+  }));
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
@@ -71,9 +109,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product || product.status === "ARCHIVED") notFound();
 
   const primaryCategory = product.categories[0]?.category;
-  const categoryChain = primaryCategory
-    ? await getCategoryChain(primaryCategory.id)
-    : [];
+  const [categoryChain, related, nav, t] = await Promise.all([
+    primaryCategory ? getCategoryChain(primaryCategory.id) : Promise.resolve([]),
+    primaryCategory
+      ? getRelatedProducts(primaryCategory.id, product.id).catch(() => [])
+      : Promise.resolve([]),
+    getTranslations("nav"),
+    getTranslations("product"),
+  ]);
 
   const reviewCount = product.reviews.length;
   const avgRating = reviewCount > 0
@@ -112,8 +155,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
   };
 
   const breadcrumbItems = [
-    { label: "Home", href: "/" },
-    { label: "Catalog", href: "/catalog" },
+    { label: nav("home"), href: "/" },
+    { label: nav("catalog"), href: "/catalog" },
     ...categoryChain.map((cat) => ({
       label: cat.name,
       href: `/catalog/${cat.slug}`,
@@ -128,38 +171,59 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <Breadcrumbs items={breadcrumbItems} />
 
       <div className={styles.layout}>
-        <div className={styles.gallerySticky}>
+        <div className={styles.galleryCol}>
           <ProductGallery images={product.images} productName={product.name} />
         </div>
-        <ProductInfo
-          id={product.id}
-          name={product.name}
-          slug={product.slug}
-          sku={product.sku}
-          price={Number(product.price)}
-          comparePrice={product.comparePrice ? Number(product.comparePrice) : null}
-          quantity={product.quantity}
-          shortDescription={product.shortDescription}
-          description={product.description}
-          brand={product.brand}
-          condition={product.condition}
-          lowStockAlert={product.lowStockAlert}
-          imageUrl={product.images[0]?.url}
-          ean={product.ean}
-          reviewCount={reviewCount}
-          avgRating={avgRating}
-          categoryPath={categoryChain}
-        />
+
+        <div className={styles.infoCol}>
+          <div className={styles.infoSticky}>
+            <ProductInfo
+              id={product.id}
+              name={product.name}
+              slug={product.slug}
+              sku={product.sku}
+              price={Number(product.price)}
+              comparePrice={product.comparePrice ? Number(product.comparePrice) : null}
+              quantity={product.quantity}
+              shortDescription={product.shortDescription}
+              description={product.description}
+              brand={product.brand}
+              condition={product.condition}
+              lowStockAlert={product.lowStockAlert}
+              imageUrl={product.images[0]?.url}
+              ean={product.ean}
+              reviewCount={reviewCount}
+              avgRating={avgRating}
+              categoryPath={categoryChain}
+            />
+          </div>
+        </div>
+
+        <div className={styles.detailsCol}>
+          <ProductTabs
+            description={product.description}
+            characteristics={characteristics}
+            reviews={product.reviews.map((r) => ({
+              ...r,
+              createdAt: r.createdAt.toISOString(),
+            }))}
+          />
+        </div>
       </div>
 
-      <ProductTabs
-        description={product.description}
-        characteristics={characteristics}
-        reviews={product.reviews.map((r) => ({
-          ...r,
-          createdAt: r.createdAt.toISOString(),
-        }))}
-      />
+      {related.length > 0 && primaryCategory && (
+        <section className={styles.related} aria-labelledby="related-heading">
+          <div className={styles.relatedHead}>
+            <h2 id="related-heading" className={styles.relatedTitle}>
+              {t("relatedTitle", { category: primaryCategory.name })}
+            </h2>
+            <Link href={`/catalog/${primaryCategory.slug}`} className="btn-quiet btn-sm">
+              {t("relatedLink")}
+            </Link>
+          </div>
+          <ProductGrid products={related} />
+        </section>
+      )}
     </div>
   );
 }

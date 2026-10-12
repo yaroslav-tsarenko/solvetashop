@@ -1,59 +1,68 @@
 /**
- * Tailwind class constants for the catalog page — replaces catalog.module.css.
+ * Tailwind class constants for the listing pages (catalog, category, search).
+ * Layout: light title → hairline filter bar → full-width grid → text pagination.
+ * Filters live in a right-hand slide-over drawer.
  */
 export const catalogClasses = {
-  wrapper: "mx-auto max-w-[var(--max-width)] px-4",
+  wrapper: "wrap pb-24",
 
-  header: "mb-6 flex flex-wrap items-end justify-between gap-4",
+  intro: "pb-10 pt-2 md:pb-14",
 
-  title:
-    "text-[1.375rem] font-extrabold tracking-[-0.03em] min-[481px]:text-[1.75rem]",
+  title: "display m-0 break-words",
 
-  headerSub: "mt-1 text-sm text-[var(--color-text-secondary)]",
+  lede: "lede mt-4",
 
-  headerActions:
-    "flex items-center gap-2 max-[480px]:w-full max-[480px]:justify-between",
+  subLinks: "mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm",
 
-  filtersBtn:
-    "hidden max-lg:inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] border border-[var(--color-border)] bg-[var(--color-bg)] px-4 py-2 text-[0.8125rem] font-semibold text-[var(--color-text-secondary)] cursor-pointer hover:border-[var(--color-accent)] hover:text-[var(--color-accent)]",
+  subLink: "text-muted underline-offset-4 transition-colors hover:text-ink hover:underline",
 
-  filterBadge:
-    "rounded-[var(--radius-pill)] bg-[var(--color-accent)] px-1.5 py-px text-[0.6875rem] font-bold text-white",
+  bar:
+    "mb-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-y border-line py-3",
 
-  layout: "grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr]",
+  barStart: "flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2",
 
-  sidebar:
-    "hidden self-start lg:sticky lg:top-[calc(var(--header-height)+var(--announcement-height)+1rem)] lg:block",
+  barEnd: "flex items-center gap-6",
 
-  content: "min-w-0",
+  filterToggle:
+    "inline-flex cursor-pointer items-center gap-2 bg-transparent py-1 text-sm font-medium text-ink hover:text-sage-hover",
+
+  filterCount: "tabular-nums text-muted",
+
+  chip:
+    "inline-flex cursor-pointer items-center gap-1.5 rounded-[var(--radius-pill)] border border-line bg-transparent px-3 py-1 text-xs text-ink transition-colors hover:border-line-strong",
+
+  clearAll: "btn-quiet btn-sm !min-h-0 !text-xs text-muted",
+
+  resultCount: "text-sm tabular-nums text-muted",
 
   pagination:
-    "mt-10 flex flex-wrap items-center justify-center gap-1.5 pb-12",
+    "mt-16 flex flex-wrap items-center justify-center gap-x-1 gap-y-2 border-t border-line pt-8 text-sm",
 
-  pageBtn:
-    "flex h-9 w-9 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-bg)] text-[0.8125rem] font-medium text-[var(--color-text)]",
+  pageEdge:
+    "cursor-pointer bg-transparent px-3 py-2 text-ink underline-offset-4 hover:underline disabled:cursor-default disabled:text-faint disabled:no-underline",
 
-  pageBtnActive:
-    "flex h-9 min-w-9 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border-none bg-[var(--color-accent)] text-[0.8125rem] font-bold text-white",
+  pageNum:
+    "min-w-9 cursor-pointer bg-transparent px-2 py-2 tabular-nums text-muted transition-colors hover:text-ink",
 
-  pageBtnEdge: "h-9 w-auto px-4",
+  pageNumActive: "min-w-9 px-2 py-2 tabular-nums font-medium text-ink underline underline-offset-[6px]",
 
-  pageBtnDisabled: "opacity-50 cursor-not-allowed",
+  pageGap: "min-w-6 px-1 text-center text-faint",
 
-  pageEllipsis:
-    "flex h-9 w-9 items-center justify-center text-[0.8125rem] text-[var(--color-text-secondary)]",
+  drawerRoot: "fixed inset-0 z-[200]",
 
-  overlay: "fixed inset-0 z-[200]",
+  drawerBackdrop: "absolute inset-0 bg-ink/30",
 
-  overlayBackdrop: "absolute inset-0 bg-black/40 backdrop-blur-sm",
+  drawerPanel:
+    "absolute inset-y-0 right-0 flex w-full max-w-[420px] flex-col bg-paper shadow-[var(--shadow-md)]",
 
-  overlaySheet:
-    "absolute inset-x-0 bottom-0 flex max-h-[85vh] flex-col overflow-auto rounded-t-[var(--radius-2xl)] bg-[var(--color-bg)] p-6",
+  drawerHead: "flex items-center justify-between border-b border-line px-6 py-5",
 
-  overlayHeader: "mb-4 flex items-center justify-between",
+  drawerTitle: "m-0 text-xl font-light tracking-[-0.01em] text-ink",
 
-  overlayTitle: "text-lg font-bold",
+  drawerClose:
+    "flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-transparent text-ink hover:bg-surface",
 
-  overlayClose:
-    "flex h-8 w-8 cursor-pointer items-center justify-center rounded-[var(--radius-lg)] border-none bg-[var(--color-bg-tertiary)] text-[var(--color-text)]",
+  drawerBody: "flex-1 overflow-y-auto px-6 py-6",
+
+  drawerFoot: "flex items-center justify-between gap-4 border-t border-line px-6 py-4",
 } as const;

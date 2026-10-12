@@ -1,50 +1,83 @@
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
-import { Heart, Truck, Shield, Award } from "lucide-react";
+import { COMPANY } from "@/lib/company";
 
-const values = [
-  { icon: <Heart size={28} />, title: "Customer First", desc: "Whether you're a professional electrician or a DIY installer, your satisfaction drives every decision we make." },
-  { icon: <Truck size={28} />, title: "Fast & Reliable", desc: "We partner with trusted carriers to deliver your electrical supplies quickly and safely, every time." },
-  { icon: <Shield size={28} />, title: "Certified Quality", desc: "Every product meets professional installation standards and is sourced from certified manufacturers." },
-  { icon: <Award size={28} />, title: "Trade Pricing", desc: "We work directly with manufacturers to offer competitive trade prices on cables, switchgear, and more." },
-];
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("about");
+  return { title: t("metaTitle") };
+}
 
-export default function AboutPage() {
+const PRINCIPLES = ["light", "detail", "keep"] as const;
+
+export default async function AboutPage() {
+  const t = await getTranslations("about");
+  const nav = await getTranslations("nav");
+
   return (
-    <div className="mx-auto max-w-[var(--max-width)] px-4 pb-16">
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About Us" }]} />
+    <div className="wrap pb-24">
+      <Breadcrumbs items={[{ label: nav("home"), href: "/" }, { label: t("crumb") }]} />
 
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-8 text-center sm:mb-12">
-          <h1 className="mb-4 text-[1.625rem] font-extrabold tracking-[-0.04em] sm:text-[2.25rem]">
-            About <span className="gradient-text">Solvetashop</span>
-          </h1>
-          <p className="mx-auto max-w-[540px] text-[0.9375rem] leading-[1.7] text-[var(--color-text-secondary)] sm:text-[1.0625rem]">
-            We&apos;re on a mission to make professional-grade electrical materials accessible to electricians, contractors, and DIY installers. Finding the right cables, switchgear, and installation accessories shouldn&apos;t be complicated.
-          </p>
+      {/* Opening statement */}
+      <header className="grid gap-10 pb-16 pt-6 lg:grid-cols-12 lg:pb-24 lg:pt-10">
+        <div className="lg:col-span-8">
+          <span className="eyebrow">{t("eyebrow")}</span>
+          <h1 className="display mt-5 max-w-[14ch]">{t("title")}</h1>
         </div>
+        <p className="lede self-end lg:col-span-4">{t("lede")}</p>
+      </header>
 
-        <div className="mb-8 grid grid-cols-1 gap-3.5 min-[601px]:grid-cols-2 min-[601px]:gap-5 sm:mb-12">
-          {values.map((v) => (
-            <div
-              key={v.title}
-              className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-bg)] p-5 min-[481px]:p-7"
-            >
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-[var(--radius-lg)] bg-[var(--color-accent-light)] text-[var(--color-accent)]">
-                {v.icon}
-              </div>
-              <h3 className="mb-2 text-[1.0625rem] font-bold">{v.title}</h3>
-              <p className="text-sm leading-relaxed text-[var(--color-text-secondary)]">{v.desc}</p>
-            </div>
+      {/* Three short principles in text columns */}
+      <section aria-labelledby="about-principles" className="border-t border-line py-14 lg:py-20">
+        <h2 id="about-principles" className="eyebrow mb-10">
+          {t("principlesLabel")}
+        </h2>
+        <ol className="grid gap-10 md:grid-cols-3 md:gap-12">
+          {PRINCIPLES.map((key, index) => (
+            <li key={key}>
+              <span className="text-sm tabular-nums text-faint">0{index + 1}</span>
+              <h3 className="mt-3 text-xl font-normal tracking-[-0.01em] text-ink">
+                {t(`principles.${key}.title`)}
+              </h3>
+              <p className="mt-3 text-[0.9375rem] leading-[1.75] text-muted">
+                {t(`principles.${key}.text`)}
+              </p>
+            </li>
           ))}
-        </div>
+        </ol>
+      </section>
 
-        <div className="rounded-[var(--radius-2xl)] bg-[var(--color-accent)] p-5 text-center text-white min-[481px]:p-10">
-          <h2 className="mb-3 text-xl font-extrabold min-[481px]:text-2xl">Our Promise</h2>
-          <p className="mx-auto max-w-[480px] text-[0.9375rem] leading-[1.7] opacity-90">
-            We stand behind every electrical product we sell. If you&apos;re not completely satisfied, we&apos;ll make it right — that&apos;s our guarantee to you.
+      {/* Split: who runs the shop */}
+      <section
+        aria-labelledby="about-company"
+        className="grid gap-8 border-t border-line py-14 lg:grid-cols-12 lg:gap-12 lg:py-20"
+      >
+        <h2 id="about-company" className="heading lg:col-span-5">
+          {t("companyTitle")}
+        </h2>
+        <div className="space-y-5 text-[0.9375rem] leading-[1.8] text-text-secondary lg:col-span-6 lg:col-start-7">
+          <p>
+            {t("companyText", {
+              tradingName: COMPANY.tradingName,
+              legalName: COMPANY.legalName,
+              number: COMPANY.companyNumber,
+            })}
           </p>
+          <p>{t("termsText")}</p>
+          <div className="flex flex-wrap gap-3 pt-3">
+            <Link href="/catalog" className="btn-ink">
+              {t("ctaShop")}
+            </Link>
+            <Link href="/policies" className="btn-line">
+              {t("ctaPolicies")}
+            </Link>
+            <Link href="/contact" className="btn-quiet">
+              {t("ctaContact")}
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -34,23 +34,57 @@ async function fetchWithRetry(
   throw lastError instanceof Error ? lastError : new Error("Fetch failed");
 }
 
+interface CategoryNode {
+  id: string;
+  name: string;
+  slug: string;
+  children?: CategoryNode[];
+}
+
+function findCategoryName(nodes: CategoryNode[], slug: string): string | null {
+  for (const node of nodes) {
+    if (node.slug === slug) return node.name;
+    if (node.children?.length) {
+      const hit = findCategoryName(node.children, slug);
+      if (hit) return hit;
+    }
+  }
+  return null;
+}
+
+function pageList(page: number, totalPages: number): (number | "gap-start" | "gap-end")[] {
+  const pages: (number | "gap-start" | "gap-end")[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+    return pages;
+  }
+  pages.push(1);
+  if (page > 3) pages.push("gap-start");
+  const start = Math.max(2, page - 1);
+  const end = Math.min(totalPages - 1, page + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (page < totalPages - 2) pages.push("gap-end");
+  pages.push(totalPages);
+  return pages;
+}
+
 export default function CatalogPage() {
-  const t = useTranslations("product");
+  const t = useTranslations("listing");
   const nav = useTranslations("nav");
   const searchParams = useSearchParams();
   const router = useRouter();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [products, setProducts] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<CategoryNode[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [brands, setBrands] = useState<string[]>([]);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const requestIdRef = useRef(0);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const page = parseInt(searchParams.get("page") || "1");
   const sort = searchParams.get("sort") || "newest";
@@ -95,6 +129,8 @@ export default function CatalogPage() {
 
   useEffect(() => {
     const reqId = ++requestIdRef.current;
+    // Fetch-on-param-change: flag the request as in flight before it starts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setLoadError(false);
     const params = new URLSearchParams();
@@ -126,172 +162,214 @@ export default function CatalogPage() {
       });
   }, [page, sort, category, minPrice, maxPrice, inStock, onSale, selectedBrand]);
 
+  // Lock page scroll and listen for Escape while the drawer is open.
   useEffect(() => {
-    if (mobileFiltersOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    if (!drawerOpen) return;
+    document.body.style.overflow = "hidden";
+    closeBtnRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDrawerOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
     };
-  }, [mobileFiltersOpen]);
+  }, [drawerOpen]);
 
   const activeFilterCount = [category, minPrice, maxPrice, inStock, onSale, selectedBrand].filter(Boolean).length;
+
+  const clearAll = () =>
+    updateParams({ category: "", minPrice: "", maxPrice: "", inStock: "", onSale: "", brand: "", page: "1" });
+
+  const categoryName = category ? findCategoryName(categories, category) || category : "";
+
+  const priceChip =
+    minPrice && maxPrice ? t("chipPriceRange", { min: `£${minPrice}`, max: `£${maxPrice}` })
+    : minPrice ? t("chipPriceFrom", { amount: `£${minPrice}` })
+    : maxPrice ? t("chipPriceTo", { amount: `£${maxPrice}` })
+    : "";
+
+  const chips: { key: string; label: string; clear: Record<string, string> }[] = [
+    ...(category ? [{ key: "category", label: categoryName, clear: { category: "" } }] : []),
+    ...(selectedBrand ? [{ key: "brand", label: selectedBrand, clear: { brand: "" } }] : []),
+    ...(priceChip ? [{ key: "price", label: priceChip, clear: { minPrice: "", maxPrice: "" } }] : []),
+    ...(inStock ? [{ key: "inStock", label: t("onlyInStock"), clear: { inStock: "" } }] : []),
+    ...(onSale ? [{ key: "onSale", label: t("onlyReduced"), clear: { onSale: "" } }] : []),
+  ];
+
+  const filters = (
+    <ProductFilters
+      categories={categories}
+      selectedCategory={category}
+      minPrice={minPrice}
+      maxPrice={maxPrice}
+      inStock={inStock}
+      onSale={onSale}
+      brands={brands}
+      selectedBrand={selectedBrand}
+      onCategoryChange={(v) => { updateParams({ category: v, page: "1" }); setDrawerOpen(false); }}
+      onMinPriceChange={(v) => updateParams({ minPrice: v, page: "1" })}
+      onMaxPriceChange={(v) => updateParams({ maxPrice: v, page: "1" })}
+      onInStockChange={(v) => updateParams({ inStock: v ? "true" : "", page: "1" })}
+      onSaleChange={(v) => updateParams({ onSale: v ? "true" : "", page: "1" })}
+      onBrandChange={(v) => { updateParams({ brand: v, page: "1" }); setDrawerOpen(false); }}
+    />
+  );
 
   return (
     <div className={styles.wrapper}>
       <Breadcrumbs
         items={[
           { label: nav("home"), href: "/" },
-          { label: nav("catalog") },
+          ...(category
+            ? [{ label: nav("catalog"), href: "/catalog" }, { label: categoryName }]
+            : [{ label: nav("catalog") }]),
         ]}
       />
 
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>{nav("catalog")}</h1>
-          <p className={styles.headerSub}>
-            {t("showing", { count: products.length, total })}
-          </p>
-        </div>
-        <div className={styles.headerActions}>
+      <header className={styles.intro}>
+        <h1 className={styles.title}>{categoryName || nav("catalog")}</h1>
+        {!category && <p className={styles.lede}>{t("catalogLede")}</p>}
+      </header>
+
+      <div className={styles.bar}>
+        <div className={styles.barStart}>
           <button
-            onClick={() => setMobileFiltersOpen(true)}
-            className={styles.filtersBtn}
             type="button"
+            onClick={() => setDrawerOpen(true)}
+            className={styles.filterToggle}
+            aria-haspopup="dialog"
+            aria-expanded={drawerOpen}
           >
-            <SlidersHorizontal size={16} />
-            Filters
-            {activeFilterCount > 0 && (
-              <span className={styles.filterBadge}>{activeFilterCount}</span>
-            )}
+            <SlidersHorizontal size={16} strokeWidth={1.5} />
+            {t("filterButton")}
+            {activeFilterCount > 0 && <span className={styles.filterCount}>({activeFilterCount})</span>}
           </button>
+          {chips.map((chip) => (
+            <button
+              key={chip.key}
+              type="button"
+              onClick={() => updateParams({ ...chip.clear, page: "1" })}
+              className={styles.chip}
+              aria-label={t("removeFilter", { label: chip.label })}
+            >
+              {chip.label}
+              <X size={12} strokeWidth={1.5} />
+            </button>
+          ))}
+          {chips.length > 1 && (
+            <button type="button" onClick={clearAll} className={styles.clearAll}>
+              {t("clearAll")}
+            </button>
+          )}
+        </div>
+        <div className={styles.barEnd}>
+          <span className={styles.resultCount} aria-live="polite">
+            {loading && products.length === 0 ? t("counting") : t("resultCount", { count: total })}
+          </span>
           <ProductSort value={sort} onChange={(v) => updateParams({ sort: v, page: "1" })} />
         </div>
       </div>
 
-      <div className={styles.layout}>
-        <aside className={styles.sidebar}>
-          <ProductFilters
-            categories={categories}
-            selectedCategory={category}
-            minPrice={minPrice}
-            maxPrice={maxPrice}
-            inStock={inStock}
-            onSale={onSale}
-            brands={brands}
-            selectedBrand={selectedBrand}
-            onCategoryChange={(v) => updateParams({ category: v, page: "1" })}
-            onMinPriceChange={(v) => updateParams({ minPrice: v, page: "1" })}
-            onMaxPriceChange={(v) => updateParams({ maxPrice: v, page: "1" })}
-            onInStockChange={(v) => updateParams({ inStock: v ? "true" : "", page: "1" })}
-            onSaleChange={(v) => updateParams({ onSale: v ? "true" : "", page: "1" })}
-            onBrandChange={(v) => updateParams({ brand: v, page: "1" })}
+      <div className="min-w-0">
+        {loading && products.length === 0 ? (
+          <ProductSkeleton count={12} />
+        ) : loadError && products.length === 0 ? (
+          <EmptyState
+            title={t("loadErrorTitle")}
+            subtitle={t("loadErrorText")}
+            actionLabel={t("loadErrorAction")}
+            actionHref={`?${searchParams.toString()}`}
           />
-        </aside>
-
-        <div className={styles.content}>
-          {loading && products.length === 0 ? (
-            <ProductSkeleton count={12} />
-          ) : loadError && products.length === 0 ? (
-            <EmptyState
-              title="Failed to load products"
-              subtitle="Please check your connection and try again."
-              actionLabel="Retry"
-              actionHref={`?${searchParams.toString()}`}
-            />
-          ) : products.length === 0 ? (
-            <EmptyState
-              title={t("filterBy")}
-              subtitle={t("priceRange")}
-              actionLabel={nav("home")}
-              actionHref="/"
-            />
-          ) : (
-            <>
-              <ProductGrid products={products} />
-              {totalPages > 1 && (
-                <div className={styles.pagination}>
-                  <button
-                    onClick={() => updateParams({ page: String(page - 1) })}
-                    disabled={page <= 1}
-                    className={`${styles.pageBtn} ${styles.pageBtnEdge} ${page <= 1 ? styles.pageBtnDisabled : ""}`}
-                  >
-                    Prev
-                  </button>
-                  {(() => {
-                    const pages: (number | "ellipsis-start" | "ellipsis-end")[] = [];
-                    if (totalPages <= 7) {
-                      for (let i = 1; i <= totalPages; i++) pages.push(i);
-                    } else {
-                      pages.push(1);
-                      if (page > 3) pages.push("ellipsis-start");
-                      const start = Math.max(2, page - 1);
-                      const end = Math.min(totalPages - 1, page + 1);
-                      for (let i = start; i <= end; i++) pages.push(i);
-                      if (page < totalPages - 2) pages.push("ellipsis-end");
-                      pages.push(totalPages);
-                    }
-                    return pages.map((p) =>
-                      typeof p === "string" ? (
-                        <span key={p} className={styles.pageEllipsis}>…</span>
-                      ) : (
-                        <button
-                          key={p}
-                          onClick={() => updateParams({ page: String(p) })}
-                          className={`${styles.pageBtn} ${p === page ? styles.pageBtnActive : ""}`}
-                        >
-                          {p}
-                        </button>
-                      )
-                    );
-                  })()}
-                  <button
-                    onClick={() => updateParams({ page: String(page + 1) })}
-                    disabled={page >= totalPages}
-                    className={`${styles.pageBtn} ${styles.pageBtnEdge} ${page >= totalPages ? styles.pageBtnDisabled : ""}`}
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+        ) : products.length === 0 ? (
+          <EmptyState
+            title={t("emptyTitle")}
+            subtitle={activeFilterCount > 0 ? t("emptyFilteredText") : t("emptyText")}
+            actionLabel={activeFilterCount > 0 ? t("clearAll") : nav("home")}
+            actionHref={activeFilterCount > 0 ? "/catalog" : "/"}
+          />
+        ) : (
+          <>
+            <ProductGrid products={products} />
+            {totalPages > 1 && (
+              <nav className={styles.pagination} aria-label={t("paginationLabel")}>
+                <button
+                  type="button"
+                  onClick={() => updateParams({ page: String(page - 1) })}
+                  disabled={page <= 1}
+                  className={styles.pageEdge}
+                >
+                  {t("previous")}
+                </button>
+                {pageList(page, totalPages).map((p) =>
+                  typeof p === "string" ? (
+                    <span key={p} className={styles.pageGap} aria-hidden="true">…</span>
+                  ) : p === page ? (
+                    <span key={p} className={styles.pageNumActive} aria-current="page">
+                      {p}
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => updateParams({ page: String(p) })}
+                      className={styles.pageNum}
+                      aria-label={t("goToPage", { page: p })}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+                <button
+                  type="button"
+                  onClick={() => updateParams({ page: String(page + 1) })}
+                  disabled={page >= totalPages}
+                  className={styles.pageEdge}
+                >
+                  {t("next")}
+                </button>
+              </nav>
+            )}
+          </>
+        )}
       </div>
 
-      {/* Mobile filters overlay */}
-      {mobileFiltersOpen && (
-        <div className={styles.overlay}>
-          <div className={styles.overlayBackdrop} onClick={() => setMobileFiltersOpen(false)} />
-          <div className={styles.overlaySheet}>
-            <div className={styles.overlayHeader}>
-              <span className={styles.overlayTitle}>Filters</span>
+      {drawerOpen && (
+        <div className={styles.drawerRoot}>
+          <div className={styles.drawerBackdrop} onClick={() => setDrawerOpen(false)} aria-hidden="true" />
+          <div
+            className={styles.drawerPanel}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="filters-title"
+          >
+            <div className={styles.drawerHead}>
+              <h2 id="filters-title" className={styles.drawerTitle}>{t("drawerTitle")}</h2>
               <button
-                onClick={() => setMobileFiltersOpen(false)}
-                className={styles.overlayClose}
-                aria-label="Close filters"
+                ref={closeBtnRef}
+                type="button"
+                onClick={() => setDrawerOpen(false)}
+                className={styles.drawerClose}
+                aria-label={t("drawerClose")}
               >
-                <X size={18} />
+                <X size={18} strokeWidth={1.5} />
               </button>
             </div>
-            <ProductFilters
-              categories={categories}
-              selectedCategory={category}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-              inStock={inStock}
-              onSale={onSale}
-              brands={brands}
-              selectedBrand={selectedBrand}
-              onCategoryChange={(v) => { updateParams({ category: v, page: "1" }); setMobileFiltersOpen(false); }}
-              onMinPriceChange={(v) => updateParams({ minPrice: v, page: "1" })}
-              onMaxPriceChange={(v) => updateParams({ maxPrice: v, page: "1" })}
-              onInStockChange={(v) => updateParams({ inStock: v ? "true" : "", page: "1" })}
-              onSaleChange={(v) => updateParams({ onSale: v ? "true" : "", page: "1" })}
-              onBrandChange={(v) => { updateParams({ brand: v, page: "1" }); setMobileFiltersOpen(false); }}
-            />
+            <div className={styles.drawerBody}>{filters}</div>
+            <div className={styles.drawerFoot}>
+              <button
+                type="button"
+                onClick={clearAll}
+                disabled={activeFilterCount === 0}
+                className="btn-quiet btn-sm"
+              >
+                {t("clearAll")}
+              </button>
+              <button type="button" onClick={() => setDrawerOpen(false)} className="btn-ink">
+                {loading ? t("counting") : t("showResults", { count: total })}
+              </button>
+            </div>
           </div>
         </div>
       )}

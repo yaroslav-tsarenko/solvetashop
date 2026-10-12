@@ -1,474 +1,636 @@
-import { PolicyLayout, ContactBlock } from "@/components/layout/PolicyLayout/PolicyLayout";
+import type { Metadata } from "next";
+import { PolicyLayout, ContactBlock, type PolicySection } from "@/components/layout/PolicyLayout/PolicyLayout";
 import { COMPANY } from "@/lib/company";
 
-export const metadata = { title: "Warranty Policy — Solvetashop" };
+export const metadata: Metadata = { title: "Warranty Policy" };
+
+const sections: PolicySection[] = [
+  {
+    id: "about-this-policy",
+    title: "Who and what this policy applies to",
+    body: (
+      <>
+        <p>1.1 This document deals only with physical goods bought from Solvetashop.</p>
+        <p>
+          1.2 Our range is made up of lighting, lamps, light fittings, light bulbs, home décor and related
+          electrical and lighting accessories.
+        </p>
+        <p>
+          1.3 Lamps, light fittings and other electrical items can affect safety. For that reason, whether a
+          warranty applies may turn on whether the item was the right choice for the job, was fitted
+          properly, was used sensibly and in line with the manufacturer&rsquo;s guidance, and was kept in
+          suitable operating conditions.
+        </p>
+        <p>
+          1.4 Both Consumers and Business Customers are covered by this document, although certain legal
+          rights are available to Consumers only. Section 14 sets out the points that apply specifically to
+          Business Customers.
+        </p>
+        <p>
+          1.5 This document is about faults and warranty claims. Changing your mind, cancelling an order and
+          the wider returns process are dealt with separately &mdash; see section 15.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "legal-rights",
+    title: "Your legal rights come first",
+    body: (
+      <>
+        <p>
+          2.1 Consumer law gives you rights of its own, which we call your statutory rights. They can come
+          into play where an item is defective, does not match its description, is not fit for its purpose,
+          is unsafe, or otherwise does not conform to the contract.
+        </p>
+        <p>
+          2.2 Those rights stand apart from any guarantee offered by a manufacturer, any other commercial
+          warranty, any paid Additional Warranty and any goodwill warranty help we give. Extra cover of that
+          kind can add to your protection but never takes the place of what the law already gives you.
+        </p>
+        <p>
+          2.3 No part of this document removes, restricts or reduces a mandatory statutory right that applies
+          to you, or any right that the law does not allow to be excluded.
+        </p>
+        <h3>Customers in the United Kingdom</h3>
+        <p>
+          2.4 UK Consumers may be protected by applicable UK consumer law where goods are defective, differ
+          from their description, are unfit for their purpose or otherwise fall short of the standard
+          required.
+        </p>
+        <p>
+          2.5 Depending on the facts, the timing, the state of the item and the law that applies, the
+          available remedies may include a repair, a replacement, a refund or a reduction in price.
+        </p>
+        <h3>Customers in the European Union</h3>
+        <p>
+          2.6 EU Consumers may benefit from a legal guarantee of at least 2 years under applicable EU consumer
+          law.
+        </p>
+        <p>
+          2.7 That guarantee may be relied on where goods do not conform to the contract, are defective, do
+          not match their description, are unfit for their purpose or otherwise fail the conformity
+          standards that apply.
+        </p>
+        <p>
+          2.8 The legal guarantee arises by law. It is independent of any paid Additional Warranty,
+          manufacturer guarantee or other commercial warranty.
+        </p>
+        <p>
+          2.9 How the legal guarantee works in practice &mdash; including whether it is available, the steps
+          to follow, who has to prove what, the remedies and the time limits &mdash; may depend on the law of
+          the country where you live and on the facts of your claim.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "manufacturer-guarantees",
+    title: "Guarantees given by manufacturers",
+    body: (
+      <>
+        <p>
+          3.1 Certain items are sold with a guarantee from the manufacturer. Its terms are decided by the
+          manufacturer, not by Solvetashop, and they can differ according to the product, brand, country,
+          type of item, fitting requirements and conditions of use.
+        </p>
+        <p>3.2 To claim under a manufacturer&rsquo;s guarantee you may be asked for:</p>
+        <ul>
+          <li>proof that you bought the item;</li>
+          <li>the item&rsquo;s serial number;</li>
+          <li>evidence of how it was installed;</li>
+          <li>paperwork showing it was installed by a professional;</li>
+          <li>confirmation that it was used correctly;</li>
+          <li>confirmation that the manufacturer&rsquo;s instructions were followed;</li>
+          <li>registration of the item with the manufacturer;</li>
+          <li>the item itself, sent back or made available for inspection.</li>
+        </ul>
+        <p>
+          3.3 Where it is reasonable to do so, we may help you pursue a manufacturer&rsquo;s guarantee claim.
+          We cannot, however, control the manufacturer&rsquo;s decisions, how long it takes to deal with a
+          claim, the outcome of its inspection, whether a replacement is available, or how it carries out
+          repairs.
+        </p>
+        <p>
+          3.4 If a manufacturer&rsquo;s terms differ from this document, a claim under that
+          manufacturer&rsquo;s guarantee may be governed by the manufacturer&rsquo;s own terms.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "additional-warranty",
+    title: "Additional Warranty you can buy",
+    body: (
+      <>
+        <p>
+          4.1 For some products we may offer a paid Additional Warranty. It is entirely optional and, where
+          offered, can be chosen at checkout.
+        </p>
+        <p>
+          4.2 Additional Warranty is a commercial warranty that sits on top of your statutory rights. It leaves
+          those rights, and any legal guarantee you may have, fully intact &mdash; it does not replace, reduce
+          or limit them.
+        </p>
+        <p>
+          4.3 Unless the product page or checkout shows something different, the price of Additional
+          Warranty is worked out as follows:
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Length of cover</th>
+              <th>How the price is set</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Additional Warranty, 1 extra year</td>
+              <td>10% of the product price; never less than &euro;6.99 / &pound;6.99 / $6.99</td>
+            </tr>
+            <tr>
+              <td>Additional Warranty, 2 extra years</td>
+              <td>16% of the product price; never less than &euro;9.99 / &pound;9.99 / $9.99</td>
+            </tr>
+            <tr>
+              <td>Additional Warranty, 3 extra years</td>
+              <td>22% of the product price; never less than &euro;12.99 / &pound;12.99 / $12.99</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>
+          4.4 The percentage is applied to the product price alone, leaving out delivery charges and any
+          import VAT, customs duties, local taxes, brokerage fees or other charges raised in the destination
+          country.
+        </p>
+        <p>
+          4.5 Whether Additional Warranty is offered can depend on the product, its category, where it is
+          being sent, the type of order and how checkout is set up.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "additional-warranty-period",
+    title: "When Additional Warranty begins and how long it runs",
+    body: (
+      <>
+        <p>
+          5.1 Unless checkout or product-specific warranty terms say otherwise, Additional Warranty only
+          starts once the standard warranty, manufacturer&rsquo;s guarantee, statutory warranty period or
+          legal guarantee period that applies to the product has come to an end.
+        </p>
+        <p>
+          5.2 If more than one warranty or legal guarantee applies, Additional Warranty is meant to extend
+          your protection beyond the end of the original period. It does not cut that period short or stand
+          in for it.
+        </p>
+        <p>5.3 Cover lasts only for the length you chose at checkout, which will be one of:</p>
+        <ul>
+          <li>+1 year;</li>
+          <li>+2 years;</li>
+          <li>+3 years.</li>
+        </ul>
+        <p>5.4 Additional Warranty is tied to the specific product and the order in which it was bought.</p>
+      </>
+    ),
+  },
+  {
+    id: "additional-warranty-cover",
+    title: "What Additional Warranty protects against",
+    body: (
+      <>
+        <p>
+          6.1 Subject to this document and any terms specific to the product, Additional Warranty protects
+          against qualifying defects in manufacture or materials that appear while the item is in normal use.
+        </p>
+        <p>6.2 Cover is only available if the item was:</p>
+        <ul>
+          <li>the right choice for the purpose it was bought for;</li>
+          <li>properly installed, where it needed installing;</li>
+          <li>used as the manufacturer&rsquo;s instructions direct;</li>
+          <li>run within its rated specifications;</li>
+          <li>kept in suitable storage conditions;</li>
+          <li>maintained, where maintenance was needed;</li>
+          <li>free from misuse, overloading, alteration or damage.</li>
+        </ul>
+        <p>6.3 If we accept a valid Additional Warranty claim, we may offer one or more of these outcomes:</p>
+        <ul>
+          <li>a repair;</li>
+          <li>a replacement;</li>
+          <li>an equivalent replacement;</li>
+          <li>a partial refund;</li>
+          <li>a refund;</li>
+          <li>store credit, if you agree to it;</li>
+          <li>some other reasonable remedy.</li>
+        </ul>
+        <p>
+          6.4 Which outcome is offered will depend on the kind of product, the nature of the fault, whether
+          spare parts can be obtained, the view of the manufacturer or supplier, what an inspection shows,
+          how old the item is and the law that applies.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "exclusions",
+    title: "Things no warranty covers",
+    body: (
+      <>
+        <p>
+          7.1 Unless we have expressly said otherwise, neither statutory warranty support, nor a
+          manufacturer&rsquo;s guarantee, nor a paid Additional Warranty extends to problems that result from
+          the customer&rsquo;s own circumstances, outside events, misuse or faulty installation.
+        </p>
+        <p>7.2 In the ordinary course, the following fall outside warranty cover:</p>
+        <ul>
+          <li>choosing a product that was wrong for the job;</li>
+          <li>
+            a product that does not suit your installation, system, wiring, voltage, surroundings or project
+            needs;
+          </li>
+          <li>faulty installation, wiring, connection, testing, commissioning or integration;</li>
+          <li>
+            fitting by someone unqualified or unauthorised in cases where professional installation is
+            needed or advisable;
+          </li>
+          <li>
+            not following the manufacturer&rsquo;s instructions, installation guides, safety warnings or
+            technical specifications;
+          </li>
+          <li>misuse, neglect, abuse, careless handling or using the item unsafely;</li>
+          <li>
+            overloading, the wrong voltage or current, too great a load, an unsuitable power supply, or
+            running the item beyond its rated specifications;
+          </li>
+          <li>
+            repair, modification, opening, dismantling, alteration or tampering that we or the manufacturer
+            have not authorised;
+          </li>
+          <li>
+            accidental or impact damage, damage from fire, water, moisture or chemicals, corrosion,
+            contamination, or dust or dirt getting inside;
+          </li>
+          <li>
+            damage from power surges, lightning, an unstable supply, electrical faults or wider problems
+            with the installation;
+          </li>
+          <li>ordinary wear and tear;</li>
+          <li>cosmetic marks or damage that leave the item working as it should;</li>
+          <li>
+            consumable or replaceable parts &mdash; for example bulbs, lamps, batteries, fuses, filters, seals,
+            connectors and accessories &mdash; or anything else expected to wear out, unless we have expressly said they are covered;
+          </li>
+          <li>
+            damage from unsuitable storage, transport, temperatures, humidity or surroundings;
+          </li>
+          <li>use of the item for anything other than what the manufacturer intended;</li>
+          <li>
+            use in industrial, commercial, rental or heavy-load settings that the item was not designed for;
+          </li>
+          <li>
+            software, firmware, set-up, calibration or compatibility problems, unless we have expressly said
+            they are covered;
+          </li>
+          <li>
+            the cost of labour, electricians, contractors, testing, inspection, removal, refitting or
+            certification, and any project delays, downtime, lost profit or indirect losses.
+          </li>
+        </ul>
+        <p>
+          7.3 Defects or damage that arise after delivery from events beyond Solvetashop&rsquo;s control are
+          not covered.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "safe-selection-and-installation",
+    title: "Choosing, fitting and using electrical items safely",
+    body: (
+      <>
+        <p>
+          8.1 Lamps, light fittings and other electrical items can be hazardous if the wrong one is chosen,
+          or if they are badly installed, connected or wired, altered, overloaded or misused.
+        </p>
+        <p>
+          8.2 Before you buy, it is your responsibility to make sure the item suits the use you have in mind.
+          That means checking every relevant detail, including:
+        </p>
+        <ul>
+          <li>voltage;</li>
+          <li>current;</li>
+          <li>wattage;</li>
+          <li>load rating;</li>
+          <li>IP rating;</li>
+          <li>dimensions;</li>
+          <li>cable type;</li>
+          <li>connector type;</li>
+          <li>the environment it will be installed in;</li>
+          <li>compatibility;</li>
+          <li>local electrical rules;</li>
+          <li>the product code and technical documentation.</li>
+        </ul>
+        <p>
+          8.3 Where it is required or appropriate, any item that has to be installed, wired, connected,
+          tested, commissioned or integrated into an electrical system should be fitted only by a qualified
+          electrician or another competent professional.
+        </p>
+        <p>
+          8.4 You must keep, and act on, all instructions, manuals, labels, safety warnings and technical
+          documents that come with the item or that the manufacturer makes available. Not doing so may affect
+          whether a warranty applies.
+        </p>
+        <p>
+          8.5 If you are not sure how to install, connect, test or use an item safely, get advice from a
+          qualified electrician or other competent professional.
+        </p>
+        <p>
+          8.6 A warranty claim may be turned down, or the cover limited, where the defect stems from fitting
+          that was incorrect, unsafe or non-compliant, from unsuitable use, or from not following
+          instructions.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "making-a-claim",
+    title: "Raising a warranty claim",
+    body: (
+      <>
+        <p>
+          9.1 To start a claim, email us at <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>.
+        </p>
+        <p>9.2 Please include:</p>
+        <ul>
+          <li>your full name;</li>
+          <li>your order number;</li>
+          <li>the product name or SKU;</li>
+          <li>the date you bought it;</li>
+          <li>a description of the problem;</li>
+          <li>when you first noticed it;</li>
+          <li>photographs or video of the item and the fault;</li>
+          <li>photographs of labels, serial numbers, model numbers or manufacturer markings;</li>
+          <li>details of the installation, where relevant;</li>
+          <li>evidence of professional installation, where we reasonably need it;</li>
+          <li>anything you have already tried in order to fix the problem.</li>
+        </ul>
+        <p>9.3 We may ask you for further details so that we can assess your claim.</p>
+        <p>
+          9.4 Stop using the item if carrying on could be unsafe, could make the fault worse or could cause
+          damage.
+        </p>
+        <p>
+          9.5 Do not try any unauthorised repair, alteration, dismantling or testing where it could
+          compromise safety or affect whether the warranty applies.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "inspection",
+    title: "How we check a fault",
+    body: (
+      <>
+        <p>
+          10.1 A claim may need to be inspected by Solvetashop, the manufacturer, a supplier, a service
+          provider or another authorised party, and we may ask you to send the item back for inspection
+          before we agree a remedy.
+        </p>
+        <p>10.2 An inspection may look at:</p>
+        <ul>
+          <li>the condition of the item;</li>
+          <li>evidence of how it was installed;</li>
+          <li>signs of misuse or damage from outside causes;</li>
+          <li>signs of overloading or the wrong voltage;</li>
+          <li>exposure to the environment;</li>
+          <li>alteration or tampering;</li>
+          <li>what the manufacturer has found;</li>
+          <li>whether the item&rsquo;s condition is consistent with the fault you describe;</li>
+          <li>
+            whether the defect falls under the law, a manufacturer&rsquo;s guarantee or Additional Warranty.
+          </li>
+        </ul>
+        <p>
+          10.3 Where the inspection shows the problem is covered, we will provide a suitable remedy in line
+          with this document and the law that applies.
+        </p>
+        <p>
+          10.4 Where the inspection shows the problem is not covered, we may decline the claim. If so, we may,
+          where applicable, send the item back to you at your own cost, or offer a paid repair or replacement
+          if one is available.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "return-shipping",
+    title: "Sending an item back for assessment",
+    body: (
+      <>
+        <p>
+          11.1 Please get in touch with us before sending anything back for a warranty assessment. If a
+          return is needed, we will tell you how to make it.
+        </p>
+        <p>
+          11.2 Where a valid claim concerns goods that are faulty, damaged or do not conform to the contract,
+          Solvetashop may pay for the return postage if the law requires it or if we agree to do so.
+        </p>
+        <p>
+          11.3 If a claim is declined because the fault is not covered, you may have to pay for return
+          postage, inspection, handling or other reasonable costs, where the law allows this and the costs
+          have been made clear to you.
+        </p>
+        <p>
+          11.4 Claims involving another country may involve customs declarations, import and export
+          paperwork, taxes, duties, brokerage fees and courier charges. These may fall to you to pay, except where
+          your claim is confirmed as valid and the applicable law places them elsewhere.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "remedies",
+    title: "Repairs, replacements and refunds",
+    body: (
+      <>
+        <h3>Repaired and replacement items</h3>
+        <p>
+          12.1 Where the law allows and it is appropriate, a replacement may be new, equivalent,
+          refurbished, reconditioned, repaired or functionally equivalent.
+        </p>
+        <p>
+          12.2 If the original item has been discontinued or cannot be obtained, we may propose an equivalent
+          alternative or one that is reasonably comparable.
+        </p>
+        <p>
+          12.3 A repair or replacement does not of itself start the original warranty period afresh, unless
+          the law requires this or we have said so in writing. Any repaired, replacement or equivalent item
+          will usually be covered only for the time left to run on the original warranty or Additional
+          Warranty, except where the law that applies requires something different.
+        </p>
+        <h3>Refunds on a warranty claim</h3>
+        <p>
+          12.4 A refund may be offered under a warranty where a repair or replacement is unavailable,
+          impractical or disproportionate, or where the law requires one.
+        </p>
+        <p>
+          12.5 The amount refunded may reflect how old the item is, how much it has been used, its condition,
+          what an inspection showed, the law that applies and the kind of fault involved.
+        </p>
+        <p>12.6 Wherever possible, we will normally refund to the payment method you originally used.</p>
+        <p>
+          12.7 Unless the law requires it, a warranty refund does not normally include installation or
+          labour costs, delivery charges, import VAT, customs duties, local taxes, courier handling charges,
+          brokerage fees or other costs charged by third parties.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "cancelling-additional-warranty",
+    title: "Cancelling or refunding Additional Warranty",
+    body: (
+      <>
+        <p>
+          13.1 Where a product is validly cancelled or sent back before its Additional Warranty has begun, and
+          we approve the refund for that product, the charge for the Additional Warranty may also be refunded
+          where the law requires it or Solvetashop agrees.
+        </p>
+        <p>
+          13.2 Once Additional Warranty has begun, or once a claim has been made under it, it may not be
+          refundable unless the law requires it.
+        </p>
+        <p>
+          13.3 Because Additional Warranty is tied to a particular product and order, it cannot normally be
+          moved to a different product, order, person or customer.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "business-customers",
+    title: "Points for Business Customers",
+    body: (
+      <>
+        <p>
+          14.1 Before buying, Business Customers must check that items are suitable and confirm their
+          specifications, compatibility, installation needs and any regulatory requirements.
+        </p>
+        <p>
+          14.2 We expect Business Customers buying electrical goods to have the relevant technical knowledge
+          or to have taken professional advice.
+        </p>
+        <p>
+          14.3 Except where mandatory law says otherwise, Business Customers may have more limited warranty
+          remedies than Consumers.
+        </p>
+        <p>
+          14.4 So far as the law permits, Solvetashop accepts no liability to Business Customers, in
+          connection with a warranty matter, for the cost of labour, electricians, contractors, testing,
+          removal, refitting or certification, or for project delays, downtime, lost profit, lost contracts,
+          lost revenue, lost business opportunities or any indirect or consequential loss.
+        </p>
+        <p>
+          14.5 Business Customers should not book installation, labour, project deadlines or site work until
+          the goods have arrived and have been checked and confirmed as correct and suitable.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "warranty-and-returns",
+    title: "How warranty claims relate to returns",
+    body: (
+      <>
+        <p>
+          15.1 This document deals with warranty and defect claims only. A warranty claim is different from
+          returning something because you have changed your mind.
+        </p>
+        <p>
+          15.2 Change-of-mind returns, consumer cancellation rights, when refunds are paid, items that cannot
+          be returned, goods damaged in transit, wrong items and the steps for sending things back are all
+          covered by our <a href="/policies/returns">Returns &amp; Refunds Policy</a>.
+        </p>
+        <p>
+          15.3 Where an item is faulty, damaged, wrong or not as described, we may handle the matter under
+          the consumer law that applies, our Returns &amp; Refunds Policy, a manufacturer&rsquo;s guarantee,
+          this Warranty Policy, or a mix of these, depending on the circumstances.
+        </p>
+        <p>
+          15.4 This document should also be read alongside our <a href="/policies/terms">Terms of Sale</a>,{" "}
+          <a href="/policies/shipping">Shipping &amp; Delivery Policy</a>,{" "}
+          <a href="/policies/payment">Payment Terms</a>, <a href="/policies/privacy">Privacy Notice</a> and
+          any warranty information given for a specific product.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "changes",
+    title: "Updates to this policy",
+    body: (
+      <>
+        <p>
+          16.1 We may revise this Warranty Policy from time to time, for example because of changes to the
+          warranty options we offer, the price of Additional Warranty, our product categories, the law, the
+          terms set by manufacturers, the procedures our suppliers follow or the way we run our business.
+        </p>
+        <p>
+          16.2 Your order is governed by the version in force when you placed it. The exceptions are changes
+          the law requires and corrections that must be applied.
+        </p>
+        <p>
+          16.3 Whenever we revise this document, we will change the &ldquo;Last updated&rdquo; date shown at
+          the top of the page.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "contact",
+    title: "Questions and contact details",
+    body: (
+      <>
+        <p>
+          For questions about your statutory rights, a manufacturer&rsquo;s guarantee, Additional Warranty,
+          a claim, a defective product or anything this document excludes, you can reach us using the
+          details below.
+        </p>
+        <ContactBlock />
+      </>
+    ),
+  },
+];
 
 export default function WarrantyPolicyPage() {
   return (
-    <PolicyLayout title="Warranty Policy" lastUpdated="29 May 2026">
-      <p>
-        This Warranty Policy explains how statutory rights, legal guarantees, manufacturer warranties, and
-        paid Additional Warranty options apply to products purchased through www.solvetashop.com.
-      </p>
-      <p>The Website is operated by:</p>
-      <ContactBlock />
-      <p>
-        In this Policy, &ldquo;Solvetashop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; or &ldquo;our&rdquo;
-        means {COMPANY.legalName}. &ldquo;Customer&rdquo;, &ldquo;you&rdquo; or &ldquo;your&rdquo; means any
-        person or business purchasing goods through the Website.
-      </p>
-      <p>
-        This Policy should be read together with our Terms and Conditions, Shipping Policy, Returns, Refunds
-        and Cancellation Policy, Payment Policy, Privacy Policy, and any product-specific warranty
-        information.
-      </p>
-      <p>
-        Nothing in this Policy limits any mandatory legal rights you may have under applicable consumer
-        protection law.
-      </p>
-
-      <h2>1. Scope of This Policy</h2>
-      <p>1.1 This Policy applies to physical goods purchased through Solvetashop.</p>
-      <p>
-        1.2 Solvetashop supplies electrical products, electrical materials, wiring accessories,
-        lighting-related products, installation components, distribution and circuit protection products,
-        sockets, switches, cables, mounting accessories, and related goods.
-      </p>
-      <p>
-        1.3 Because electrical goods can be safety-critical, warranty eligibility may depend on correct
-        product selection, correct installation, proper use, compliance with manufacturer instructions, and
-        suitable operating conditions.
-      </p>
-      <p>
-        1.4 This Policy applies to both Consumers and Business Customers, but some statutory rights apply
-        only to Consumers.
-      </p>
-
-      <h2>2. Statutory Rights, Legal Guarantees, and Commercial Warranties</h2>
-      <p>2.1 Your statutory rights are rights provided by applicable consumer law.</p>
-      <p>
-        2.2 Statutory rights may apply where goods are faulty, not as described, not fit for purpose, unsafe,
-        or not in conformity with the contract.
-      </p>
-      <p>
-        2.3 These statutory rights are separate from any manufacturer warranty, commercial warranty, paid
-        Additional Warranty, or voluntary warranty service.
-      </p>
-      <p>
-        2.4 Nothing in this Policy excludes, restricts, or reduces any mandatory statutory rights that apply
-        to you.
-      </p>
-      <p>
-        2.5 A manufacturer warranty or Additional Warranty may give you extra protection, but it does not
-        replace your legal rights.
-      </p>
-
-      <h2>3. UK Consumer Rights</h2>
-      <p>
-        3.1 If you are a UK Consumer, you may have statutory rights under applicable UK consumer protection
-        law where goods are faulty, not as described, not fit for purpose, or otherwise do not meet required
-        standards.
-      </p>
-      <p>
-        3.2 These rights may include remedies such as repair, replacement, refund, or price reduction
-        depending on the circumstances, timing, product condition, and applicable law.
-      </p>
-      <p>3.3 This Policy does not limit any rights that cannot lawfully be excluded.</p>
-
-      <h2>4. EU Consumer Legal Guarantee</h2>
-      <p>
-        4.1 If you are an EU Consumer, you may have a minimum 2-year legal guarantee under applicable EU
-        consumer law.
-      </p>
-      <p>
-        4.2 The legal guarantee may apply where goods are not in conformity with the contract, are
-        defective, not as described, not fit for purpose, or otherwise fail to meet applicable conformity
-        requirements.
-      </p>
-      <p>
-        4.3 The legal guarantee is provided by law and is separate from any paid Additional Warranty,
-        manufacturer warranty, or commercial warranty.
-      </p>
-      <p>
-        4.4 The availability, procedure, burden of proof, remedies, and limitation periods may depend on the
-        law of your country of residence and the circumstances of the claim.
-      </p>
-
-      <h2>5. Manufacturer Warranty</h2>
-      <p>5.1 Some products may come with a manufacturer warranty.</p>
-      <p>5.2 Manufacturer warranty terms are set by the manufacturer, not by Solvetashop.</p>
-      <p>
-        5.3 Manufacturer warranties may vary by product, brand, country, product type, installation
-        requirements, and usage conditions.
-      </p>
-      <p>5.4 A manufacturer warranty may require:</p>
-      <ul>
-        <li>proof of purchase;</li>
-        <li>product serial number;</li>
-        <li>installation evidence;</li>
-        <li>professional installation documentation;</li>
-        <li>correct use;</li>
-        <li>compliance with manufacturer instructions;</li>
-        <li>registration with the manufacturer;</li>
-        <li>return or inspection of the product.</li>
-      </ul>
-      <p>
-        5.5 Solvetashop may assist with manufacturer warranty claims where reasonable, but we do not control
-        manufacturer decisions, warranty processing times, inspection results, replacement availability, or
-        repair procedures.
-      </p>
-      <p>
-        5.6 If manufacturer warranty terms differ from this Policy, the manufacturer&rsquo;s warranty terms
-        may apply to the manufacturer warranty claim.
-      </p>
-
-      <h2>6. Paid Additional Warranty</h2>
-      <p>6.1 Solvetashop may offer paid Additional Warranty options for selected products.</p>
-      <p>6.2 Additional Warranty is optional and may be selected at checkout where available.</p>
-      <p>
-        6.3 Additional Warranty provides commercial warranty protection in addition to your statutory rights.
-      </p>
-      <p>
-        6.4 Additional Warranty does not replace, reduce, or limit your statutory rights or any legal
-        guarantee that may apply.
-      </p>
-      <p>
-        6.5 Unless otherwise stated on the product page or at checkout, Additional Warranty pricing is
-        calculated as follows:
-      </p>
-      <table>
-        <thead>
-          <tr>
-            <th>Additional Warranty option</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>+1 Year Additional Warranty</td><td>10% of the product price, minimum &euro;6.99 / &pound;6.99 / $6.99</td></tr>
-          <tr><td>+2 Year Additional Warranty</td><td>16% of the product price, minimum &euro;9.99 / &pound;9.99 / $9.99</td></tr>
-          <tr><td>+3 Year Additional Warranty</td><td>22% of the product price, minimum &euro;12.99 / &pound;12.99 / $12.99</td></tr>
-        </tbody>
-      </table>
-      <p>
-        6.6 The Additional Warranty price is calculated based on the product price before delivery charges,
-        customs duties, import VAT, brokerage fees, local taxes, or other destination charges.
-      </p>
-      <p>
-        6.7 Additional Warranty availability may vary by product, category, destination, order type, or
-        checkout configuration.
-      </p>
-
-      <h2>7. When Additional Warranty Starts</h2>
-      <p>
-        7.1 Unless otherwise stated at checkout or in product-specific warranty terms, paid Additional
-        Warranty begins after the expiry of the standard warranty, manufacturer warranty, statutory warranty
-        period, or legal guarantee period applicable to the relevant product.
-      </p>
-      <p>
-        7.2 Where more than one warranty or legal guarantee may apply, the Additional Warranty is intended to
-        provide extra protection after the original applicable warranty period ends, not to shorten or
-        replace it.
-      </p>
-      <p>7.3 Additional Warranty applies only for the duration selected at checkout:</p>
-      <ul>
-        <li>+1 year;</li>
-        <li>+2 years;</li>
-        <li>+3 years.</li>
-      </ul>
-      <p>7.4 Additional Warranty is linked to the product and original order.</p>
-
-      <h2>8. What Additional Warranty Covers</h2>
-      <p>
-        8.1 Subject to this Policy and any product-specific terms, Additional Warranty covers eligible
-        manufacturing defects and material defects that arise during normal use.
-      </p>
-      <p>8.2 Coverage applies only where the product has been:</p>
-      <ul>
-        <li>correctly selected for its intended purpose;</li>
-        <li>installed correctly where installation is required;</li>
-        <li>used in accordance with manufacturer instructions;</li>
-        <li>operated within rated specifications;</li>
-        <li>stored in suitable conditions;</li>
-        <li>maintained where required;</li>
-        <li>not misused, overloaded, modified, or damaged.</li>
-      </ul>
-      <p>
-        8.3 Where a valid Additional Warranty claim is approved, we may provide one or more of the following
-        remedies:
-      </p>
-      <ul>
-        <li>repair;</li>
-        <li>replacement;</li>
-        <li>equivalent replacement;</li>
-        <li>partial refund;</li>
-        <li>refund;</li>
-        <li>store credit, where agreed;</li>
-        <li>another reasonable remedy.</li>
-      </ul>
-      <p>
-        8.4 The remedy will depend on the product type, defect, availability of replacement parts,
-        manufacturer/supplier position, inspection results, age of the product, and applicable law.
-      </p>
-
-      <h2>9. What Warranty Does Not Cover</h2>
-      <p>
-        9.1 Unless expressly stated otherwise, statutory warranty support, manufacturer warranties, and paid
-        Additional Warranty do not cover problems caused by customer-side factors, external events, misuse,
-        or incorrect installation.
-      </p>
-      <p>9.2 Warranty coverage does not normally include:</p>
-      <ul>
-        <li>incorrect product selection;</li>
-        <li>incompatibility with your installation, system, wiring, voltage, environment, or project requirements;</li>
-        <li>incorrect installation, wiring, connection, testing, commissioning, or integration;</li>
-        <li>installation by an unqualified or unauthorised person where professional installation is required or appropriate;</li>
-        <li>failure to follow manufacturer instructions, installation manuals, safety warnings, or technical specifications;</li>
-        <li>misuse, negligence, abuse, careless handling, or unsafe use;</li>
-        <li>overloading, incorrect voltage, incorrect current, excessive load, unsuitable power supply, or operation outside rated specifications;</li>
-        <li>unauthorised repair, modification, opening, dismantling, alteration, or tampering;</li>
-        <li>accidental damage, impact damage, fire damage, water damage, moisture damage, chemical damage, corrosion, contamination, dust, or dirt ingress;</li>
-        <li>damage caused by power surges, lightning, unstable power supply, electrical faults, or wider installation faults;</li>
-        <li>normal wear and tear;</li>
-        <li>cosmetic damage that does not affect product functionality;</li>
-        <li>consumable parts, replaceable parts, batteries, bulbs, fuses, lamps, seals, connectors, accessories, filters, or items expected to wear out unless expressly covered;</li>
-        <li>damage caused by unsuitable storage, transport, temperature, humidity, or environment;</li>
-        <li>products used for purposes outside the manufacturer&rsquo;s intended use;</li>
-        <li>products used in industrial, commercial, rental, or high-load environments where the product is not designed for such use;</li>
-        <li>software, firmware, configuration, calibration, or compatibility issues unless expressly covered;</li>
-        <li>labour costs, electrician costs, contractor costs, testing costs, inspection costs, removal costs, reinstallation costs, certification costs, project delays, downtime, loss of profit, or indirect losses.</li>
-      </ul>
-      <p>
-        9.3 Warranty does not cover defects or damage caused after delivery by events outside
-        Solvetashop&rsquo;s control.
-      </p>
-
-      <h2>10. Electrical Installation Responsibility</h2>
-      <p>
-        10.1 Electrical products can be dangerous if incorrectly selected, installed, connected, wired,
-        modified, overloaded, or used.
-      </p>
-      <p>
-        10.2 You are responsible for ensuring that the product is suitable for your intended use before
-        purchase.
-      </p>
-      <p>10.3 You should check all relevant specifications, including:</p>
-      <ul>
-        <li>voltage;</li>
-        <li>current;</li>
-        <li>wattage;</li>
-        <li>load rating;</li>
-        <li>IP rating;</li>
-        <li>dimensions;</li>
-        <li>cable type;</li>
-        <li>connector type;</li>
-        <li>installation environment;</li>
-        <li>compatibility;</li>
-        <li>local electrical requirements;</li>
-        <li>product code and technical documentation.</li>
-      </ul>
-      <p>
-        10.4 Products requiring installation, wiring, connection, testing, commissioning, or integration
-        into an electrical system should be installed only by a qualified electrician or competent
-        professional where required or appropriate.
-      </p>
-      <p>
-        10.5 Warranty may be refused or limited where a defect is caused by incorrect installation, unsafe
-        installation, non-compliant installation, unsuitable use, or failure to follow instructions.
-      </p>
-
-      <h2>11. How to Make a Warranty Claim</h2>
-      <p>11.1 To make a warranty claim, contact us at info@solvetashop.com.</p>
-      <p>11.2 Please provide:</p>
-      <ul>
-        <li>your full name;</li>
-        <li>order number;</li>
-        <li>product name or SKU;</li>
-        <li>date of purchase;</li>
-        <li>description of the issue;</li>
-        <li>when the issue first appeared;</li>
-        <li>photos or videos showing the product and defect;</li>
-        <li>photos of product labels, serial numbers, model numbers, or manufacturer markings;</li>
-        <li>installation details where relevant;</li>
-        <li>proof of professional installation where reasonably required;</li>
-        <li>any troubleshooting steps already taken.</li>
-      </ul>
-      <p>11.3 We may ask for additional information to assess the claim.</p>
-      <p>
-        11.4 You must stop using the product if continued use may be unsafe, may worsen the defect, or may
-        cause damage.
-      </p>
-      <p>
-        11.5 Do not attempt unauthorised repair, modification, dismantling, or testing where this may affect
-        safety or warranty eligibility.
-      </p>
-
-      <h2>12. Inspection and Assessment</h2>
-      <p>
-        12.1 Warranty claims may require inspection by Solvetashop, the manufacturer, supplier, service
-        provider, or another authorised party.
-      </p>
-      <p>12.2 We may require you to return the product for inspection before approving a remedy.</p>
-      <p>12.3 Inspection may consider:</p>
-      <ul>
-        <li>product condition;</li>
-        <li>installation evidence;</li>
-        <li>signs of misuse or external damage;</li>
-        <li>signs of overloading or incorrect voltage;</li>
-        <li>environmental exposure;</li>
-        <li>modification or tampering;</li>
-        <li>manufacturer findings;</li>
-        <li>compatibility with claimed fault;</li>
-        <li>whether the defect is covered by law, manufacturer warranty, or Additional Warranty.</li>
-      </ul>
-      <p>
-        12.4 If inspection confirms that the issue is covered, we will provide an appropriate remedy in
-        accordance with this Policy and applicable law.
-      </p>
-      <p>
-        12.5 If inspection finds that the issue is not covered, we may reject the claim and, where
-        applicable, return the product to you at your cost or offer a paid repair or replacement where
-        available.
-      </p>
-
-      <h2>13. Return Shipping for Warranty Claims</h2>
-      <p>13.1 You should not return a product for warranty assessment without contacting us first.</p>
-      <p>13.2 We will provide return instructions where a return is required.</p>
-      <p>
-        13.3 For valid warranty claims involving faulty, damaged, or non-conforming goods, return shipping
-        may be covered by Solvetashop where required by law or approved by us.
-      </p>
-      <p>
-        13.4 If a warranty claim is rejected because the defect is not covered, you may be responsible for
-        return shipping, inspection costs, handling costs, or other reasonable costs where permitted by law
-        and where clearly communicated.
-      </p>
-      <p>
-        13.5 For international warranty claims, customs declarations, import/export documents, taxes, duties,
-        brokerage fees, and courier charges may apply. These may be the customer&rsquo;s responsibility
-        unless the claim is confirmed as valid and applicable law requires otherwise.
-      </p>
-
-      <h2>14. Replacement Products and Repaired Products</h2>
-      <p>
-        14.1 Replacement products may be new, equivalent, refurbished, reconditioned, repaired, or
-        functionally equivalent where permitted by law and appropriate in the circumstances.
-      </p>
-      <p>
-        14.2 If the original product is discontinued or unavailable, we may offer an equivalent or
-        reasonably comparable product.
-      </p>
-      <p>
-        14.3 A replacement or repair does not automatically restart the original warranty period unless
-        required by law or expressly stated in writing.
-      </p>
-      <p>
-        14.4 Any replacement, repaired product, or equivalent product will normally remain covered only for
-        the remaining period of the original warranty or Additional Warranty, unless applicable law requires
-        otherwise.
-      </p>
-
-      <h2>15. Refunds Under Warranty</h2>
-      <p>
-        15.1 Refunds under warranty may be offered where repair or replacement is not available, not
-        practical, not proportionate, or required by law.
-      </p>
-      <p>
-        15.2 Refund amounts may take into account the product age, use, condition, inspection results,
-        applicable law, and the nature of the defect.
-      </p>
-      <p>15.3 Refunds will normally be made to the original payment method where possible.</p>
-      <p>
-        15.4 Delivery charges, customs duties, import VAT, brokerage fees, courier handling charges, local
-        taxes, installation costs, labour costs, and other third-party costs are not normally refundable
-        under warranty unless required by law.
-      </p>
-
-      <h2>16. Additional Warranty Cancellation and Refunds</h2>
-      <p>
-        16.1 If you validly cancel or return a product before the Additional Warranty begins and the product
-        refund is approved, the related Additional Warranty charge may also be refunded where required by
-        law or approved by Solvetashop.
-      </p>
-      <p>
-        16.2 If the Additional Warranty has already begun or has already been used for a claim, it may not
-        be refundable unless required by law.
-      </p>
-      <p>
-        16.3 Additional Warranty is linked to the relevant product and order and cannot normally be
-        transferred to another product, order, person, or customer.
-      </p>
-
-      <h2>17. Business Customer Warranty Terms</h2>
-      <p>
-        17.1 Business Customers are responsible for checking product suitability, specifications,
-        compatibility, installation requirements, and regulatory requirements before purchase.
-      </p>
-      <p>
-        17.2 Business Customers are expected to have appropriate technical knowledge or professional advice
-        when purchasing electrical goods.
-      </p>
-      <p>
-        17.3 Warranty remedies for Business Customers may be more limited than those available to Consumers,
-        except where mandatory law provides otherwise.
-      </p>
-      <p>
-        17.4 To the fullest extent permitted by law, Solvetashop will not be liable to Business Customers for
-        labour costs, electrician costs, contractor costs, testing costs, removal costs, reinstallation
-        costs, certification costs, project delays, downtime, loss of profit, loss of contract, loss of
-        revenue, loss of business opportunity, or indirect or consequential losses arising from a warranty
-        issue.
-      </p>
-      <p>
-        17.5 Business Customers should not schedule installation, labour, project deadlines, or site work
-        until goods have been received, inspected, and confirmed as correct and suitable.
-      </p>
-
-      <h2>18. Manufacturer Instructions and Documentation</h2>
-      <p>
-        18.1 You must keep and follow all manufacturer instructions, manuals, labels, safety warnings, and
-        technical documentation supplied with the product or made available by the manufacturer.
-      </p>
-      <p>18.2 Failure to follow manufacturer instructions may affect warranty eligibility.</p>
-      <p>
-        18.3 If you are unsure how to install, connect, test, or use a product safely, you should seek
-        advice from a qualified electrician or competent professional.
-      </p>
-
-      <h2>19. Relationship With Returns Policy</h2>
-      <p>19.1 This Warranty Policy covers warranty and defect claims.</p>
-      <p>
-        19.2 Change-of-mind returns, consumer cancellation rights, refund timing, non-returnable items,
-        damaged deliveries, incorrect goods, and return procedures are covered in our Returns, Refunds and
-        Cancellation Policy.
-      </p>
-      <p>19.3 A warranty claim is not the same as a change-of-mind return.</p>
-      <p>
-        19.4 If a product is faulty, damaged, incorrect, or not as described, your claim may be handled
-        under applicable consumer law, the Returns Policy, manufacturer warranty, this Warranty Policy, or a
-        combination of these depending on the circumstances.
-      </p>
-
-      <h2>20. Changes to This Warranty Policy</h2>
-      <p>
-        20.1 We may update this Warranty Policy from time to time to reflect changes in warranty options,
-        product categories, manufacturer terms, additional warranty pricing, legal requirements, supplier
-        procedures, or business operations.
-      </p>
-      <p>
-        20.2 The version of this Warranty Policy in force at the time you place your order will apply to
-        that order, unless a change is required by law or relates to a correction that must be applied.
-      </p>
-      <p>
-        20.3 When we update this Policy, we will revise the &ldquo;Last updated&rdquo; date at the top of
-        the page.
-      </p>
-
-      <h2>21. Contact Information</h2>
-      <p>
-        If you have any questions about statutory rights, manufacturer warranty, Additional Warranty,
-        warranty claims, product defects, or warranty exclusions, please contact us:
-      </p>
-      <ContactBlock />
-    </PolicyLayout>
+    <PolicyLayout
+      title="Warranty Policy"
+      lastUpdated="12 October 2026"
+      summary="How your legal rights, manufacturers' guarantees and our optional paid Additional Warranty work for items bought from Solvetashop, and how to raise a claim if something goes wrong."
+      intro={
+        <>
+          <p>
+            This Warranty Policy sets out how your statutory rights, legal guarantees, manufacturers&rsquo;
+            guarantees and our optional paid Additional Warranty apply to goods bought on
+            www.solvetashop.com (the &ldquo;Website&rdquo;). The Website is run by:
+          </p>
+          <ContactBlock />
+          <p>
+            Throughout this document, &ldquo;Solvetashop&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo; and
+            &ldquo;our&rdquo; refer to {COMPANY.legalName}, and &ldquo;Customer&rdquo;, &ldquo;you&rdquo; and
+            &ldquo;your&rdquo; refer to any individual or business buying goods through the Website.
+            &ldquo;Consumer&rdquo; and &ldquo;Business Customer&rdquo; have the meanings given in our{" "}
+            <a href="/policies/terms">Terms of Sale</a>.
+          </p>
+          <p>
+            Nothing here limits any mandatory right you have under consumer protection law that applies to
+            you.
+          </p>
+        </>
+      }
+      sections={sections}
+    />
   );
 }

@@ -3,18 +3,24 @@
 import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/shared/EmptyState/EmptyState";
 import { MapPin } from "lucide-react";
+import { accountClasses as styles } from "../account-classes";
 
 export default function AddressesPage() {
   const t = useTranslations("account");
 
   return (
     <div>
-      <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "1.25rem" }}>{t("addresses")}</h1>
-      <EmptyState
-        title="No addresses yet"
-        subtitle="Add a shipping address for faster checkout"
-        icon={<MapPin size={48} />}
-      />
+      <div className="mb-10">
+        <h2 className={styles.pageTitle}>{t("addressesTitle")}</h2>
+        <p className={styles.pageLede}>{t("addressesLede")}</p>
+      </div>
+      <div className="border-t border-line">
+        <EmptyState
+          title={t("noAddresses")}
+          subtitle={t("noAddressesSubtitle")}
+          icon={<MapPin size={40} strokeWidth={1.25} />}
+        />
+      </div>
     </div>
   );
 }

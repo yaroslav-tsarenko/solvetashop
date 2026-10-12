@@ -1,61 +1,127 @@
+import type { ReactNode } from "react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
-import { ReactNode } from "react";
 import { COMPANY, COMPANY_ADDRESS } from "@/lib/company";
+
+/**
+ * One numbered part of a legal document. The layout prints the number
+ * (position in the array + 1) in front of the title and builds the
+ * table of contents from the list, so clause numbers written inside
+ * `body` (e.g. "4.2") must follow the array order.
+ */
+export interface PolicySection {
+  /** Anchor id, kebab-case, unique within the page. */
+  id: string;
+  title: string;
+  body: ReactNode;
+}
 
 interface PolicyLayoutProps {
   title: string;
   lastUpdated: string;
-  children: ReactNode;
+  /** Short plain-language summary shown under the title. */
+  summary?: string;
+  /** Un-numbered preamble rendered before section 1. */
+  intro?: ReactNode;
+  sections: PolicySection[];
 }
 
+/* Long-form reading styles for everything inside a section body. */
 const proseCls = [
-  "text-[0.875rem] leading-[1.65] text-[var(--color-text-secondary)] sm:text-[0.9375rem] sm:leading-[1.75]",
-  "[&_h2]:mb-3 [&_h2]:mt-6 [&_h2]:text-[1.0625rem] [&_h2]:font-bold [&_h2]:text-[var(--color-text)] sm:[&_h2]:mt-8 sm:[&_h2]:text-lg",
-  "[&_h3]:mb-2 [&_h3]:mt-5 [&_h3]:text-[0.9375rem] [&_h3]:font-semibold [&_h3]:text-[var(--color-text)] sm:[&_h3]:text-base",
-  "[&_p]:mb-3",
-  "[&_ul]:my-2 [&_ul]:ml-6 [&_ul]:list-disc [&_ul]:p-0",
-  "[&_ul_li]:mb-1",
-  "[&_table]:my-4 [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto [&_table]:border-collapse [&_table]:text-[0.8125rem] sm:[&_table]:text-sm",
-  "[&_table_thead]:table [&_table_tbody]:table [&_table_tr]:table [&_table_thead]:w-full [&_table_tbody]:w-full [&_table_tr]:w-full [&_table_thead]:table-fixed [&_table_tbody]:table-fixed [&_table_tr]:table-fixed",
-  "[&_table_th]:border [&_table_th]:border-[var(--color-border)] [&_table_th]:bg-[var(--color-bg-secondary)] [&_table_th]:px-2 [&_table_th]:py-1.5 [&_table_th]:text-left [&_table_th]:font-semibold [&_table_th]:text-[var(--color-text)] sm:[&_table_th]:px-3 sm:[&_table_th]:py-2",
-  "[&_table_td]:border [&_table_td]:border-[var(--color-border)] [&_table_td]:px-2 [&_table_td]:py-1.5 [&_table_td]:break-words sm:[&_table_td]:px-3 sm:[&_table_td]:py-2",
+  "text-[0.9375rem] leading-[1.75] text-text-secondary",
+  "[&_p]:mb-4 [&_p:last-child]:mb-0",
+  "[&_h3]:mb-2 [&_h3]:mt-7 [&_h3]:text-[0.9375rem] [&_h3]:font-medium [&_h3]:text-ink",
+  "[&_ul]:mb-4 [&_ul]:ml-5 [&_ul]:list-[circle] [&_ul_li]:mb-1.5 [&_ul_li]:pl-1",
+  "[&_strong]:font-medium [&_strong]:text-ink",
+  "[&_a]:text-sage [&_a]:underline [&_a]:underline-offset-4 [&_a:hover]:text-sage-hover",
+  // Tables: no boxes, just hairline rules between rows.
+  "[&_table]:my-6 [&_table]:block [&_table]:w-full [&_table]:overflow-x-auto [&_table]:border-collapse [&_table]:text-sm",
+  "[&_thead]:table [&_tbody]:table [&_tr]:table [&_thead]:w-full [&_tbody]:w-full [&_tr]:w-full [&_thead]:table-fixed [&_tbody]:table-fixed [&_tr]:table-fixed",
+  "[&_th]:border-b [&_th]:border-line-strong [&_th]:py-2.5 [&_th]:pr-4 [&_th]:text-left [&_th]:text-xs [&_th]:font-medium [&_th]:uppercase [&_th]:tracking-[0.06em] [&_th]:text-muted",
+  "[&_td]:border-b [&_td]:border-line [&_td]:py-3 [&_td]:pr-4 [&_td]:align-top [&_td]:break-words",
 ].join(" ");
 
-export function PolicyLayout({ title, lastUpdated, children }: PolicyLayoutProps) {
+export function PolicyLayout({ title, lastUpdated, summary, intro, sections }: PolicyLayoutProps) {
   return (
-    <div className="mx-auto max-w-3xl break-words px-4 pb-16 [overflow-wrap:anywhere]">
+    <div className="wrap pb-24 [overflow-wrap:anywhere]">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Policies", href: "/policies" },
+          { label: "Legal", href: "/policies" },
           { label: title },
         ]}
       />
-      <h1 className="mb-5 text-[1.375rem] font-extrabold tracking-[-0.02em] text-[var(--color-text)] sm:text-[1.75rem]">
-        {title}
-      </h1>
-      <div className={proseCls}>
-        <p className="mb-4 text-sm text-[var(--color-text-tertiary)]">Last updated: {lastUpdated}</p>
-        {children}
+
+      <header className="border-b border-line pb-10 pt-4 sm:pb-14">
+        <span className="eyebrow">Legal</span>
+        <h1 className="mt-4 max-w-4xl text-[clamp(2rem,4.4vw,3.5rem)] font-light leading-[1.05] tracking-[-0.025em] text-ink">
+          {title}
+        </h1>
+        {summary ? <p className="lede mt-5">{summary}</p> : null}
+        <p className="mt-6 text-xs text-muted">
+          Last updated <time>{lastUpdated}</time>
+        </p>
+      </header>
+
+      <div className="grid gap-12 pt-10 lg:grid-cols-[15rem_minmax(0,760px)] lg:gap-20 lg:pt-14">
+        <aside className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)] lg:self-start lg:overflow-y-auto">
+          <p className="eyebrow mb-4">On this page</p>
+          <ol className="space-y-2 border-l border-line pl-4 text-[0.8125rem] leading-snug">
+            {sections.map((section, index) => (
+              <li key={section.id}>
+                <a
+                  href={`#${section.id}`}
+                  className="flex gap-2 text-muted transition-colors hover:text-ink"
+                >
+                  <span className="w-5 shrink-0 tabular-nums text-faint">{index + 1}</span>
+                  <span>{section.title}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </aside>
+
+        <article className="min-w-0">
+          {intro ? <div className={`${proseCls} mb-12`}>{intro}</div> : null}
+          {sections.map((section, index) => (
+            <section
+              key={section.id}
+              id={section.id}
+              aria-labelledby={`${section.id}-title`}
+              className="scroll-mt-28 border-t border-line py-10 first:border-t-0 first:pt-0"
+            >
+              <h2
+                id={`${section.id}-title`}
+                className="mb-5 flex items-baseline gap-3 text-[1.375rem] font-light leading-tight tracking-[-0.015em] text-ink"
+              >
+                <span className="text-sm font-normal tabular-nums text-faint">{index + 1}.</span>
+                <span>{section.title}</span>
+              </h2>
+              <div className={proseCls}>{section.body}</div>
+            </section>
+          ))}
+        </article>
       </div>
     </div>
   );
 }
 
+/** Registered company details as a plain definition list. */
 export function ContactBlock() {
+  const rows: Array<[string, ReactNode]> = [
+    ["Seller", COMPANY.legalName],
+    ["Company no.", COMPANY.companyNumber],
+    ["Registered office", COMPANY_ADDRESS],
+    ["Telephone", <a key="p" href={COMPANY.phoneHref}>{COMPANY.phone}</a>],
+    ["Email", <a key="e" href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>],
+  ];
   return (
-    <div className="mt-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-4 py-3.5 text-sm leading-[1.7]">
-      <p>
-        <strong>{COMPANY.legalName}</strong>
-        <br />
-        Company number: {COMPANY.companyNumber}
-        <br />
-        Registered office: {COMPANY_ADDRESS}
-        <br />
-        Phone: {COMPANY.phone}
-        <br />
-        Email: {COMPANY.email}
-      </p>
-    </div>
+    <dl className="my-6 grid grid-cols-1 gap-x-8 border-y border-line py-5 text-sm sm:grid-cols-[10rem_1fr]">
+      {rows.map(([label, value]) => (
+        <div key={label} className="contents">
+          <dt className="pt-2 text-xs uppercase tracking-[0.06em] text-muted sm:pt-1">{label}</dt>
+          <dd className="pb-2 text-ink sm:py-1">{value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

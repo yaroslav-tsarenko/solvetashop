@@ -1,120 +1,97 @@
-"use client";
-
-import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { Plus } from "lucide-react";
+import { Link } from "@/i18n/routing";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs/Breadcrumbs";
-import { motion, AnimatePresence } from "framer-motion";
+import { COMPANY } from "@/lib/company";
 
-const faqs = [
-  {
-    q: "How long does shipping take?",
-    a: "Standard shipping takes 3-5 business days. Express shipping is available for 1-2 business day delivery. Free shipping is offered on orders over £100.",
-  },
-  {
-    q: "What is your return policy?",
-    a: "We offer a 30-day return policy on all items. Products must be unused and in their original packaging. Contact our support team to initiate a return.",
-  },
-  {
-    q: "Do you ship internationally?",
-    a: "Yes! We ship to most countries worldwide. International shipping typically takes 7-14 business days depending on the destination.",
-  },
-  {
-    q: "How can I track my order?",
-    a: "Once your order ships, you'll receive a confirmation email with a tracking number. You can also track your order from your account dashboard.",
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "We accept Visa, Mastercard, American Express, PayPal, and bank transfers. All payments are processed securely with SSL encryption.",
-  },
-  {
-    q: "Can I change or cancel my order?",
-    a: "Orders can be modified or cancelled within 1 hour of placement. After that, please contact our support team and we'll do our best to help.",
-  },
-  {
-    q: "Do you offer gift wrapping?",
-    a: "Yes! Gift wrapping is available at checkout for a small additional fee. You can also include a personalized message with your gift.",
-  },
-  {
-    q: "How do I contact customer support?",
-    a: "You can reach us via our contact form, email at support@store.com, or through live chat on our website. We're available 24/7 to help.",
-  },
-];
-
-function FaqItem({ q, a }: { q: string; a: string }) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div style={{
-      borderRadius: "var(--radius-xl)",
-      border: "1px solid var(--color-border)",
-      overflow: "hidden",
-      background: open ? "var(--color-bg-secondary)" : "var(--color-bg)",
-      transition: "background-color 0.2s",
-    }}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          width: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "1.125rem 1.25rem",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          textAlign: "left",
-          gap: "1rem",
-        }}
-      >
-        <span style={{ fontWeight: 600, fontSize: "0.9375rem", color: "var(--color-text)" }}>{q}</span>
-        <ChevronDown
-          size={18}
-          style={{
-            color: "var(--color-text-tertiary)",
-            flexShrink: 0,
-            transition: "transform 0.2s",
-            transform: open ? "rotate(180deg)" : "none",
-          }}
-        />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ overflow: "hidden" }}
-          >
-            <div style={{ padding: "0 1.25rem 1.125rem", fontSize: "0.875rem", color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
-              {a}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("faq");
+  return { title: t("metaTitle") };
 }
 
-export default function FaqPage() {
+/** Topics in reading order; each lists the question keys under `faq.items`. */
+const TOPICS = [
+  { key: "orders", items: ["cancel", "account", "contact"] },
+  { key: "delivery", items: ["dispatch", "freeDelivery", "abroad", "tracking"] },
+  { key: "returns", items: ["changeMind", "damaged", "refund"] },
+  { key: "payment", items: ["methods", "warranty"] },
+] as const;
+
+export default async function FaqPage() {
+  const t = await getTranslations("faq");
+  const nav = await getTranslations("nav");
+  const values = { email: COMPANY.email, phone: COMPANY.phone };
+
   return (
-    <div style={{ maxWidth: "var(--max-width)", margin: "0 auto", padding: "0 1rem 4rem" }}>
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "FAQ" }]} />
+    <div className="wrap pb-24">
+      <Breadcrumbs items={[{ label: nav("home"), href: "/" }, { label: t("crumb") }]} />
 
-      <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <h1 style={{ fontSize: "clamp(1.5rem, 5.5vw, 2.25rem)", fontWeight: 800, letterSpacing: "-0.04em", marginBottom: "0.75rem", wordBreak: "break-word" }}>
-            Frequently Asked <span className="gradient-text">Questions</span>
-          </h1>
-          <p style={{ fontSize: "clamp(0.875rem, 2.4vw, 1rem)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-            Everything you need to know about shopping with us
-          </p>
-        </div>
+      <div className="grid gap-12 pt-4 lg:grid-cols-12 lg:gap-16">
+        <header className="lg:col-span-4">
+          <div className="lg:sticky lg:top-24">
+            <span className="eyebrow">{t("eyebrow")}</span>
+            <h1 className="mt-4 text-[clamp(2.25rem,4.5vw,3.5rem)] font-light leading-[1.04] tracking-[-0.03em] text-ink">
+              {t("title")}
+            </h1>
+            <p className="lede mt-5">{t("lede")}</p>
+            <nav aria-label={t("topicsLabel")} className="mt-8 hidden lg:block">
+              <ul className="space-y-2 text-sm">
+                {TOPICS.map((topic) => (
+                  <li key={topic.key}>
+                    <a href={`#faq-${topic.key}`} className="text-muted transition-colors hover:text-ink">
+                      {t(`topics.${topic.key}`)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </header>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          {faqs.map((faq) => (
-            <FaqItem key={faq.q} q={faq.q} a={faq.a} />
+        <div className="lg:col-span-8">
+          {TOPICS.map((topic) => (
+            <section
+              key={topic.key}
+              id={`faq-${topic.key}`}
+              aria-labelledby={`faq-${topic.key}-title`}
+              className="scroll-mt-28 pb-12 last:pb-0"
+            >
+              <h2 id={`faq-${topic.key}-title`} className="eyebrow mb-3">
+                {t(`topics.${topic.key}`)}
+              </h2>
+              <div className="border-t border-line">
+                {topic.items.map((item) => (
+                  <details key={item} className="group border-b border-line">
+                    <summary className="flex cursor-pointer list-none items-start justify-between gap-6 py-5 text-[1.0625rem] font-normal leading-snug text-ink marker:hidden [&::-webkit-details-marker]:hidden">
+                      <span>{t(`items.${item}.q`)}</span>
+                      <Plus
+                        size={18}
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                        className="mt-0.5 shrink-0 text-muted transition-transform duration-200 group-open:rotate-45"
+                      />
+                    </summary>
+                    <p className="max-w-[62ch] pb-6 pr-10 text-[0.9375rem] leading-[1.75] text-text-secondary">
+                      {t(`items.${item}.a`, values)}
+                    </p>
+                  </details>
+                ))}
+              </div>
+            </section>
           ))}
+
+          <div className="mt-16 flex flex-col gap-5 border-t border-line pt-10 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[0.9375rem] text-muted">{t("stillStuck")}</p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/contact" className="btn-ink btn-sm">
+                {t("ctaContact")}
+              </Link>
+              <Link href="/policies" className="btn-line btn-sm">
+                {t("ctaPolicies")}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>

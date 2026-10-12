@@ -4,17 +4,16 @@ import { useEffect, useState, Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { CheckCircle, AlertTriangle, Package, MapPin, Truck, Mail, ChevronRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { useCurrency } from "@/providers/CurrencyProvider";
 import { formatPrice } from "@/lib/utils/format-price";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner/LoadingSpinner";
 import { useCart } from "@/providers/CartProvider";
 import type { OrderDetail } from "@/types/order";
 
+type Outcome = "placed" | "cancel" | "decline" | "exception" | "failed";
+
 function ConfirmedContent() {
-  const t = useTranslations("notifications");
+  const t = useTranslations("order");
   const { currency, convert } = useCurrency();
   const { clearCart } = useCart();
   const searchParams = useSearchParams();
@@ -58,254 +57,138 @@ function ConfirmedContent() {
       return () => {
         isSubscribed = false;
       };
-    } else {
-      setLoading(false);
     }
+    // Without an order/checkout id there is nothing to verify; `loading`
+    // already starts as false in that case.
   }, [orderId, statusParam, paymentLinkId, checkoutId, clearCart]);
 
   if (loading) {
     return (
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: "1.5rem" }}>
+      <div className="wrap-narrow flex min-h-[60vh] flex-col items-start justify-center gap-5 py-16" role="status">
         <LoadingSpinner />
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 700 }}>Checking payment status...</h2>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "0.875rem" }}>Please do not close or refresh this page.</p>
+        <h2 className="heading">{t("checkingTitle")}</h2>
+        <p className="lede">{t("checkingNote")}</p>
       </div>
     );
   }
 
   const isFailed = order?.paymentStatus === "FAILED" || ["decline", "cancel", "exception"].includes(statusParam || "");
 
-  const getHeaderInfo = () => {
-    if (!isFailed) {
-      return {
-        title: t("orderPlaced"),
-        message: "Thank you for your order. We'll send a confirmation email shortly.",
-      };
-    }
-    if (statusParam === "cancel") {
-      return {
-        title: "Payment Cancelled",
-        message: "You cancelled the payment transaction. No charges were made to your account.",
-      };
-    }
-    if (statusParam === "decline") {
-      return {
-        title: "Payment Declined",
-        message: "Your payment was declined by your bank or card issuer. Please check your details or try another payment method.",
-      };
-    }
-    if (statusParam === "exception") {
-      return {
-        title: "Payment Error",
-        message: "An unexpected error occurred while processing your payment. Please try again.",
-      };
-    }
-    return {
-      title: "Payment Failed",
-      message: "Your payment transaction could not be completed. Please try again or use another payment method.",
-    };
-  };
+  const outcome: Outcome = !isFailed
+    ? "placed"
+    : statusParam === "cancel" || statusParam === "decline" || statusParam === "exception"
+      ? statusParam
+      : "failed";
 
-  const headerInfo = getHeaderInfo();
+  const money = (value: number) => formatPrice(convert(Number(value)), currency);
 
   return (
-    <div style={{ maxWidth: "640px", margin: "2rem auto 4rem", padding: "0 1rem" }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        style={{ textAlign: "center", marginBottom: "2rem" }}
-      >
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: "50%",
-            background: isFailed 
-              ? "rgba(239, 68, 68, 0.12)"
-              : "var(--color-success-light, rgba(34,197,94,0.12))",
-            color: isFailed ? "var(--color-danger, #ef4444)" : "var(--color-success)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 1rem",
-          }}
-        >
-          {isFailed ? <AlertTriangle size={40} /> : <CheckCircle size={40} />}
-        </motion.div>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: "0.5rem" }}>
-          {headerInfo.title}
-        </h1>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "0.9375rem" }}>
-          {headerInfo.message}
-        </p>
+    <div className="wrap-narrow pb-24 pt-14 sm:pb-32 sm:pt-20">
+      <header className="flex flex-col gap-4 border-b border-line pb-10">
+        <span className={`eyebrow ${isFailed ? "text-brick" : "text-sage"}`}>
+          {isFailed ? t("eyebrowFailed") : t("eyebrowPlaced")}
+        </span>
+        <h1 className="display">{t(`outcomes.${outcome}.title`)}</h1>
+        <p className="lede">{t(`outcomes.${outcome}.message`)}</p>
         {order && (
-          <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", color: "var(--color-text-tertiary)" }}>
-            Order <strong style={{ color: "var(--color-text)" }}>#{order.orderNumber.slice(-8)}</strong>
+          <p className="text-sm text-muted">
+            {t("reference")}{" "}
+            <span className="font-medium text-ink tabular-nums">#{order.orderNumber.slice(-8)}</span>
           </p>
         )}
-      </motion.div>
+      </header>
 
       {order && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          style={{
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-xl)",
-            background: "var(--color-bg)",
-            padding: "1.5rem",
-            marginBottom: "1.5rem",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
-            <Package size={18} color="var(--color-accent)" />
-            <h2 style={{ fontSize: "1rem", fontWeight: 700 }}>Order Summary</h2>
-          </div>
+        <section aria-labelledby="oc-items" className="border-b border-line py-10">
+          <h2 id="oc-items" className="eyebrow mb-6">{t("itemsTitle")}</h2>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1rem" }}>
+          <ul className="flex flex-col">
             {order.items.map((item) => (
-              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: "1rem", fontSize: "0.875rem", paddingBottom: "0.75rem", borderBottom: "1px solid var(--color-border)" }}>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis" }}>{item.productName}</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--color-text-tertiary)", marginTop: "0.125rem" }}>
-                    Qty {item.quantity} × {formatPrice(convert(Number(item.price)), currency)}
+              <li key={item.id} className="flex items-baseline justify-between gap-6 border-t border-line py-4 first:border-t-0 first:pt-0">
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-[0.9375rem] text-ink">{item.productName}</div>
+                  <div className="mt-0.5 text-xs text-muted">
+                    {item.variantName ? `${item.variantName} · ` : ""}
+                    {t("lineQty", { count: item.quantity, price: money(item.price) })}
                   </div>
                 </div>
-                <span style={{ fontWeight: 700, whiteSpace: "nowrap" }}>{formatPrice(convert(Number(item.total)), currency)}</span>
-              </div>
+                <span className="whitespace-nowrap text-sm tabular-nums">{money(item.total)}</span>
+              </li>
             ))}
-          </div>
+          </ul>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.375rem", fontSize: "0.875rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--color-text-secondary)" }}>Subtotal</span>
-              <span>{formatPrice(convert(Number(order.subtotal)), currency)}</span>
+          <dl className="mt-6 flex flex-col gap-2 border-t border-line pt-6 text-sm">
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted">{t("subtotal")}</dt>
+              <dd className="tabular-nums">{money(order.subtotal)}</dd>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--color-text-secondary)" }}>Shipping</span>
-              <span>{Number(order.shippingCost) === 0 ? "Free" : formatPrice(convert(Number(order.shippingCost)), currency)}</span>
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted">{t("delivery")}</dt>
+              <dd className="tabular-nums">
+                {Number(order.shippingCost) === 0 ? t("free") : money(order.shippingCost)}
+              </dd>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ color: "var(--color-text-secondary)" }}>Tax</span>
-              <span>{formatPrice(convert(Number(order.taxAmount)), currency)}</span>
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted">{t("tax")}</dt>
+              <dd className="tabular-nums">{money(order.taxAmount)}</dd>
             </div>
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              fontWeight: 800,
-              fontSize: "1.0625rem",
-              borderTop: "1px solid var(--color-border)",
-              paddingTop: "0.625rem",
-              marginTop: "0.375rem",
-            }}>
-              <span>Total</span>
-              <span>{formatPrice(convert(Number(order.total)), currency)}</span>
+            <div className="mt-3 flex items-baseline justify-between gap-4 border-t border-line pt-4">
+              <dt className="font-medium">{t("total")}</dt>
+              <dd className="text-2xl font-light tracking-[-0.01em] tabular-nums">{money(order.total)}</dd>
             </div>
-          </div>
-        </motion.div>
+          </dl>
+        </section>
       )}
 
       {order && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "0.875rem",
-            marginBottom: "1.5rem",
-          }}
-        >
-          <div style={{ padding: "1rem 1.25rem", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", background: "var(--color-bg)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-              <MapPin size={14} color="var(--color-accent)" />
-              <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--color-text-tertiary)" }}>
-                Delivery to
-              </span>
-            </div>
-            <p style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>
+        <section className="grid grid-cols-1 gap-10 border-b border-line py-10 sm:grid-cols-2">
+          <div>
+            <h2 className="eyebrow mb-3">{t("shipTo")}</h2>
+            <address className="text-sm not-italic leading-[1.7] text-muted">
               {order.shippingAddress.firstName} {order.shippingAddress.lastName}<br />
               {order.shippingAddress.address1}<br />
               {order.shippingAddress.city}, {order.shippingAddress.postalCode}<br />
               {order.shippingAddress.country}
-            </p>
+            </address>
           </div>
-          <div style={{ padding: "1rem 1.25rem", border: "1px solid var(--color-border)", borderRadius: "var(--radius-lg)", background: "var(--color-bg)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem" }}>
-              <Truck size={14} color="var(--color-accent)" />
-              <span style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.04em", color: "var(--color-text-tertiary)" }}>
-                Next Steps
-              </span>
-            </div>
+          <div>
+            <h2 className="eyebrow mb-3">{t("whatNext")}</h2>
             {isFailed ? (
-              <p style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)", lineHeight: 1.5, margin: 0 }}>
-                Please check your card details or try a different payment method. You can return to checkout to retry your payment.
-              </p>
+              <p className="text-sm leading-[1.7] text-muted">{t("failedNext")}</p>
             ) : (
-              <ul style={{ fontSize: "0.8125rem", color: "var(--color-text-secondary)", lineHeight: 1.6, paddingLeft: "1rem", margin: 0 }}>
-                <li>We&apos;ll prepare your order within 1–2 business days</li>
-                <li>You&apos;ll receive a tracking link by email</li>
-                <li>Estimated delivery depends on destination</li>
-              </ul>
+              <ol className="flex flex-col gap-2 text-sm leading-[1.6] text-muted">
+                <li className="flex gap-3"><span className="w-4 text-faint tabular-nums">1</span>{t("next1")}</li>
+                <li className="flex gap-3"><span className="w-4 text-faint tabular-nums">2</span>{t("next2")}</li>
+                <li className="flex gap-3"><span className="w-4 text-faint tabular-nums">3</span>{t("next3")}</li>
+              </ol>
             )}
           </div>
-        </motion.div>
+        </section>
       )}
 
       {order && !isFailed && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          style={{
-            padding: "0.875rem 1rem",
-            background: "var(--color-accent-light)",
-            border: "1px solid var(--color-accent)",
-            borderRadius: "var(--radius-lg)",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.625rem",
-            marginBottom: "1.5rem",
-            fontSize: "0.8125rem",
-          }}
-        >
-          <Mail size={16} color="var(--color-accent)" style={{ flexShrink: 0 }} />
-          <span>
-            A confirmation email has been sent to{" "}
-            <strong>{order.customerEmail}</strong>
-          </span>
-        </motion.div>
+        <p className="border-b border-line py-6 text-sm text-muted">
+          {t.rich("emailSent", {
+            email: order.customerEmail,
+            strong: (chunks) => <span className="text-ink">{chunks}</span>,
+          })}
+        </p>
       )}
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        style={{
-          display: "flex",
-          gap: "0.75rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <Button as={Link} href="/account/orders" variant="bordered" style={{ flex: "1 1 200px" }}>
-          View Orders <ChevronRight size={16} />
-        </Button>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-4 pt-10">
         {isFailed ? (
-          <Button as={Link} href="/checkout" color="primary" style={{ flex: "1 1 200px" }}>
-            Try Again / Return to Checkout
-          </Button>
+          <Link href="/checkout" className="btn-ink btn-lg">
+            {t("retry")}
+          </Link>
         ) : (
-          <Button as={Link} href="/catalog" color="primary" style={{ flex: "1 1 200px" }}>
-            Continue Shopping
-          </Button>
+          <Link href="/catalog" className="btn-ink btn-lg">
+            {t("keepBrowsing")}
+          </Link>
         )}
-      </motion.div>
+        <Link href="/account/orders" className="btn-quiet">
+          {t("viewOrders")}
+        </Link>
+      </div>
     </div>
   );
 }
