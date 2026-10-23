@@ -17,7 +17,7 @@ export const COMPANY = {
   phoneHref: "tel:+447446940486",
   phone2: "+44 7481 359087",
   phone2Href: "tel:+447481359087",
-  email: "info@solvetashop.com",
+  email: "support@solvetashop.com",
 } as const;
 
 export const COMPANY_ADDRESS = `${COMPANY.street}, ${COMPANY.city}, ${COMPANY.country}, ${COMPANY.postalCode}`;

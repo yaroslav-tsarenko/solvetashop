@@ -27,12 +27,12 @@ function getFrom(): string {
   return (
     process.env.SMTP_FROM ||
     process.env.SMTP_USER ||
-    "Solvetashop <info@solvetashop.com>"
+    "Solvetashop <support@solvetashop.com>"
   );
 }
 
 function getReplyTo(): string | undefined {
-  return process.env.SMTP_REPLY_TO || process.env.SMTP_USER || undefined;
+  return COMPANY.email;
 }
 
 function getSiteUrl(): string {
