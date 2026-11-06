@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { catalogClasses as styles } from "../catalog-classes";
 
-export const revalidate = 60;
+export const revalidate = 86400;
 
 interface CategoryPageProps {
   params: Promise<{ category: string }>;
