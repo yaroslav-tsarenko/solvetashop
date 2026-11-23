@@ -52,6 +52,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // apex -> www lives here instead of in Vercel's domain settings, so that
+  // /.well-known/* (Apple Pay merchant verification) is served on the bare
+  // domain with a 200: Apple's verifier does not follow redirects.
+  redirects: async () => [
+    {
+      source: "/:path((?!\\.well-known/).*)",
+      has: [{ type: "host", value: "solvetashop.com" }],
+      destination: "https://www.solvetashop.com/:path",
+      permanent: true,
+    },
+  ],
   headers: async () => [
     {
       source: "/(.*)",
